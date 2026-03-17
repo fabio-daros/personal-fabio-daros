@@ -6,11 +6,18 @@ import ClientScripts from "@/components/ClientScripts";
 import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "Fabio Daros - Personal",
-  description: "Personal portfolio and resume",
+  title: "Fabio Daros | Software Engineer • Biotechnology & AI",
+  description: "Fabio Daros is a software engineer transitioning into biotechnology and biomedical AI, focusing on data analysis, cancer research and health technology.",
   icons: {
     icon: "/assets/img/favicon.png",
     apple: "/assets/img/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "Fabio Daros | Software Engineer • Biotechnology & AI",
+    description: "Software engineer transitioning into biotechnology and biomedical AI. Focused on health technology, data analysis and cancer research.",
+    url: "https://fabiodaros.com",
+    type: "website",
+    images: ["https://fabiodaros.com/assets/img/profile-img.jpg"],
   },
 };
 

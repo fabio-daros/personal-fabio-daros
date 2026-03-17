@@ -52,7 +52,8 @@ export default function HeroSection() {
     <section id="hero" className="hero section dark-background">
       <div className="hero-bg" data-aos="fade-in" />
       <div className="container" data-aos="zoom-out" data-aos-delay="100">
-        <h2>Fabio Daros</h2>
+        <h1>{translations[locale].hero.name}</h1>
+        <h2>{translations[locale].hero.subtitle}</h2>
         <p>
           {translations[locale].hero.im}{" "}
           <span ref={typedRef} className="typed"></span>

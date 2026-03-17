@@ -10,6 +10,8 @@ export const translations = {
       contact: "Contato",
     },
     hero: {
+      name: "Fabio Daros",
+      subtitle: "Engenheiro de Software | Biotecnologia e IA Biomédica",
       im: "Sou",
       typed: ["Engenheiro de Software", "Freelancer", "Engenheiro de IA", "Engenheiro de Bioinformática", "Product Owner"],
     },
@@ -187,6 +189,8 @@ export const translations = {
       contact: "Contact",
     },
     hero: {
+      name: "Fabio Daros",
+      subtitle: "Software Engineer | Biotechnology & Biomedical AI",
       im: "I'm",
       typed: ["Software Engineer", "Freelancer", "AI Engineer", "Bioinformatics Engineer", "Product Owner"],
     },

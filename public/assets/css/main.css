@@ -709,10 +709,16 @@ section,
   z-index: 3;
 }
 
-.hero h2 {
+.hero h1 {
   margin: 0;
   font-size: 64px;
   font-weight: 700;
+}
+
+.hero h2 {
+  margin: 10px 0 0 0;
+  font-size: 26px;
+  font-weight: 400;
 }
 
 .hero p {
@@ -748,8 +754,12 @@ section,
 }
 
 @media (max-width: 768px) {
-  .hero h2 {
+  .hero h1 {
     font-size: 32px;
+  }
+
+  .hero h2 {
+    font-size: 18px;
   }
 
   .hero p {
