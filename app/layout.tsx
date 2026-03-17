@@ -12,6 +12,9 @@ export const metadata: Metadata = {
     icon: "/assets/img/favicon.png",
     apple: "/assets/img/apple-touch-icon.png",
   },
+  verification: {
+    google: "HX3rX0v_c7uj975CdpCE_7bxRQAb4dJ9WmcbCtXmOvo",
+  },
   openGraph: {
     title: "Fabio Daros | Software Engineer • Biotechnology & AI",
     description: "Software engineer transitioning into biotechnology and biomedical AI. Focused on health technology, data analysis and cancer research.",
