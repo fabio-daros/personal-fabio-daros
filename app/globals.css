@@ -13,6 +13,13 @@
   border: 0;
 }
 
+/* AOS fallback: show content if AOS fails to load (prevents blank page) */
+body.aos-fallback [data-aos] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
 /* Skills - lista simples sem porcentagens */
 .skills .skills-list .skill-tag {
   display: inline-flex;

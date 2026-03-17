@@ -64,6 +64,11 @@ export default function RootLayout({
         <link href="/assets/css/main.css" rel="stylesheet" />
       </head>
       <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=setTimeout(function(){var e=document.querySelector('[data-aos]');if(e&&!e.classList.contains('aos-animate'))document.body.classList.add('aos-fallback');},4000);if(document.readyState==='complete')clearTimeout(t);else window.addEventListener('load',function(){clearTimeout(t);});})();`,
+          }}
+        />
         <Providers>
           <Header />
           {children}
