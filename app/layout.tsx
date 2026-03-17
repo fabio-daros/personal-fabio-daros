@@ -32,6 +32,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Fabio Daros",
+              url: "https://fabiodaros.com",
+              image: "https://fabiodaros.com/assets/img/profile-img.jpg",
+              jobTitle: "Software Engineer",
+              description: "Software engineer transitioning into biotechnology and biomedical AI, focused on data analysis, cancer research and health technology.",
+              sameAs: [
+                "https://github.com/fabio-daros",
+                "https://www.linkedin.com/in/daros-fabio",
+              ],
+            }),
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
