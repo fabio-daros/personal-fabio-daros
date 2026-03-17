@@ -1,0 +1,104 @@
+/* Template Personal - styles loaded via layout */
+
+/* Skills - lista simples sem porcentagens */
+.skills .skills-list .skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 0.25rem;
+  font-size: 1.1rem;
+}
+
+.skills .skills-list .skill-tag i,
+.skills .skills-list .skill-tag .skill-icon {
+  color: var(--accent-color);
+  font-size: 1.2rem;
+}
+
+.skills .skills-list .skill-tag .skill-icon {
+  flex-shrink: 0;
+}
+
+/* ORCID e Lattes links na página About */
+.about .profile-links {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.about .profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--accent-color);
+  text-decoration: none;
+  font-size: 1rem;
+  transition: opacity 0.2s;
+}
+.about .profile-link:hover {
+  opacity: 0.85;
+  color: var(--accent-color);
+}
+/* Ícone Lattes - mask com fundo transparente + verde da página */
+.about .profile-link .lattes-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  background-color: var(--accent-color);
+  -webkit-mask: url(/assets/img/lattes-icon.png) center/contain no-repeat;
+  mask: url(/assets/img/lattes-icon.png) center/contain no-repeat;
+}
+
+/* Botões sociais da hero - tamanho aumentado */
+.hero .social-links a {
+  font-size: 20px;
+  width: 50px;
+  height: 50px;
+}
+
+/* Hero background - div com background-image para controle responsivo */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url(/assets/img/hero-bg.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+/* Language switcher no header */
+.language-switcher .lang-btn {
+  background: none;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.language-switcher .lang-btn:hover,
+.language-switcher .lang-btn.active {
+  color: var(--accent-color);
+}
+.language-switcher .lang-separator {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  user-select: none;
+}
+
+/* Mobile: imagem completa visível */
+@media (max-width: 992px) {
+  .hero-bg {
+    background-size: contain;
+  }
+  .hero {
+    background-color: #0a0a0a;
+  }
+}
