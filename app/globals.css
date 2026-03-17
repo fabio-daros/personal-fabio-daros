@@ -1,5 +1,18 @@
 /* Template Personal - styles loaded via layout */
 
+/* Visually hidden - for SEO, keeps content in DOM but invisible */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Skills - lista simples sem porcentagens */
 .skills .skills-list .skill-tag {
   display: inline-flex;

@@ -715,12 +715,6 @@ section,
   font-weight: 700;
 }
 
-.hero h2 {
-  margin: 10px 0 0 0;
-  font-size: 26px;
-  font-weight: 400;
-}
-
 .hero p {
   margin: 5px 0 0 0;
   font-size: 26px;
@@ -756,10 +750,6 @@ section,
 @media (max-width: 768px) {
   .hero h1 {
     font-size: 32px;
-  }
-
-  .hero h2 {
-    font-size: 18px;
   }
 
   .hero p {
