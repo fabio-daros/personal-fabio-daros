@@ -61,12 +61,15 @@
   });
 
   /**
-   * Preloader
+   * Preloader - remove on load, or after 6s timeout (prevents infinite loading if a resource fails)
    */
   const preloader = document.querySelector('#preloader');
   if (preloader) {
+    const removePreloader = () => preloader.remove();
+    const fallbackTimeout = setTimeout(removePreloader, 6000);
     window.addEventListener('load', () => {
-      preloader.remove();
+      clearTimeout(fallbackTimeout);
+      removePreloader();
     });
   }
 
