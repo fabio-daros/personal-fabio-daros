@@ -101,6 +101,16 @@ body.aos-fallback [data-aos] {
   z-index: 1;
 }
 
+/* Gradiente na borda inferior para transição suave com a página */
+.hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, rgba(10, 10, 10, 0.4) 70%, #0a0a0a 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
 /* Language switcher no header */
 .language-switcher .lang-btn {
   background: none;
