@@ -20,6 +20,15 @@ body.aos-fallback [data-aos] {
   transform: none !important;
 }
 
+/* All content ALWAYS visible - no dependency on AOS/scripts (fixes blank page on reload, all pages) */
+.main [data-aos],
+#hero .hero-bg,
+#hero .container {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
 /* Skills - lista simples sem porcentagens */
 .skills .skills-list .skill-tag {
   display: inline-flex;

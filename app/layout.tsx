@@ -66,7 +66,7 @@ export default function RootLayout({
       <body>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var t=setTimeout(function(){var e=document.querySelector('[data-aos]');if(e&&!e.classList.contains('aos-animate'))document.body.classList.add('aos-fallback');},4000);if(document.readyState==='complete')clearTimeout(t);else window.addEventListener('load',function(){clearTimeout(t);});})();`,
+            __html: `(function(){setTimeout(function(){var e=document.querySelector('[data-aos]');if(e&&!e.classList.contains('aos-animate'))document.body.classList.add('aos-fallback');},2000);})();`,
           }}
         />
         <Providers>
