@@ -62,6 +62,7 @@ export default function RootLayout({
         <link href="/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
         <link href="/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet" />
         <link href="/assets/css/main.css" rel="stylesheet" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png" />
       </head>
       <body>
         <script
