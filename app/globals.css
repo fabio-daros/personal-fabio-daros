@@ -106,7 +106,7 @@ body.aos-fallback [data-aos] {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 30%, rgba(10, 10, 10, 0.4) 70%, #0a0a0a 100%);
+  background: linear-gradient(to bottom, transparent 30%, rgba(0, 0, 0, 0.4) 70%, #000000 100%);
   pointer-events: none;
   z-index: 2;
 }
@@ -132,12 +132,18 @@ body.aos-fallback [data-aos] {
   user-select: none;
 }
 
+/* Hero e Contact: mesmo preto (#000) para consistência */
+.hero.section.dark-background {
+  --background-color: #000000;
+  background-color: #000000;
+}
+
 /* Mobile: imagem completa visível */
 @media (max-width: 992px) {
   .hero-bg {
     background-size: contain;
   }
   .hero {
-    background-color: #0a0a0a;
+    background-color: #000000;
   }
 }
