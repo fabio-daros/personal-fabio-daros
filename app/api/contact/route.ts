@@ -7,6 +7,15 @@ const CONTACT_EMAILS: Record<string, string> = {
   en: "contact@fabiodaros.com",
 };
 
+const EMAIL_LABELS: Record<string, { name: string; email: string; subject: string; message: string }> = {
+  pt: { name: "Nome", email: "Email", subject: "Assunto", message: "Mensagem" },
+  en: { name: "Name", email: "Email", subject: "Subject", message: "Message" },
+};
+// Enquanto o domínio não estiver verificado no Resend, use este override para enviar
+// para seu email de cadastro (ex: daros.fabio87@gmail.com). Remova após verificar fabiodaros.com
+const CONTACT_EMAIL_OVERRIDE = process.env.CONTACT_EMAIL_OVERRIDE?.trim();
+const RESEND_FROM = process.env.RESEND_FROM || "Personal Site <onboarding@resend.dev>";
+
 export async function POST(request: NextRequest) {
   if (!RESEND_API_KEY) {
     console.error("[Contact API] RESEND_API_KEY is not set. Add it to .env.local");
@@ -16,7 +25,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const locale = ((formData.get("locale") as string)?.trim() || "en") as keyof typeof CONTACT_EMAILS;
-    const toEmail = CONTACT_EMAILS[locale] || CONTACT_EMAILS.en;
+    const toEmail = CONTACT_EMAIL_OVERRIDE || CONTACT_EMAILS[locale] || CONTACT_EMAILS.en;
     const name = (formData.get("name") as string)?.trim() || "";
     const email = (formData.get("email") as string)?.trim() || "";
     const subject = (formData.get("subject") as string)?.trim() || "";
@@ -27,16 +36,17 @@ export async function POST(request: NextRequest) {
     }
 
     const resend = new Resend(RESEND_API_KEY);
+    const labels = EMAIL_LABELS[locale] || EMAIL_LABELS.en;
 
     const { data, error } = await resend.emails.send({
-      from: "Personal Site <onboarding@resend.dev>",
+      from: RESEND_FROM,
       to: toEmail,
       replyTo: email,
       subject: `[Site] ${subject}`,
       html: `
-        <p><strong>Nome:</strong> ${escapeHtml(name)}</p>
-        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-        <p><strong>Assunto:</strong> ${escapeHtml(subject)}</p>
+        <p><strong>${labels.name}:</strong> ${escapeHtml(name)}</p>
+        <p><strong>${labels.email}:</strong> ${escapeHtml(email)}</p>
+        <p><strong>${labels.subject}:</strong> ${escapeHtml(subject)}</p>
         <hr />
         <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
       `,
