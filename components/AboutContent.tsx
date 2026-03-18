@@ -5,6 +5,7 @@ import ProfileLinks from "@/components/ProfileLinks";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 import { DiAws } from "react-icons/di";
+import { FaBrain } from "react-icons/fa";
 import {
   SiDjango,
   SiDocker,
@@ -32,6 +33,7 @@ const SKILLS = [
   { name: "Django", Icon: SiDjango },
   { name: "SQL", Icon: SiPostgresql },
   { name: "Machine Learning", Icon: SiTensorflow },
+  { name: "Deep Learning", Icon: FaBrain },
   { name: "PyTorch", Icon: SiPytorch },
   { name: "Data Analysis", Icon: SiPandas },
   { name: "Scientific Computing", Icon: SiNumpy },

@@ -58,18 +58,6 @@ export default function ResumeContent() {
                 <p><em>{t.research3Location}</em></p>
               </div>
 
-              <h3 className="resume-title">{t.scholarships}</h3>
-              <div className="resume-item">
-                <h4>{t.schol1Title}</h4>
-                <h5>{t.schol1Period}</h5>
-                <p><em>{t.schol1Location}</em></p>
-              </div>
-              <div className="resume-item">
-                <h4>{t.schol2Title}</h4>
-                <h5>{t.schol2Period}</h5>
-                <p><em>{t.schol2Location}</em></p>
-              </div>
-
               <h3 className="resume-title">{t.communityService}</h3>
               <div className="resume-item">
                 <h4>{t.comm1Title}</h4>
