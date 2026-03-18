@@ -90,7 +90,7 @@ body.aos-fallback [data-aos] {
   height: 50px;
 }
 
-/* Hero background - div com background-image para controle responsivo */
+/* Hero background - não bloqueia cliques (pointer-events: none) */
 .hero-bg {
   position: absolute;
   inset: 0;
@@ -99,6 +99,7 @@ body.aos-fallback [data-aos] {
   background-position: center;
   background-repeat: no-repeat;
   z-index: 1;
+  pointer-events: none;
 }
 
 /* Gradiente na borda inferior para transição suave com a página */
@@ -148,6 +149,15 @@ body.preloader-released #preloader {
 #contact .php-email-form input,
 #contact .php-email-form textarea,
 #contact .php-email-form button {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 10;
+}
+
+/* Links sociais: garantir que sejam sempre clicáveis (Hero, Footer, Contact) */
+.hero .social-links a,
+.footer .social-links a,
+.contact .info-item .social-links a {
   pointer-events: auto !important;
   position: relative;
   z-index: 10;
