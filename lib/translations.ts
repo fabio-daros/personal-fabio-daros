@@ -21,6 +21,7 @@ export const translations = {
       location: "Localização",
       callMe: "Ligue",
       emailMe: "Email",
+      contactEmail: "contato@fabiodaros.com",
       socialProfiles: "Redes Sociais",
       yourName: "Seu nome",
       yourEmail: "Seu email",
@@ -33,6 +34,7 @@ export const translations = {
     footer: {
       tagline: "Where Software meets Biology...",
       credits: "Design baseado no template BootstrapMade",
+      poweredBy: "Powered by Next.js",
     },
     about: {
       title: "Sobre",
@@ -200,6 +202,7 @@ export const translations = {
       location: "Location",
       callMe: "Call Me",
       emailMe: "Email me",
+      contactEmail: "contact@fabiodaros.com",
       socialProfiles: "Social Profiles",
       yourName: "Your Name",
       yourEmail: "Your Email",
@@ -212,6 +215,7 @@ export const translations = {
     footer: {
       tagline: "Where Software meets Biology...",
       credits: "Design based on BootstrapMade template",
+      poweredBy: "Powered by Next.js",
     },
     about: {
       title: "About",

@@ -66,7 +66,10 @@ export default function RootLayout({
       <body>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){setTimeout(function(){var e=document.querySelector('[data-aos]');if(e&&!e.classList.contains('aos-animate'))document.body.classList.add('aos-fallback');},2000);})();`,
+            __html: `(function(){
+              setTimeout(function(){var e=document.querySelector('[data-aos]');if(e&&!e.classList.contains('aos-animate'))document.body.classList.add('aos-fallback');},2000);
+              setTimeout(function(){document.body.classList.add('preloader-released');var p=document.getElementById('preloader');if(p)p.style.pointerEvents='none';},1500);
+            })();`,
           }}
         />
         <Providers>

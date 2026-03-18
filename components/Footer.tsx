@@ -2,6 +2,7 @@
 
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
+import { SiNextdotjs } from "react-icons/si";
 
 export default function Footer() {
   const { locale } = useLanguage();
@@ -23,6 +24,13 @@ export default function Footer() {
         </div>
         <div className="credits">
           {t.credits}
+          <span className="ms-1">
+            |{" "}
+            <a href="https://nextjs.org" target="_blank" rel="noopener noreferrer" className="credits-next d-inline-flex align-items-center gap-1" title="Next.js">
+              <span>{t.poweredBy}</span>
+              <SiNextdotjs size={18} />
+            </a>
+          </span>
         </div>
       </div>
     </footer>

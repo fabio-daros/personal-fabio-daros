@@ -500,6 +500,19 @@ h6 {
   padding-top: 5px;
 }
 
+.footer .credits .credits-next {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+  vertical-align: middle;
+}
+
+.footer .credits .credits-next:hover {
+  opacity: 1;
+  color: var(--accent-color);
+}
+
 /*--------------------------------------------------------------
 # Preloader
 --------------------------------------------------------------*/

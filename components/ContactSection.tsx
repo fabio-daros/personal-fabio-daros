@@ -38,7 +38,7 @@ export default function ContactSection() {
               <i className="icon bi bi-envelope flex-shrink-0"></i>
               <div>
                 <h3>{t.emailMe}</h3>
-                <p>contact@fabiodaros.com</p>
+                <p>{t.contactEmail}</p>
               </div>
             </div>
           </div>
@@ -60,6 +60,7 @@ export default function ContactSection() {
         </div>
 
         <form action="/api/contact" method="post" className="php-email-form" data-aos="fade-up" data-aos-delay="600">
+          <input type="hidden" name="locale" value={locale} />
           <div className="row gy-4">
             <div className="col-md-6">
               <input type="text" name="name" className="form-control" placeholder={t.yourName} required />

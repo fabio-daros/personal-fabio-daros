@@ -2,15 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const CONTACT_EMAIL = "contact@fabiodaros.com";
+const CONTACT_EMAILS: Record<string, string> = {
+  pt: "contato@fabiodaros.com",
+  en: "contact@fabiodaros.com",
+};
 
 export async function POST(request: NextRequest) {
   if (!RESEND_API_KEY) {
+    console.error("[Contact API] RESEND_API_KEY is not set. Add it to .env.local");
     return new NextResponse("Email service not configured", { status: 500 });
   }
 
   try {
     const formData = await request.formData();
+    const locale = ((formData.get("locale") as string)?.trim() || "en") as keyof typeof CONTACT_EMAILS;
+    const toEmail = CONTACT_EMAILS[locale] || CONTACT_EMAILS.en;
     const name = (formData.get("name") as string)?.trim() || "";
     const email = (formData.get("email") as string)?.trim() || "";
     const subject = (formData.get("subject") as string)?.trim() || "";
@@ -22,9 +28,9 @@ export async function POST(request: NextRequest) {
 
     const resend = new Resend(RESEND_API_KEY);
 
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: "Personal Site <onboarding@resend.dev>",
-      to: CONTACT_EMAIL,
+      to: toEmail,
       replyTo: email,
       subject: `[Site] ${subject}`,
       html: `
@@ -37,7 +43,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error("Resend error:", error);
+      console.error("[Contact API] Resend error:", JSON.stringify(error, null, 2));
       return new NextResponse(error.message || "Failed to send email", { status: 500 });
     }
 
@@ -46,7 +52,8 @@ export async function POST(request: NextRequest) {
       headers: { "Content-Type": "text/plain" },
     });
   } catch (err) {
-    console.error("Contact API error:", err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[Contact API] Exception:", message, err);
     return new NextResponse("Internal server error", { status: 500 });
   }
 }

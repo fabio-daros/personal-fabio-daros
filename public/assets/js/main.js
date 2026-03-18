@@ -62,34 +62,42 @@
 
   /**
    * Preloader - remove on load, or after 6s timeout (prevents infinite loading if a resource fails)
+   * Also remove immediately if load already fired (Next.js/React can load main.js after window load)
    */
   const preloader = document.querySelector('#preloader');
   if (preloader) {
     const removePreloader = () => preloader.remove();
     const fallbackTimeout = setTimeout(removePreloader, 6000);
-    window.addEventListener('load', () => {
+    if (document.readyState === 'complete') {
       clearTimeout(fallbackTimeout);
       removePreloader();
-    });
+    } else {
+      window.addEventListener('load', () => {
+        clearTimeout(fallbackTimeout);
+        removePreloader();
+      });
+    }
   }
 
   /**
    * Scroll top button
    */
-  let scrollTop = document.querySelector('.scroll-top');
+  const scrollTop = document.querySelector('.scroll-top');
 
   function toggleScrollTop() {
     if (scrollTop) {
       window.scrollY > 100 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
     }
   }
-  scrollTop.addEventListener('click', (e) => {
-    e.preventDefault();
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
+  if (scrollTop) {
+    scrollTop.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     });
-  });
+  }
 
   window.addEventListener('load', toggleScrollTop);
   document.addEventListener('scroll', toggleScrollTop);

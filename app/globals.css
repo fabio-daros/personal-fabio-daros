@@ -138,6 +138,21 @@ body.aos-fallback [data-aos] {
   background-color: #000000;
 }
 
+/* Preloader: libera interação após 1.5s (fallback se main.js não remover) */
+body.preloader-released #preloader {
+  pointer-events: none;
+}
+
+/* Formulário de contato: garantir que seja sempre interativo */
+#contact .php-email-form,
+#contact .php-email-form input,
+#contact .php-email-form textarea,
+#contact .php-email-form button {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 10;
+}
+
 /* Mobile: imagem completa visível */
 @media (max-width: 992px) {
   .hero-bg {
