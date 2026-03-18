@@ -194,7 +194,7 @@ export const translations = {
       getInTouch: "Get In Touch",
       location: "Location",
       callMe: "Call Me",
-      emailMe: "Email me",
+      emailMe: "Email Me",
       contactEmail: "contact@fabiodaros.com",
       socialProfiles: "Social Profiles",
       yourName: "Your Name",
