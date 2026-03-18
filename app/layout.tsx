@@ -84,6 +84,7 @@ export default function RootLayout({
         </a>
         <div id="preloader"></div>
         <ClientScripts />
+        <Analytics />
       </body>
     </html>
   );
