@@ -11,10 +11,8 @@ const EMAIL_LABELS: Record<string, { name: string; email: string; subject: strin
   pt: { name: "Nome", email: "Email", subject: "Assunto", message: "Mensagem" },
   en: { name: "Name", email: "Email", subject: "Subject", message: "Message" },
 };
-// Enquanto o domínio não estiver verificado no Resend, use este override para enviar
-// para seu email de cadastro (ex: daros.fabio87@gmail.com). Remova após verificar fabiodaros.com
-const CONTACT_EMAIL_OVERRIDE = process.env.CONTACT_EMAIL_OVERRIDE?.trim();
-const RESEND_FROM = process.env.RESEND_FROM || "Personal Site <onboarding@resend.dev>";
+// Remetente: verifique fabiodaros.com no Resend e use contact@fabiodaros.com
+const RESEND_FROM = process.env.RESEND_FROM || "Fabio Daros <contact@fabiodaros.com>";
 
 export async function POST(request: NextRequest) {
   if (!RESEND_API_KEY) {
