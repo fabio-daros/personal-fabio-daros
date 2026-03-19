@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const locale = ((formData.get("locale") as string)?.trim() || "en") as keyof typeof CONTACT_EMAILS;
-    const toEmail = CONTACT_EMAIL_OVERRIDE || CONTACT_EMAILS[locale] || CONTACT_EMAILS.en;
+    const toEmail = CONTACT_EMAILS[locale] || CONTACT_EMAILS.en;
     const name = (formData.get("name") as string)?.trim() || "";
     const email = (formData.get("email") as string)?.trim() || "";
     const subject = (formData.get("subject") as string)?.trim() || "";
