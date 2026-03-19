@@ -83,8 +83,8 @@ export default function AboutContent() {
                 </div>
               </div>
               <p className="py-3">{t.bio2}</p>
-              <p className="py-3">{t.bio3}</p>
-              <p className="py-3">{t.bio4}</p>
+              {t.bio3 && <p className="py-3">{t.bio3}</p>}
+              {t.bio4 && <p className="py-3">{t.bio4}</p>}
             </div>
           </div>
         </div>
