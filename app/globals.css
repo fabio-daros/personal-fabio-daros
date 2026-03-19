@@ -49,6 +49,53 @@ body.aos-fallback [data-aos] {
   flex-shrink: 0;
 }
 
+/* Bandeiras ao lado dos títulos no Resume */
+.resume .resume-flag {
+  margin-right: 0.35em;
+  font-style: normal;
+}
+
+/* Links do advisor (lab, LinkedIn) no Resume */
+.resume .resume-research-links {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+.resume .resume-research-links-label {
+  color: var(--default-color);
+  font-size: 1em;
+  margin-right: 0.15em;
+}
+.resume .resume-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-color);
+  text-decoration: none;
+  font-size: 1.25rem;
+  transition: opacity 0.2s;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+  padding: 0.25rem;
+  min-width: 36px;
+  min-height: 36px;
+}
+.resume .resume-link:hover {
+  opacity: 0.85;
+  color: var(--accent-color);
+}
+
+/* Círculo do resume-item não deve bloquear cliques nos links */
+.resume .resume-item::before {
+  pointer-events: none;
+}
+
 /* ORCID e Lattes links na página About */
 .about .profile-links {
   display: flex;

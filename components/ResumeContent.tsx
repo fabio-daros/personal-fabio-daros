@@ -22,37 +22,46 @@ export default function ResumeContent() {
             <div className="col-lg-6 order-lg-2" data-aos="fade-up" data-aos-delay="100">
               <h3 className="resume-title">{t.education}</h3>
               <div className="resume-item">
-                <h4>{t.edu1Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.edu1Flag}</span> {t.edu1Title}</h4>
                 <h5>{t.edu1Period}</h5>
                 <p><em>{t.edu1Location}</em></p>
               </div>
               <div className="resume-item">
-                <h4>{t.edu2Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.edu2Flag}</span> {t.edu2Title}</h4>
                 <h5>{t.edu2Period}</h5>
                 <p><em>{t.edu2Location}</em></p>
               </div>
               <div className="resume-item">
-                <h4>{t.edu3Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.edu3Flag}</span> {t.edu3Title}</h4>
                 <h5>{t.edu3Period}</h5>
                 <p><em>{t.edu3Location}</em></p>
               </div>
 
               <h3 className="resume-title">{t.researchExperience}</h3>
               <div className="resume-item">
-                <h4>{t.research1Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.research1Flag}</span> {t.research1Title}</h4>
                 <h5>{t.research1Period}</h5>
                 <p><em>{t.research1Advisor}</em></p>
                 <p><em>{t.research1Location}</em></p>
+                <div className="resume-research-links">
+                  <span className="resume-research-links-label">{t.research1LabLabel}</span>
+                  <a href="https://www.lummertzdarocha-lab.org/" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Lummertz da Rocha Lab website">
+                    <i className="bi bi-globe" />
+                  </a>
+                  <a href="https://www.linkedin.com/in/edroaldo-lummertz-da-rocha-6b976033" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Edroaldo Lummertz da Rocha LinkedIn">
+                    <i className="bi bi-linkedin" />
+                  </a>
+                </div>
                 <p>{t.research1Desc}</p>
               </div>
               <div className="resume-item">
-                <h4>{t.research2Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.research2Flag}</span> {t.research2Title}</h4>
                 <h5>{t.research2Period}</h5>
                 <p><em>{t.research2Advisor}</em></p>
                 <p><em>{t.research2Location}</em></p>
               </div>
               <div className="resume-item">
-                <h4>{t.research3Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.research3Flag}</span> {t.research3Title}</h4>
                 <h5>{t.research3Period}</h5>
                 <p><em>{t.research3Advisor}</em></p>
                 <p><em>{t.research3Location}</em></p>
@@ -60,7 +69,7 @@ export default function ResumeContent() {
 
               <h3 className="resume-title">{t.communityService}</h3>
               <div className="resume-item">
-                <h4>{t.comm1Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.comm1Flag}</span> {t.comm1Title}</h4>
                 <h5>{t.comm1Period}</h5>
                 <p><em>{t.comm1Location}</em></p>
               </div>
@@ -69,7 +78,7 @@ export default function ResumeContent() {
             <div className="col-lg-6" data-aos="fade-up" data-aos-delay="200">
               <h3 className="resume-title">{t.professionalExperience}</h3>
               <div className="resume-item">
-                <h4>{t.prof1Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.prof1Flag}</span> {t.prof1Title}</h4>
                 <h5>{t.prof1Period}</h5>
                 <p><em>{t.prof1Company}</em></p>
                 <ul>
@@ -81,7 +90,7 @@ export default function ResumeContent() {
                 </ul>
               </div>
               <div className="resume-item">
-                <h4>{t.prof2Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.prof2Flag}</span> {t.prof2Title}</h4>
                 <h5>{t.prof2Period}</h5>
                 <p><em>{t.prof2Company}</em></p>
                 <ul>
@@ -92,7 +101,7 @@ export default function ResumeContent() {
                 </ul>
               </div>
               <div className="resume-item">
-                <h4>{t.prof3Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.prof3Flag}</span> {t.prof3Title}</h4>
                 <h5>{t.prof3Period}</h5>
                 <p><em>{t.prof3Company}</em></p>
                 <ul>
@@ -103,7 +112,7 @@ export default function ResumeContent() {
                 </ul>
               </div>
               <div className="resume-item">
-                <h4>{t.prof4Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.prof4Flag}</span> {t.prof4Title}</h4>
                 <h5>{t.prof4Period}</h5>
                 <p><em>{t.prof4Company}</em></p>
                 <ul>
@@ -114,7 +123,7 @@ export default function ResumeContent() {
                 </ul>
               </div>
               <div className="resume-item">
-                <h4>{t.prof5Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.prof5Flag}</span> {t.prof5Title}</h4>
                 <h5>{t.prof5Period}</h5>
                 <p><em>{t.prof5Company}</em></p>
                 <ul>
@@ -123,7 +132,7 @@ export default function ResumeContent() {
                 </ul>
               </div>
               <div className="resume-item">
-                <h4>{t.prof6Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.prof6Flag}</span> {t.prof6Title}</h4>
                 <h5>{t.prof6Period}</h5>
                 <p><em>{t.prof6Company}</em></p>
                 <ul>
@@ -134,12 +143,12 @@ export default function ResumeContent() {
 
               <h3 className="resume-title">{t.earlyCareer}</h3>
               <div className="resume-item">
-                <h4>{t.early1Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.early1Flag}</span> {t.early1Title}</h4>
                 <h5>{t.early1Period}</h5>
                 <p><em>{t.early1Company}</em></p>
               </div>
               <div className="resume-item">
-                <h4>{t.early2Title}</h4>
+                <h4><span className="resume-flag" aria-hidden>{t.early2Flag}</span> {t.early2Title}</h4>
                 <h5>{t.early2Period}</h5>
                 <p><em>{t.early2Company}</em></p>
               </div>
