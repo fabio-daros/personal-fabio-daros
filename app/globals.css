@@ -163,6 +163,42 @@ body.preloader-released #preloader {
   z-index: 10;
 }
 
+/* Swipe navigation - botões de seta para desktop */
+.swipe-nav-btn {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 998;
+  text-decoration: none !important;
+  color: #fff !important;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  font-size: 2rem;
+}
+.swipe-nav-btn:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+.swipe-nav-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.swipe-nav-prev {
+  left: 16px;
+}
+.swipe-nav-next {
+  right: 16px;
+}
+
 /* Mobile: imagem completa visível */
 @media (max-width: 992px) {
   .hero-bg {

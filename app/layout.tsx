@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ClientScripts from "@/components/ClientScripts";
 import Providers from "@/components/Providers";
+import SwipeNavigation from "@/components/SwipeNavigation";
 
 export const metadata: Metadata = {
   title: "Fabio Daros | Software Engineer • Biotechnology & AI",
@@ -84,6 +85,7 @@ export default function RootLayout({
         </a>
         <div id="preloader"></div>
         <ClientScripts />
+        <SwipeNavigation />
         <Analytics mode="production" />
       </body>
     </html>
