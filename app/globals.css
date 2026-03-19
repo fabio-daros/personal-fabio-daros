@@ -199,6 +199,33 @@ body.preloader-released #preloader {
   right: 16px;
 }
 
+/* Indicadores de página (bolinhas) - mobile */
+.swipe-nav-dots {
+  position: fixed;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  z-index: 998;
+  gap: 8px;
+}
+.swipe-nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.swipe-nav-dot:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+.swipe-nav-dot.active {
+  background: var(--accent-color);
+  transform: scale(1.2);
+}
+
 /* Mobile: imagem completa visível */
 @media (max-width: 992px) {
   .hero-bg {
@@ -206,5 +233,55 @@ body.preloader-released #preloader {
   }
   .hero {
     background-color: #000000;
+  }
+}
+
+/* View Transitions: cartas deslizantes no mobile (swipe) */
+@media (max-width: 991px) {
+  /* Grupo sem clip para ambas as páginas visíveis durante o slide */
+  ::view-transition-group(root) {
+    overflow: visible;
+  }
+  ::view-transition-image-pair(root) {
+    overflow: visible;
+  }
+  /* Fallback quando vt-dir-styles não está definido (ex: navegação pelo menu) */
+  ::view-transition-old(root) {
+    animation: vt-slide-out-left 0.45s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+  ::view-transition-new(root) {
+    animation: vt-slide-in-right 0.45s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+}
+@keyframes vt-slide-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes vt-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes vt-slide-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes vt-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
   }
 }

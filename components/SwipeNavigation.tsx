@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 
 const PAGES = ["/", "/about", "/resume", "/expertise"] as const;
 const SWIPE_THRESHOLD = 80; // mínima distância para considerar swipe
@@ -10,7 +11,7 @@ const SWIPE_MAX_VERTICAL = 80; // máx movimento vertical para não confundir co
 
 export default function SwipeNavigation() {
   const pathname = usePathname();
-  const router = useRouter();
+  const router = useTransitionRouter();
   const [canSwipe, setCanSwipe] = useState(true);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
@@ -18,22 +19,41 @@ export default function SwipeNavigation() {
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex >= 0 && currentIndex < PAGES.length - 1;
 
+  const applyTransitionDir = useCallback((dir: "next" | "prev") => {
+    const style = document.getElementById("vt-dir-styles") as HTMLStyleElement | null;
+    if (style) {
+      if (dir === "next") {
+        style.textContent = `::view-transition-old(root){animation:vt-slide-out-left .45s cubic-bezier(0.32,0.72,0,1) both}::view-transition-new(root){animation:vt-slide-in-right .45s cubic-bezier(0.32,0.72,0,1) both}`;
+      } else {
+        style.textContent = `::view-transition-old(root){animation:vt-slide-out-right .45s cubic-bezier(0.32,0.72,0,1) both}::view-transition-new(root){animation:vt-slide-in-left .45s cubic-bezier(0.32,0.72,0,1) both}`;
+      }
+    }
+  }, []);
+
   const goPrev = useCallback(() => {
     if (hasPrev) {
       setCanSwipe(false);
+      applyTransitionDir("prev");
       router.push(PAGES[currentIndex - 1]);
     }
-  }, [currentIndex, hasPrev, router]);
+  }, [currentIndex, hasPrev, router, applyTransitionDir]);
 
   const goNext = useCallback(() => {
     if (hasNext) {
       setCanSwipe(false);
+      applyTransitionDir("next");
       router.push(PAGES[currentIndex + 1]);
     }
-  }, [currentIndex, hasNext, router]);
+  }, [currentIndex, hasNext, router, applyTransitionDir]);
 
   useEffect(() => {
     setCanSwipe(true);
+    // Limpar estilos só após a transição terminar (evita usar fallback errado)
+    const style = document.getElementById("vt-dir-styles") as HTMLStyleElement | null;
+    const t = setTimeout(() => {
+      if (style) style.textContent = "";
+    }, 600);
+    return () => clearTimeout(t);
   }, [pathname]);
 
   useEffect(() => {
@@ -65,6 +85,16 @@ export default function SwipeNavigation() {
     };
   }, [canSwipe, hasNext, hasPrev, goNext, goPrev]);
 
+  const goToPage = useCallback(
+    (index: number) => {
+      if (index === currentIndex) return;
+      setCanSwipe(false);
+      applyTransitionDir(index > currentIndex ? "next" : "prev");
+      router.push(PAGES[index]);
+    },
+    [currentIndex, router, applyTransitionDir]
+  );
+
   if (currentIndex < 0) return null;
 
   return (
@@ -89,6 +119,22 @@ export default function SwipeNavigation() {
           <i className="bi bi-chevron-right" />
         </Link>
       )}
+      {/* Indicadores de página (bolinhas) - apenas mobile */}
+      <nav
+        className="swipe-nav-dots d-flex d-md-none align-items-center justify-content-center"
+        aria-label="Indicador de páginas"
+      >
+        {PAGES.map((_, i) => (
+          <button
+            key={PAGES[i]}
+            type="button"
+            onClick={() => goToPage(i)}
+            className={`swipe-nav-dot ${i === currentIndex ? "active" : ""}`}
+            aria-label={`Página ${i + 1}`}
+            aria-current={i === currentIndex ? "true" : undefined}
+          />
+        ))}
+      </nav>
     </>
   );
 }

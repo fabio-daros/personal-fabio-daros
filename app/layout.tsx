@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { ViewTransitions } from "next-view-transitions";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -32,6 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ViewTransitions>
     <html lang="en">
       <head>
         <script
@@ -65,6 +67,7 @@ export default function RootLayout({
         <link href="/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet" />
         <link href="/assets/css/main.css" rel="stylesheet" />
         <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png" />
+        <style id="vt-dir-styles" />
       </head>
       <body>
         <script
@@ -89,5 +92,6 @@ export default function RootLayout({
         <Analytics mode="production" />
       </body>
     </html>
+    </ViewTransitions>
   );
 }
