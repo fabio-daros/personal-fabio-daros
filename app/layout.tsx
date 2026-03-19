@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import ClientScripts from "@/components/ClientScripts";
 import Providers from "@/components/Providers";
 import SwipeNavigation from "@/components/SwipeNavigation";
+import SwipeDragWrapper from "@/components/SwipeDragWrapper";
 
 export const metadata: Metadata = {
   title: "Fabio Daros | Software Engineer • Biotechnology & AI",
@@ -79,9 +80,11 @@ export default function RootLayout({
           }}
         />
         <Providers>
-          <Header />
-          {children}
-          <Footer />
+          <SwipeDragWrapper>
+            <Header />
+            {children}
+            <Footer />
+          </SwipeDragWrapper>
         </Providers>
         <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center">
           <i className="bi bi-arrow-up-short"></i>

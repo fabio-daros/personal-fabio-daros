@@ -226,6 +226,45 @@ body.preloader-released #preloader {
   transform: scale(1.2);
 }
 
+/* Swipe drag - página acompanha o dedo no mobile */
+.swipe-drag-container {
+  position: relative;
+}
+.swipe-drag-content {
+  position: relative;
+}
+.swipe-drag-preview {
+  display: none;
+}
+@media (max-width: 991px) {
+  .swipe-drag-container {
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+  .swipe-drag-content {
+    z-index: 1;
+    min-height: 100vh;
+    background: var(--background-color, #fff);
+  }
+  .swipe-drag-preview {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .swipe-drag-preview-next {
+    left: 100%;
+    background: #0a0a0a;
+  }
+  .swipe-drag-preview-prev {
+    right: 100%;
+    background: #0a0a0a;
+  }
+}
+
 /* Mobile: imagem completa visível */
 @media (max-width: 992px) {
   .hero-bg {
@@ -247,10 +286,10 @@ body.preloader-released #preloader {
   }
   /* Fallback quando vt-dir-styles não está definido (ex: navegação pelo menu) */
   ::view-transition-old(root) {
-    animation: vt-slide-out-left 0.45s cubic-bezier(0.32, 0.72, 0, 1) both;
+    animation: vt-slide-out-left 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
   }
   ::view-transition-new(root) {
-    animation: vt-slide-in-right 0.45s cubic-bezier(0.32, 0.72, 0, 1) both;
+    animation: vt-slide-in-right 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
   }
 }
 @keyframes vt-slide-out-left {

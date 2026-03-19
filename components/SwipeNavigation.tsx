@@ -1,21 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
 
 const PAGES = ["/", "/about", "/resume", "/expertise"] as const;
-const SWIPE_THRESHOLD = 100; // mínima distância para considerar swipe (evita acionamento acidental)
-const SWIPE_MAX_VERTICAL = 100; // máx movimento vertical para não confundir com scroll
-const SWIPE_COOLDOWN_MS = 500; // cooldown para evitar duplo swipe
 
 export default function SwipeNavigation() {
   const pathname = usePathname();
   const router = useTransitionRouter();
   const [canSwipe, setCanSwipe] = useState(true);
-  const touchStart = useRef<{ x: number; y: number; id: number } | null>(null);
-  const lastSwipeTime = useRef(0);
 
   const currentIndex = PAGES.indexOf(pathname as (typeof PAGES)[number]);
   const hasPrev = currentIndex > 0;
@@ -25,9 +20,9 @@ export default function SwipeNavigation() {
     const style = document.getElementById("vt-dir-styles") as HTMLStyleElement | null;
     if (style) {
       if (dir === "next") {
-        style.textContent = `::view-transition-old(root){animation:vt-slide-out-left .45s cubic-bezier(0.32,0.72,0,1) both}::view-transition-new(root){animation:vt-slide-in-right .45s cubic-bezier(0.32,0.72,0,1) both}`;
+        style.textContent = `::view-transition-old(root){animation:vt-slide-out-left .35s cubic-bezier(0.32,0.72,0,1) both}::view-transition-new(root){animation:vt-slide-in-right .35s cubic-bezier(0.32,0.72,0,1) both}`;
       } else {
-        style.textContent = `::view-transition-old(root){animation:vt-slide-out-right .45s cubic-bezier(0.32,0.72,0,1) both}::view-transition-new(root){animation:vt-slide-in-left .45s cubic-bezier(0.32,0.72,0,1) both}`;
+        style.textContent = `::view-transition-old(root){animation:vt-slide-out-right .35s cubic-bezier(0.32,0.72,0,1) both}::view-transition-new(root){animation:vt-slide-in-left .35s cubic-bezier(0.32,0.72,0,1) both}`;
       }
     }
   }, []);
@@ -50,74 +45,18 @@ export default function SwipeNavigation() {
 
   useEffect(() => {
     setCanSwipe(true);
+    // Prefetch das páginas adjacentes para navegação mais rápida (reduz delay)
+    if (currentIndex > 0) router.prefetch(PAGES[currentIndex - 1]);
+    if (currentIndex >= 0 && currentIndex < PAGES.length - 1) router.prefetch(PAGES[currentIndex + 1]);
     // Limpar estilos só após a transição terminar (evita usar fallback errado)
     const style = document.getElementById("vt-dir-styles") as HTMLStyleElement | null;
     const t = setTimeout(() => {
       if (style) style.textContent = "";
-    }, 600);
+    }, 500);
     return () => clearTimeout(t);
-  }, [pathname]);
+  }, [pathname, currentIndex, router]);
 
-  useEffect(() => {
-    if (!canSwipe) return;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 1) {
-        touchStart.current = {
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY,
-          id: e.touches[0].identifier,
-        };
-      }
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (!touchStart.current || !e.changedTouches.length) return;
-
-      // Cooldown: ignora swipe se muito recente (evita duplo disparo)
-      const now = Date.now();
-      if (now - lastSwipeTime.current < SWIPE_COOLDOWN_MS) {
-        touchStart.current = null;
-        return;
-      }
-
-      // Correlaciona com o mesmo dedo (touch identifier)
-      const endTouch = Array.from(e.changedTouches).find(
-        (t) => t.identifier === touchStart.current!.id
-      );
-      if (!endTouch) {
-        touchStart.current = null;
-        return;
-      }
-
-      const diffX = endTouch.clientX - touchStart.current.x;
-      const diffY = endTouch.clientY - touchStart.current.y;
-
-      touchStart.current = null;
-
-      if (Math.abs(diffY) > SWIPE_MAX_VERTICAL) return;
-      if (diffX < -SWIPE_THRESHOLD && hasNext) {
-        lastSwipeTime.current = now;
-        goNext();
-      } else if (diffX > SWIPE_THRESHOLD && hasPrev) {
-        lastSwipeTime.current = now;
-        goPrev();
-      }
-    };
-
-    const handleTouchCancel = () => {
-      touchStart.current = null;
-    };
-
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchend", handleTouchEnd, { passive: true });
-    window.addEventListener("touchcancel", handleTouchCancel, { passive: true });
-    return () => {
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchend", handleTouchEnd);
-      window.removeEventListener("touchcancel", handleTouchCancel);
-    };
-  }, [canSwipe, hasNext, hasPrev, goNext, goPrev]);
+  /* Touch/swipe é tratado pelo SwipeDragWrapper no mobile */
 
   const goToPage = useCallback(
     (index: number) => {
