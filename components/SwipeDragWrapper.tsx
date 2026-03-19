@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
 
@@ -67,9 +67,13 @@ export default function SwipeDragWrapper({
     isHorizontalSwipe.current = null;
   }, []);
 
+  // Reset transform imediatamente ao trocar de página (evita tela "pela metade")
+  useLayoutEffect(() => {
+    resetTransform();
+  }, [pathname, resetTransform]);
+
   useEffect(() => {
     setCanSwipe(true);
-    resetTransform();
     if (currentIndex > 0) router.prefetch(PAGES[currentIndex - 1]);
     if (currentIndex >= 0 && currentIndex < PAGES.length - 1) router.prefetch(PAGES[currentIndex + 1]);
     const style = document.getElementById("vt-dir-styles") as HTMLStyleElement | null;
@@ -77,7 +81,7 @@ export default function SwipeDragWrapper({
       if (style) style.textContent = "";
     }, 500);
     return () => clearTimeout(t);
-  }, [pathname, currentIndex, router, resetTransform]);
+  }, [pathname, currentIndex, router]);
 
   useEffect(() => {
     if (!canSwipe || currentIndex < 0) return;
@@ -194,7 +198,7 @@ export default function SwipeDragWrapper({
     <div ref={containerRef} className="swipe-drag-container">
       <div className="swipe-drag-preview swipe-drag-preview-next" aria-hidden />
       <div className="swipe-drag-preview swipe-drag-preview-prev" aria-hidden />
-      <div ref={contentRef} className="swipe-drag-content">
+      <div key={pathname} ref={contentRef} className="swipe-drag-content">
         {children}
       </div>
     </div>
