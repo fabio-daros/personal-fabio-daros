@@ -6,14 +6,16 @@ import { usePathname } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
 
 const PAGES = ["/", "/about", "/resume", "/expertise"] as const;
-const SWIPE_THRESHOLD = 80; // mínima distância para considerar swipe
-const SWIPE_MAX_VERTICAL = 80; // máx movimento vertical para não confundir com scroll
+const SWIPE_THRESHOLD = 100; // mínima distância para considerar swipe (evita acionamento acidental)
+const SWIPE_MAX_VERTICAL = 100; // máx movimento vertical para não confundir com scroll
+const SWIPE_COOLDOWN_MS = 500; // cooldown para evitar duplo swipe
 
 export default function SwipeNavigation() {
   const pathname = usePathname();
   const router = useTransitionRouter();
   const [canSwipe, setCanSwipe] = useState(true);
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const touchStart = useRef<{ x: number; y: number; id: number } | null>(null);
+  const lastSwipeTime = useRef(0);
 
   const currentIndex = PAGES.indexOf(pathname as (typeof PAGES)[number]);
   const hasPrev = currentIndex > 0;
@@ -60,28 +62,60 @@ export default function SwipeNavigation() {
     if (!canSwipe) return;
 
     const handleTouchStart = (e: TouchEvent) => {
-      touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      if (e.touches.length === 1) {
+        touchStart.current = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+          id: e.touches[0].identifier,
+        };
+      }
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      if (!touchStart.current) return;
-      const endX = e.changedTouches[0].clientX;
-      const endY = e.changedTouches[0].clientY;
-      const diffX = endX - touchStart.current.x;
-      const diffY = endY - touchStart.current.y;
+      if (!touchStart.current || !e.changedTouches.length) return;
+
+      // Cooldown: ignora swipe se muito recente (evita duplo disparo)
+      const now = Date.now();
+      if (now - lastSwipeTime.current < SWIPE_COOLDOWN_MS) {
+        touchStart.current = null;
+        return;
+      }
+
+      // Correlaciona com o mesmo dedo (touch identifier)
+      const endTouch = Array.from(e.changedTouches).find(
+        (t) => t.identifier === touchStart.current!.id
+      );
+      if (!endTouch) {
+        touchStart.current = null;
+        return;
+      }
+
+      const diffX = endTouch.clientX - touchStart.current.x;
+      const diffY = endTouch.clientY - touchStart.current.y;
+
+      touchStart.current = null;
 
       if (Math.abs(diffY) > SWIPE_MAX_VERTICAL) return;
-      if (diffX < -SWIPE_THRESHOLD && hasNext) goNext();
-      else if (diffX > SWIPE_THRESHOLD && hasPrev) goPrev();
+      if (diffX < -SWIPE_THRESHOLD && hasNext) {
+        lastSwipeTime.current = now;
+        goNext();
+      } else if (diffX > SWIPE_THRESHOLD && hasPrev) {
+        lastSwipeTime.current = now;
+        goPrev();
+      }
+    };
 
+    const handleTouchCancel = () => {
       touchStart.current = null;
     };
 
     window.addEventListener("touchstart", handleTouchStart, { passive: true });
     window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", handleTouchCancel, { passive: true });
     return () => {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchcancel", handleTouchCancel);
     };
   }, [canSwipe, hasNext, hasPrev, goNext, goPrev]);
 
