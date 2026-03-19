@@ -8,6 +8,8 @@ export const translations = {
       resume: "Currículo",
       expertise: "Expertise",
       contact: "Contato",
+      themeDark: "Escuro",
+      themeLight: "Claro",
     },
     hero: {
       name: "Fabio Daros",
@@ -198,6 +200,8 @@ export const translations = {
       resume: "Resume",
       expertise: "Expertise",
       contact: "Contact",
+      themeDark: "Dark",
+      themeLight: "Light",
     },
     hero: {
       name: "Fabio Daros",

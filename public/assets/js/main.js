@@ -23,29 +23,25 @@
   window.addEventListener('load', toggleScrolled);
 
   /**
-   * Mobile nav toggle
+   * Mobile nav toggle - event delegation (Header remounts on Next.js navigation)
    */
-  const mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
-
-  function mobileNavToogle() {
-    document.querySelector('body').classList.toggle('mobile-nav-active');
-    mobileNavToggleBtn.classList.toggle('bi-list');
-    mobileNavToggleBtn.classList.toggle('bi-x');
-  }
-  if (mobileNavToggleBtn) {
-    mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
+  function mobileNavToggle() {
+    const body = document.querySelector('body');
+    const btn = document.querySelector('.mobile-nav-toggle');
+    if (!body || !btn) return;
+    body.classList.toggle('mobile-nav-active');
+    btn.classList.toggle('bi-list');
+    btn.classList.toggle('bi-x');
   }
 
-  /**
-   * Hide mobile nav on same-page/hash links
-   */
-  document.querySelectorAll('#navmenu a').forEach(navmenu => {
-    navmenu.addEventListener('click', () => {
-      if (document.querySelector('.mobile-nav-active')) {
-        mobileNavToogle();
-      }
-    });
-
+  document.body.addEventListener('click', function(e) {
+    if (e.target.closest('.mobile-nav-toggle')) {
+      mobileNavToggle();
+      return;
+    }
+    if (e.target.closest('#navmenu a') && document.querySelector('.mobile-nav-active')) {
+      mobileNavToggle();
+    }
   });
 
   /**

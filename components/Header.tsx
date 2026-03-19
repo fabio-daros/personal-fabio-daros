@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 import LanguageSwitcher from "./LanguageSwitcher";
+import ThemeSwitcher from "./ThemeSwitcher";
 
 const navLinks = [
   { href: "/", labelKey: "home" as const },
@@ -42,6 +43,7 @@ export default function Header() {
             <i className="mobile-nav-toggle d-xl-none bi bi-list"></i>
           </nav>
           <LanguageSwitcher />
+          <ThemeSwitcher />
         </div>
       </div>
     </header>
