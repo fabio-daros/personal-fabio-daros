@@ -19,7 +19,7 @@ export default function ResumeContent() {
       <section id="resume" className="resume section">
         <div className="container">
           <div className="row">
-            <div className="col-lg-6 order-lg-2" data-aos="fade-up" data-aos-delay="100">
+            <div className="col-lg-6 order-2 order-lg-2" data-aos="fade-up" data-aos-delay="100">
               <h3 className="resume-title">{t.education}</h3>
               <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.edu1Flag}</span> {t.edu1Title}</h4>
@@ -75,7 +75,7 @@ export default function ResumeContent() {
               </div>
             </div>
 
-            <div className="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+            <div className="col-lg-6 order-1 order-lg-1" data-aos="fade-up" data-aos-delay="200">
               <h3 className="resume-title">{t.professionalExperience}</h3>
               <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.prof1Flag}</span> {t.prof1Title}</h4>
