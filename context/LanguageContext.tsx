@@ -19,7 +19,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (stored === "pt" || stored === "en") {
       setLocaleState(stored);
     } else {
-      // Detect browser language when no preference saved
       const browserLang = navigator.language || (navigator.languages?.[0] ?? "en");
       const prefersPt = browserLang.toLowerCase().startsWith("pt");
       setLocaleState(prefersPt ? "pt" : "en");

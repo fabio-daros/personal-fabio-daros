@@ -48,7 +48,7 @@ export default function ResumeContent() {
                   <a href="https://www.lummertzdarocha-lab.org/" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Lummertz da Rocha Lab website">
                     <i className="bi bi-globe" />
                   </a>
-                  <a href="https://www.linkedin.com/in/edroaldo-lummertz-da-rocha-6b976033" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Edroaldo Lummertz da Rocha LinkedIn">
+                  <a href="https://www.linkedin.com/company/lummertz-da-rocha-lab/" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Lummertz da Rocha Lab LinkedIn">
                     <i className="bi bi-linkedin" />
                   </a>
                 </div>

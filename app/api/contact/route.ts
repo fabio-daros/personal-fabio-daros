@@ -11,7 +11,6 @@ const EMAIL_LABELS: Record<string, { name: string; email: string; subject: strin
   pt: { name: "Nome", email: "Email", subject: "Assunto", message: "Mensagem" },
   en: { name: "Name", email: "Email", subject: "Subject", message: "Message" },
 };
-// Remetente: verifique fabiodaros.com no Resend e use contact@fabiodaros.com
 const RESEND_FROM = process.env.RESEND_FROM || "Fabio Daros <contact@fabiodaros.com>";
 
 export async function POST(request: NextRequest) {

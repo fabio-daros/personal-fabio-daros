@@ -45,18 +45,14 @@ export default function SwipeNavigation() {
 
   useEffect(() => {
     setCanSwipe(true);
-    // Prefetch das páginas adjacentes para navegação mais rápida (reduz delay)
     if (currentIndex > 0) router.prefetch(PAGES[currentIndex - 1]);
     if (currentIndex >= 0 && currentIndex < PAGES.length - 1) router.prefetch(PAGES[currentIndex + 1]);
-    // Limpar estilos só após a transição terminar (evita usar fallback errado)
     const style = document.getElementById("vt-dir-styles") as HTMLStyleElement | null;
     const t = setTimeout(() => {
       if (style) style.textContent = "";
     }, 500);
     return () => clearTimeout(t);
   }, [pathname, currentIndex, router]);
-
-  /* Touch/swipe é tratado pelo SwipeDragWrapper no mobile */
 
   const goToPage = useCallback(
     (index: number) => {
@@ -72,7 +68,6 @@ export default function SwipeNavigation() {
 
   return (
     <>
-      {/* Seta esquerda - página anterior */}
       {hasPrev && (
         <Link
           href={PAGES[currentIndex - 1]}
@@ -82,7 +77,6 @@ export default function SwipeNavigation() {
           <i className="bi bi-chevron-left" />
         </Link>
       )}
-      {/* Seta direita - próxima página */}
       {hasNext && (
         <Link
           href={PAGES[currentIndex + 1]}
@@ -92,7 +86,6 @@ export default function SwipeNavigation() {
           <i className="bi bi-chevron-right" />
         </Link>
       )}
-      {/* Indicadores de página (bolinhas) - apenas mobile */}
       <nav
         className="swipe-nav-dots d-flex d-md-none align-items-center justify-content-center"
         aria-label="Indicador de páginas"

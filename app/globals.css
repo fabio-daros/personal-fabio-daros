@@ -1,6 +1,3 @@
-/* Template Personal - styles loaded via layout */
-
-/* Visually hidden - for SEO, keeps content in DOM but invisible */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -13,14 +10,12 @@
   border: 0;
 }
 
-/* AOS fallback: show content if AOS fails to load (prevents blank page) */
 body.aos-fallback [data-aos] {
   opacity: 1 !important;
   visibility: visible !important;
   transform: none !important;
 }
 
-/* All content ALWAYS visible - no dependency on AOS/scripts (fixes blank page on reload, all pages) */
 .main [data-aos],
 #hero .hero-bg,
 #hero .container {
@@ -29,7 +24,6 @@ body.aos-fallback [data-aos] {
   transform: none !important;
 }
 
-/* Skills - lista simples sem porcentagens */
 .skills .skills-list .skill-tag {
   display: inline-flex;
   align-items: center;
@@ -49,13 +43,11 @@ body.aos-fallback [data-aos] {
   flex-shrink: 0;
 }
 
-/* Bandeiras ao lado dos títulos no Resume */
 .resume .resume-flag {
   margin-right: 0.35em;
   font-style: normal;
 }
 
-/* Links do advisor (lab, LinkedIn) no Resume */
 .resume .resume-research-links {
   display: flex;
   align-items: center;
@@ -91,12 +83,10 @@ body.aos-fallback [data-aos] {
   color: var(--accent-color);
 }
 
-/* Círculo do resume-item não deve bloquear cliques nos links */
 .resume .resume-item::before {
   pointer-events: none;
 }
 
-/* ORCID e Lattes links na página About */
 .about .profile-links {
   display: flex;
   flex-direction: row;
@@ -119,7 +109,6 @@ body.aos-fallback [data-aos] {
   opacity: 0.85;
   color: var(--accent-color);
 }
-/* Ícone Lattes - mask com fundo transparente + verde da página */
 .about .profile-link .lattes-icon {
   display: inline-block;
   width: 24px;
@@ -130,14 +119,12 @@ body.aos-fallback [data-aos] {
   mask: url(/assets/img/lattes-icon.png) center/contain no-repeat;
 }
 
-/* Botões sociais da hero - tamanho aumentado */
 .hero .social-links a {
   font-size: 20px;
   width: 50px;
   height: 50px;
 }
 
-/* Hero background - não bloqueia cliques (pointer-events: none) */
 .hero-bg {
   position: absolute;
   inset: 0;
@@ -149,7 +136,6 @@ body.aos-fallback [data-aos] {
   pointer-events: none;
 }
 
-/* Gradiente na borda inferior para transição suave com a página */
 .hero-bg::after {
   content: "";
   position: absolute;
@@ -159,7 +145,6 @@ body.aos-fallback [data-aos] {
   z-index: 2;
 }
 
-/* Language switcher no header */
 .language-switcher .lang-btn {
   background: none;
   border: none;
@@ -181,7 +166,6 @@ body.aos-fallback [data-aos] {
   user-select: none;
 }
 
-/* Theme switcher no header (ícones lua e sol) */
 .theme-switcher .theme-btn {
   background: none;
   border: none;
@@ -205,18 +189,15 @@ body.aos-fallback [data-aos] {
   user-select: none;
 }
 
-/* Hero e Contact: mesmo preto (#000) para consistência */
 .hero.section.dark-background {
   --background-color: #000000;
   background-color: #000000;
 }
 
-/* Preloader: libera interação após 1.5s (fallback se main.js não remover) */
 body.preloader-released #preloader {
   pointer-events: none;
 }
 
-/* Formulário de contato: garantir que seja sempre interativo */
 #contact .php-email-form,
 #contact .php-email-form input,
 #contact .php-email-form textarea,
@@ -226,7 +207,6 @@ body.preloader-released #preloader {
   z-index: 10;
 }
 
-/* Links sociais: garantir que sejam sempre clicáveis (Hero, Footer, Contact) */
 .hero .social-links a,
 .footer .social-links a,
 .contact .info-item .social-links a {
@@ -235,7 +215,6 @@ body.preloader-released #preloader {
   z-index: 10;
 }
 
-/* Swipe navigation - botões de seta para desktop */
 .swipe-nav-btn {
   position: fixed;
   top: 50%;
@@ -271,7 +250,6 @@ body.preloader-released #preloader {
   right: 16px;
 }
 
-/* Indicadores de página (bolinhas) - mobile */
 .swipe-nav-dots {
   position: fixed;
   bottom: 24px;
@@ -298,7 +276,6 @@ body.preloader-released #preloader {
   transform: scale(1.2);
 }
 
-/* Swipe drag - página acompanha o dedo no mobile */
 .swipe-drag-container {
   position: relative;
 }
@@ -337,7 +314,6 @@ body.preloader-released #preloader {
   }
 }
 
-/* Mobile: imagem completa visível */
 @media (max-width: 992px) {
   .hero-bg {
     background-size: contain;
@@ -350,16 +326,13 @@ body.preloader-released #preloader {
   }
 }
 
-/* View Transitions: cartas deslizantes no mobile (swipe) */
 @media (max-width: 991px) {
-  /* Grupo sem clip para ambas as páginas visíveis durante o slide */
   ::view-transition-group(root) {
     overflow: visible;
   }
   ::view-transition-image-pair(root) {
     overflow: visible;
   }
-  /* Fallback quando vt-dir-styles não está definido (ex: navegação pelo menu) */
   ::view-transition-old(root) {
     animation: vt-slide-out-left 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
   }
@@ -400,9 +373,6 @@ body.preloader-released #preloader {
   }
 }
 
-/*--------------------------------------------------------------
-# Light theme
---------------------------------------------------------------*/
 html[data-theme="light"] {
   --background-color: #ffffff;
   --default-color: #1a1a1a;
@@ -418,13 +388,11 @@ html[data-theme="light"] {
   --nav-dropdown-hover-color: #0d9e4e;
 }
 
-/* Header scrolled - light theme */
 html[data-theme="light"] .scrolled .header {
   --background-color: rgba(255, 255, 255, 0.95);
   box-shadow: 0 1px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* Hero - light theme: imagem branca e texto escuro */
 html[data-theme="light"] .hero.section.dark-background {
   --background-color: #ffffff;
   --default-color: #1a1a1a;
@@ -451,7 +419,6 @@ html[data-theme="light"] .hero .social-links a:hover {
   }
 }
 
-/* Language switcher - light theme */
 html[data-theme="light"] .language-switcher .lang-btn {
   color: rgba(0, 0, 0, 0.6);
 }
@@ -463,7 +430,6 @@ html[data-theme="light"] .language-switcher .lang-separator {
   color: rgba(0, 0, 0, 0.35);
 }
 
-/* Header: remover todos os sublinhados (logo e nav) */
 .header .logo,
 .header .logo:hover,
 .navmenu a,
@@ -481,7 +447,6 @@ html[data-theme="light"] .language-switcher .lang-separator {
   display: none !important;
 }
 
-/* Theme switcher - light theme */
 html[data-theme="light"] .theme-switcher .theme-btn {
   color: rgba(0, 0, 0, 0.6);
 }
@@ -493,7 +458,6 @@ html[data-theme="light"] .theme-switcher .theme-separator {
   color: rgba(0, 0, 0, 0.35);
 }
 
-/* Skills - light theme: fundo cinza na seção inteira */
 html[data-theme="light"] .skills.section {
   background-color: rgba(0, 0, 0, 0.08);
 }
@@ -501,7 +465,6 @@ html[data-theme="light"] .skills .skills-list .skill-tag {
   background: transparent;
 }
 
-/* Swipe nav buttons - light theme */
 html[data-theme="light"] .swipe-nav-btn {
   background: rgba(255, 255, 255, 0.9);
   color: #000000 !important;
@@ -513,7 +476,6 @@ html[data-theme="light"] .swipe-nav-btn:hover {
   border-color: var(--accent-color);
 }
 
-/* Swipe nav dots - light theme */
 html[data-theme="light"] .swipe-nav-dot {
   background: rgba(0, 0, 0, 0.3);
 }
@@ -524,7 +486,6 @@ html[data-theme="light"] .swipe-nav-dot.active {
   background: var(--accent-color);
 }
 
-/* Swipe drag preview - light theme */
 @media (max-width: 991px) {
   html[data-theme="light"] .swipe-drag-preview-next,
   html[data-theme="light"] .swipe-drag-preview-prev {
@@ -532,7 +493,6 @@ html[data-theme="light"] .swipe-nav-dot.active {
   }
 }
 
-/* Footer - light theme */
 html[data-theme="light"] .footer.dark-background {
   --background-color: #ffffff;
   --default-color: #1a1a1a;
@@ -540,7 +500,6 @@ html[data-theme="light"] .footer.dark-background {
   background-color: #ffffff;
 }
 
-/* Mobile nav toggle - garantir clicável (event delegation no main.js) */
 @media (max-width: 1199px) {
   .mobile-nav-toggle {
     pointer-events: auto;
@@ -549,7 +508,6 @@ html[data-theme="light"] .footer.dark-background {
   }
 }
 
-/* Mobile nav - light theme */
 @media (max-width: 1199px) {
   html[data-theme="light"] .mobile-nav-active .mobile-nav-toggle {
     color: #1a1a1a;

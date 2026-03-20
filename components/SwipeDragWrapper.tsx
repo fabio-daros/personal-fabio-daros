@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
 
 const PAGES = ["/", "/about", "/resume", "/expertise"] as const;
-const DRAG_RESISTANCE = 0.9; // arraste acompanha o dedo (sensação responsiva)
-const RELEASE_THRESHOLD = 0.25; // 25% da tela para confirmar navegação
+const DRAG_RESISTANCE = 0.9;
+const RELEASE_THRESHOLD = 0.25;
 const SWIPE_COOLDOWN_MS = 350;
 
 export default function SwipeDragWrapper({
@@ -67,7 +67,6 @@ export default function SwipeDragWrapper({
     isHorizontalSwipe.current = null;
   }, []);
 
-  // Reset transform imediatamente ao trocar de página (evita tela "pela metade")
   useLayoutEffect(() => {
     resetTransform();
   }, [pathname, resetTransform]);
@@ -111,7 +110,6 @@ export default function SwipeDragWrapper({
       const deltaX = touch.clientX - touchState.current.x;
       const deltaY = touch.clientY - touchState.current.y;
 
-      // Define se é swipe horizontal na primeira movimentação significativa
       if (isHorizontalSwipe.current === null && (Math.abs(deltaX) > 15 || Math.abs(deltaY) > 15)) {
         isHorizontalSwipe.current = Math.abs(deltaX) > Math.abs(deltaY);
       }
@@ -121,7 +119,6 @@ export default function SwipeDragWrapper({
         const width = container.offsetWidth;
         let translateX = deltaX * DRAG_RESISTANCE;
 
-        // Limite e resistência nas bordas
         if (translateX > 0 && !hasPrev) translateX = 0;
         if (translateX < 0 && !hasNext) translateX = 0;
         if (hasPrev && translateX > 0) {
