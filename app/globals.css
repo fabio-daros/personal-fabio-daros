@@ -1,3 +1,67 @@
+.legacy-browser-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  pointer-events: none;
+}
+.legacy-browser-notice__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  cursor: pointer;
+}
+.legacy-browser-notice__modal {
+  position: relative;
+  max-width: 420px;
+  width: 100%;
+  padding: 1.5rem;
+  text-align: center;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.9);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+}
+.legacy-browser-notice__icon {
+  font-size: 2.5rem;
+  color: #ffc107;
+  margin-bottom: 0.75rem;
+}
+.legacy-browser-notice__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.legacy-browser-notice__message {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.9;
+  margin-bottom: 1.25rem;
+}
+.legacy-browser-notice__btn {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #000;
+  background: #ffc107;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.legacy-browser-notice__btn:hover {
+  background: #e6ac00;
+}
+.legacy-browser-notice__btn:active {
+  transform: scale(0.98);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

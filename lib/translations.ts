@@ -38,6 +38,11 @@ export const translations = {
       credits: "Design baseado no template BootstrapMade",
       poweredBy: "Powered by Next.js",
     },
+    legacyBrowser: {
+      title: "Navegador desatualizado",
+      message: "Seu navegador ou dispositivo parece ser antigo. Algumas funcionalidades podem não funcionar corretamente. Recomendamos atualizar seu navegador ou acessar de um dispositivo mais recente.",
+      dismiss: "Entendi",
+    },
     about: {
       title: "Sobre",
       pageDescription: "Engenheiro de Software e mestrando em Biotecnologia, especializado em soluções HealthTech impulsionadas por IA.",
@@ -229,6 +234,11 @@ export const translations = {
       tagline: "Where Software meets Biology...",
       credits: "Design based on BootstrapMade template",
       poweredBy: "Powered by Next.js",
+    },
+    legacyBrowser: {
+      title: "Outdated Browser",
+      message: "Your browser or device appears to be outdated. Some features may not work correctly. We recommend updating your browser or accessing from a newer device.",
+      dismiss: "Understood",
     },
     about: {
       title: "About",

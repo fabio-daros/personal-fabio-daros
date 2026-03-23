@@ -9,6 +9,7 @@ import Providers from "@/components/Providers";
 import SwipeNavigation from "@/components/SwipeNavigation";
 import SwipeDragWrapper from "@/components/SwipeDragWrapper";
 import GetInTouchButton from "@/components/GetInTouchButton";
+import LegacyBrowserNotice from "@/components/LegacyBrowserNotice";
 
 export const metadata: Metadata = {
   title: "Fabio Daros | Software Engineer • Biotechnology & AI",
@@ -74,6 +75,11 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <script
           dangerouslySetInnerHTML={{
+            __html: `(function(){var ua=navigator.userAgent||"";var legacy=!1;if(/MSIE|Trident/i.test(ua))legacy=!0;else if(/iPad|iPhone|iPod/.test(ua)){var m=ua.match(/OS (\\d+)[_.]?(\\d+)?/);legacy=m?parseInt(m[1],10)<16:!0}else if(/Safari/.test(ua)&&!/Chrome|Chromium|CriOS/.test(ua)){var v=ua.match(/Version\\/(\\d+)[.\\d]*/);legacy=!!(v&&parseInt(v[1],10)<16)}else if(typeof IntersectionObserver==="undefined"||typeof Promise==="undefined")legacy=!0;if(legacy){var lang=(navigator.language||"").toLowerCase().indexOf("pt")===0?"pt":"en";var t=lang==="pt"?{title:"Navegador desatualizado",msg:"Seu navegador ou dispositivo parece ser antigo. Algumas funcionalidades podem não funcionar corretamente.",btn:"Entendi"}:{title:"Outdated Browser",msg:"Your browser or device appears to be outdated. Some features may not work correctly.",btn:"Understood"};var s=document.createElement("style");s.textContent="#legacy-browser-root{position:fixed;top:0;right:0;bottom:0;left:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;pointer-events:none}#legacy-browser-root .lb-backdrop{position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,0.5);pointer-events:auto;cursor:pointer}#legacy-browser-root .lb-modal{position:relative;max-width:420px;width:100%;padding:24px;text-align:center;color:#fff;background:rgba(0,0,0,0.92);border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,0.5);pointer-events:auto}#legacy-browser-root .lb-icon{font-size:48px;color:#ffc107;margin-bottom:12px;line-height:1}#legacy-browser-root .lb-title{font-size:20px;font-weight:600;margin:0 0 8px}#legacy-browser-root .lb-msg{font-size:16px;line-height:1.5;margin:0 0 20px;opacity:0.95}#legacy-browser-root .lb-btn{display:inline-block;padding:10px 24px;font-size:16px;font-weight:500;color:#000;background:#ffc107;border:none;border-radius:4px;cursor:pointer}";document.head.appendChild(s);var r=document.createElement("div");r.id="legacy-browser-root";r.innerHTML='<div class="lb-backdrop" onclick="document.getElementById(\\'legacy-browser-root\\').style.display=\\'none\\'"></div><div class="lb-modal"><div class="lb-icon">⚠</div><h2 class="lb-title">'+t.title+'</h2><p class="lb-msg">'+t.msg+'</p><button type="button" class="lb-btn" onclick="document.getElementById(\\'legacy-browser-root\\').style.display=\\'none\\'">'+t.btn+'</button></div>';document.body.appendChild(r)}})();`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
             __html: `(function(){
               setTimeout(function(){var e=document.querySelector('[data-aos]');if(e&&!e.classList.contains('aos-animate'))document.body.classList.add('aos-fallback');},2000);
               setTimeout(function(){document.body.classList.add('preloader-released');var p=document.getElementById('preloader');if(p)p.style.pointerEvents='none';},1500);
@@ -81,6 +87,7 @@ export default function RootLayout({
           }}
         />
         <Providers>
+          <LegacyBrowserNotice />
           <SwipeDragWrapper>
             <Header />
             {children}
