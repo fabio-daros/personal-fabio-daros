@@ -19,7 +19,7 @@ export default function Footer() {
           <a href="https://wa.me/353834677853" target="_blank" rel="noopener noreferrer"><i className="bi bi-whatsapp"></i></a>
           <a href="https://www.linkedin.com/in/daros-fabio" target="_blank" rel="noopener noreferrer"><i className="bi bi-linkedin"></i></a>
         </div>
-        <div className="copyright">
+        <div className="copyright" suppressHydrationWarning>
           © {new Date().getFullYear()} Fabio Daros
         </div>
         <div className="credits">

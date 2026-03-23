@@ -8,6 +8,7 @@ import ClientScripts from "@/components/ClientScripts";
 import Providers from "@/components/Providers";
 import SwipeNavigation from "@/components/SwipeNavigation";
 import SwipeDragWrapper from "@/components/SwipeDragWrapper";
+import GetInTouchButton from "@/components/GetInTouchButton";
 
 export const metadata: Metadata = {
   title: "Fabio Daros | Software Engineer • Biotechnology & AI",
@@ -35,13 +36,8 @@ export default function RootLayout({
 }>) {
   return (
     <ViewTransitions>
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem("site-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);else{var m=window.matchMedia("(prefers-color-scheme: dark)");document.documentElement.setAttribute("data-theme",m.matches?"dark":"light")}})();`,
-          }}
-        />
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <head suppressHydrationWarning>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -73,7 +69,7 @@ export default function RootLayout({
         <link href="/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet" />
         <link href="/assets/css/main.css" rel="stylesheet" />
         <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png" />
-        <style id="vt-dir-styles" />
+        <style id="vt-dir-styles" suppressHydrationWarning />
       </head>
       <body suppressHydrationWarning>
         <script
@@ -90,6 +86,7 @@ export default function RootLayout({
             {children}
             <Footer />
           </SwipeDragWrapper>
+          <GetInTouchButton />
         </Providers>
         <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center">
           <i className="bi bi-arrow-up-short"></i>
@@ -97,7 +94,7 @@ export default function RootLayout({
         <div id="preloader"></div>
         <ClientScripts />
         <SwipeNavigation />
-        <Analytics mode="production" />
+        {process.env.NODE_ENV === "production" && <Analytics mode="production" />}
       </body>
     </html>
     </ViewTransitions>

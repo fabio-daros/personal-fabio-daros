@@ -198,6 +198,9 @@ body.preloader-released #preloader {
   pointer-events: none;
 }
 
+#contact-form {
+  scroll-margin-top: 80px;
+}
 #contact .php-email-form,
 #contact .php-email-form input,
 #contact .php-email-form textarea,
@@ -248,6 +251,28 @@ body.preloader-released #preloader {
 }
 .swipe-nav-next {
   right: 16px;
+}
+
+.get-in-touch-btn {
+  position: fixed;
+  top: calc(50% + 170px);
+  right: 16px;
+  transform: translateY(-50%);
+  z-index: 997;
+  width: 56px;
+  height: 56px;
+  text-decoration: none !important;
+  transition: opacity 0.3s ease;
+}
+.get-in-touch-btn--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.get-in-touch-btn img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
 .swipe-nav-dots {
@@ -474,6 +499,10 @@ html[data-theme="light"] .swipe-nav-btn:hover {
   background: var(--accent-color);
   color: #fff;
   border-color: var(--accent-color);
+}
+
+html[data-theme="light"] .get-in-touch-btn img {
+  filter: brightness(0);
 }
 
 html[data-theme="light"] .swipe-nav-dot {

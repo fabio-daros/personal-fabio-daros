@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useState } from "react";
 
 export type Theme = "dark" | "light";
 
@@ -15,14 +15,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+    let initial: Theme;
     if (stored === "dark" || stored === "light") {
-      setThemeState(stored);
+      initial = stored;
     } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setThemeState(prefersDark ? "dark" : "light");
+      initial = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     }
+    setThemeState(initial);
+    document.documentElement.setAttribute("data-theme", initial);
     setMounted(true);
   }, []);
 

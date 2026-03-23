@@ -59,7 +59,7 @@ export default function ContactSection() {
           </div>
         </div>
 
-        <form action="/api/contact" method="post" className="php-email-form" data-aos="fade-up" data-aos-delay="600">
+        <form id="contact-form" action="/api/contact" method="post" className="php-email-form" data-aos="fade-up" data-aos-delay="600">
           <input type="hidden" name="locale" value={locale} />
           <div className="row gy-4">
             <div className="col-md-6">
