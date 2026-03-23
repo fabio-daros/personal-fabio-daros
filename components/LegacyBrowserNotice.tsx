@@ -41,8 +41,24 @@ export default function LegacyBrowserNotice() {
 
   useEffect(() => {
     if (document.getElementById("legacy-browser-root")) return;
+    try {
+      const loadId = (typeof window !== "undefined" && (window as unknown as { __legacyLoadId?: number }).__legacyLoadId) || Date.now();
+      if (sessionStorage.getItem("lb-dismiss") === String(loadId)) return;
+    } catch {
+      /* ignore */
+    }
     setIsLegacy(isLegacyBrowser());
   }, []);
+
+  const handleDismiss = () => {
+    setDismissed(true);
+    try {
+      const loadId = (typeof window !== "undefined" && (window as unknown as { __legacyLoadId?: number }).__legacyLoadId) || 0;
+      sessionStorage.setItem("lb-dismiss", String(loadId));
+    } catch {
+      /* ignore */
+    }
+  };
 
   if (!isLegacy || dismissed) return null;
 
@@ -50,7 +66,7 @@ export default function LegacyBrowserNotice() {
 
   return (
     <div className="legacy-browser-notice" role="dialog" aria-labelledby="legacy-browser-title" aria-modal="true">
-      <div className="legacy-browser-notice__backdrop" onClick={() => setDismissed(true)} aria-hidden />
+      <div className="legacy-browser-notice__backdrop" onClick={handleDismiss} aria-hidden />
       <div className="legacy-browser-notice__modal">
         <div className="legacy-browser-notice__icon" aria-hidden>
           <i className="bi bi-exclamation-triangle-fill" />
@@ -60,7 +76,7 @@ export default function LegacyBrowserNotice() {
         <button
           type="button"
           className="legacy-browser-notice__btn"
-          onClick={() => setDismissed(true)}
+          onClick={handleDismiss}
         >
           {t.dismiss}
         </button>
