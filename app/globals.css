@@ -267,7 +267,7 @@ body.preloader-released #preloader {
 }
 @media (min-width: 992px) {
   #contact-form {
-    scroll-margin-top: 195px;
+    scroll-margin-top: 260px;
   }
 }
 #contact .php-email-form,
