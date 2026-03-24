@@ -266,8 +266,9 @@ body.preloader-released #preloader {
   scroll-margin-top: 155px;
 }
 @media (min-width: 992px) {
+  /* Larger offset so balloon scroll hides footer (tall viewports need more margin) */
   #contact-form {
-    scroll-margin-top: 260px;
+    scroll-margin-top: clamp(320px, 32vh, 520px);
   }
 }
 #contact .php-email-form,
