@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   title: "Fabio Daros | Software Engineer • Biotechnology & AI",
   description: "Fabio Daros is a software engineer transitioning into biotechnology and biomedical AI, focusing on data analysis, cancer research and health technology.",
   icons: {
-    icon: "/assets/img/favicon.png",
-    apple: "/assets/img/apple-touch-icon.png",
+    icon: "/assets/img/favicon_v2.png",
+    apple: "/assets/img/apple-touch-icon_v2.png",
   },
   verification: {
     google: "HX3rX0v_c7uj975CdpCE_7bxRQAb4dJ9WmcbCtXmOvo",
@@ -69,7 +69,7 @@ export default function RootLayout({
         <link href="/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
         <link href="/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet" />
         <link href="/assets/css/main.css" rel="stylesheet" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon_v2.png" />
         <style id="vt-dir-styles" suppressHydrationWarning />
       </head>
       <body suppressHydrationWarning>
@@ -82,7 +82,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `(function(){
               setTimeout(function(){var e=document.querySelector('[data-aos]');if(e&&!e.classList.contains('aos-animate'))document.body.classList.add('aos-fallback');},2000);
-              setTimeout(function(){document.body.classList.add('preloader-released');var p=document.getElementById('preloader');if(p)p.style.pointerEvents='none';},1500);
+              setTimeout(function(){document.body.classList.add('preloader-released');},1500);
             })();`,
           }}
         />

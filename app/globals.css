@@ -263,7 +263,12 @@ body.preloader-released #preloader {
 }
 
 #contact-form {
-  scroll-margin-top: 120px;
+  scroll-margin-top: 155px;
+}
+@media (min-width: 992px) {
+  #contact-form {
+    scroll-margin-top: 195px;
+  }
 }
 #contact .php-email-form,
 #contact .php-email-form input,
