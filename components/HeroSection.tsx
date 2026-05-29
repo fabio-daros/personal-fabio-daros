@@ -5,6 +5,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 import HeroNeuralBackground from "@/components/HeroNeuralBackground";
 import HeroNeuralComet from "@/components/HeroNeuralComet";
+import { HeroPerformanceProvider } from "@/context/HeroPerformanceContext";
 
 export default function HeroSection() {
   const typedRef = useRef<HTMLSpanElement>(null);
@@ -63,10 +64,11 @@ export default function HeroSection() {
   }, [locale, typedStrings]);
 
   return (
-    <section id="hero" className="hero section dark-background">
-      <HeroNeuralBackground />
-      <HeroNeuralComet />
-      <div className="container" data-aos="zoom-out" data-aos-delay="100">
+    <HeroPerformanceProvider>
+      <section id="hero" className="hero section dark-background">
+        <HeroNeuralBackground />
+        <HeroNeuralComet />
+        <div className="container" data-aos="zoom-out" data-aos-delay="100">
         <h1>{translations[locale].hero.name}</h1>
         <h2 className="visually-hidden">{translations[locale].hero.subtitle}</h2>
         <p>
@@ -92,6 +94,7 @@ export default function HeroSection() {
           </a>
         </div>
       </div>
-    </section>
+      </section>
+    </HeroPerformanceProvider>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useTheme, type Theme } from "@/context/ThemeContext";
+import { useHeroPerformanceTier } from "@/context/HeroPerformanceContext";
+import { microPulseCount } from "@/lib/hero-performance";
 
 type MicroPulse = {
   id: number;
@@ -52,17 +54,20 @@ function createLightMicroPulses(count: number): MicroPulse[] {
   });
 }
 
-function createMicroPulses(theme: Theme): MicroPulse[] {
-  return theme === "light" ? createLightMicroPulses(26) : createDarkMicroPulses(22);
+function createMicroPulses(theme: Theme, count: number): MicroPulse[] {
+  if (count <= 0) return [];
+  return theme === "light" ? createLightMicroPulses(count) : createDarkMicroPulses(count);
 }
 
 export default function HeroNeuralMicroPulses() {
   const { theme } = useTheme();
+  const tier = useHeroPerformanceTier();
   const [pulses, setPulses] = useState<MicroPulse[]>([]);
 
   useEffect(() => {
-    setPulses(createMicroPulses(theme));
-  }, [theme]);
+    const count = microPulseCount(tier, theme);
+    setPulses(createMicroPulses(theme, count));
+  }, [theme, tier]);
 
   if (!pulses.length) return null;
 

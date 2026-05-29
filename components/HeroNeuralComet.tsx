@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useTheme } from "@/context/ThemeContext";
+import { useHeroPerformanceTier } from "@/context/HeroPerformanceContext";
+import { shouldRenderComet } from "@/lib/hero-performance";
 
 type CometTrajectory = "rtl" | "ltr" | "ttb" | "btt";
 
@@ -84,6 +86,8 @@ function nextIntervalMs() {
 
 export default function HeroNeuralComet() {
   const { theme } = useTheme();
+  const tier = useHeroPerformanceTier();
+  const enabled = shouldRenderComet(tier);
   const [comet, setComet] = useState<CometPass | null>(null);
   const cometIdRef = useRef(0);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -111,7 +115,7 @@ export default function HeroNeuralComet() {
   }, [trackTimeout]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !enabled) return;
 
     const scheduleNext = () => {
       trackTimeout(
@@ -130,7 +134,9 @@ export default function HeroNeuralComet() {
     );
 
     return clearTimers;
-  }, [clearTimers, launchComet, trackTimeout]);
+  }, [clearTimers, enabled, launchComet, trackTimeout]);
+
+  if (!enabled) return null;
 
   return (
     <div className="hero-neural-comet-layer" aria-hidden="true">

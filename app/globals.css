@@ -878,6 +878,49 @@ html[data-theme="light"] .hero-neural-particles canvas {
   pointer-events: none;
 }
 
+/* Lighter GPU load on constrained devices */
+.hero-neural-bg[data-hero-tier="light"] .hero-neural-nebula__blob {
+  filter: blur(48px);
+}
+.hero-neural-bg[data-hero-tier="light"] .hero-neural-nebula__blob--a {
+  animation-duration: 58s;
+}
+.hero-neural-bg[data-hero-tier="light"] .hero-neural-nebula__blob--b {
+  animation-duration: 68s;
+}
+.hero-neural-bg[data-hero-tier="light"] .hero-neural-nebula__blob--c {
+  animation-duration: 74s;
+}
+.hero-neural-bg[data-hero-tier="light"] .hero-neural-particles:not([data-theme="light"]) {
+  mix-blend-mode: normal;
+  filter: none;
+}
+.hero-neural-bg[data-hero-tier="light"] .hero-neural-micro-pulse--dark {
+  mix-blend-mode: normal;
+  box-shadow: 0 0 6px rgba(94, 245, 154, 0.35);
+}
+
+.hero-neural-bg[data-hero-tier="static"] .hero-neural-nebula__blob {
+  animation: none;
+  filter: blur(40px);
+  opacity: 0.36;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-neural-nebula__blob,
+  .hero-neural-micro-pulse,
+  .hero-neural-comet,
+  .hero-neural-comet__head,
+  .hero-neural-comet__head::before,
+  .hero-neural-comet__head::after {
+    animation: none !important;
+  }
+  .hero-neural-particles:not([data-theme="light"]) {
+    mix-blend-mode: normal;
+    filter: none;
+  }
+}
+
 /* Suave transição hero → secção seguinte */
 #hero {
   --hero-fade-to: #000000;
