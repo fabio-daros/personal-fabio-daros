@@ -7,15 +7,26 @@ export const translations = {
       about: "Sobre",
       resume: "Currículo",
       expertise: "Expertise",
+      research: "Pesquisa",
       contact: "Contato",
       themeDark: "Escuro",
       themeLight: "Claro",
+      themeSwitchToLight: "Ativar tema claro",
+      themeSwitchToDark: "Ativar tema escuro",
+      langSwitchToEn: "Mudar para inglês",
+      langSwitchToPt: "Mudar para português",
+      langMenuLabel: "Idioma",
+      langLabelPt: "Português",
+      langLabelEn: "English",
     },
     hero: {
       name: "Fabio Daros",
       subtitle: "Engenheiro de Software | Biotecnologia e IA Biomédica",
       im: "Sou",
       typed: ["Engenheiro de Software", "Freelancer", "Engenheiro de IA", "Engenheiro de Bioinformática", "Product Owner"],
+    },
+    home: {
+      researchCta: "Pesquisas que estou envolvido",
     },
     contact: {
       title: "Contato",
@@ -71,6 +82,7 @@ export const translations = {
     resume: {
       title: "Currículo",
       pageDescription: "Engenheiro de Software e mestrando em Biotecnologia, especializado em soluções HealthTech impulsionadas por IA e desenvolvimento full-stack.",
+      downloadCv: "Baixar currículo",
       breadcrumbHome: "Início",
       breadcrumbResume: "Currículo",
       education: "Formação Acadêmica",
@@ -197,6 +209,19 @@ export const translations = {
         },
       ],
     },
+    research: {
+      title: "Pesquisa",
+      pageDescription:
+        "Projetos de pesquisa em IA biomédica, imagens médicas e engenharia de software aplicada à ciência.",
+      breadcrumbHome: "Início",
+      breadcrumbResearch: "Pesquisa",
+      expandProject: "Expandir imagens do projeto",
+      collapseProject: "Recolher imagens do projeto",
+      closeProject: "Fechar projeto",
+      inpuntoTitle:
+        "LAMP-INPUNTO - Plataforma Inteligente de Diagnóstico Molecular e Aplicação na Detecção de IBV",
+      comingSoon: "Em breve",
+    },
   },
   en: {
     nav: {
@@ -204,15 +229,26 @@ export const translations = {
       about: "About",
       resume: "Resume",
       expertise: "Expertise",
+      research: "Research",
       contact: "Contact",
       themeDark: "Dark",
       themeLight: "Light",
+      themeSwitchToLight: "Switch to light theme",
+      themeSwitchToDark: "Switch to dark theme",
+      langSwitchToEn: "Switch to English",
+      langSwitchToPt: "Switch to Portuguese",
+      langMenuLabel: "Language",
+      langLabelPt: "Português",
+      langLabelEn: "English",
     },
     hero: {
       name: "Fabio Daros",
       subtitle: "Software Engineer | Biotechnology & Biomedical AI",
       im: "I'm",
       typed: ["Software Engineer", "Freelancer", "AI Engineer", "Bioinformatics Engineer", "Product Owner"],
+    },
+    home: {
+      researchCta: "Research I'm involved in",
     },
     contact: {
       title: "Contact",
@@ -268,6 +304,7 @@ export const translations = {
     resume: {
       title: "Resume",
       pageDescription: "Software Engineer and Master's student in Biotechnology, specialising in AI-driven HealthTech solutions and full-stack development.",
+      downloadCv: "Download resume",
       breadcrumbHome: "Home",
       breadcrumbResume: "Resume",
       education: "Education",
@@ -393,6 +430,19 @@ export const translations = {
           description: "Design of scalable AI pipelines and backend systems for training, deploying and integrating machine learning models in scientific and biomedical environments.",
         },
       ],
+    },
+    research: {
+      title: "Research",
+      pageDescription:
+        "Research projects in biomedical AI, medical imaging and software engineering applied to science.",
+      breadcrumbHome: "Home",
+      breadcrumbResearch: "Research",
+      expandProject: "Expand project images",
+      collapseProject: "Collapse project images",
+      closeProject: "Close project",
+      inpuntoTitle:
+        "LAMP-INPUNTO - Intelligent Molecular Diagnostics Platform and Application in IBV Detection",
+      comingSoon: "Coming soon",
     },
   },
 } as const;

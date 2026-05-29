@@ -1,6 +1,7 @@
 "use client";
 
 import PageTitle from "@/components/PageTitle";
+import ResumeCvDownloadButton from "@/components/ResumeCvDownloadButton";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
@@ -13,6 +14,7 @@ export default function ResumeContent() {
       <PageTitle
         title={t.title}
         description={t.pageDescription}
+        action={<ResumeCvDownloadButton />}
         breadcrumbs={[{ label: t.breadcrumbHome, href: "/" }, { label: t.breadcrumbResume }]}
       />
 

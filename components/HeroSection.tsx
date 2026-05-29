@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
+import HeroNeuralBackground from "@/components/HeroNeuralBackground";
+import HeroNeuralComet from "@/components/HeroNeuralComet";
 
 export default function HeroSection() {
   const typedRef = useRef<HTMLSpanElement>(null);
@@ -12,45 +14,58 @@ export default function HeroSection() {
   useEffect(() => {
     if (typeof window === "undefined" || !typedRef.current) return;
 
-    let typedInstance: { destroy: () => void } | null = null;
-    let retryTimeoutId: ReturnType<typeof setTimeout> | null = null;
     let isMounted = true;
-    let retryCount = 0;
-    const maxRetries = 20;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let stringIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
 
-    const tryInit = () => {
-      if (!isMounted) return;
-      const Typed = (window as Window & { Typed?: new (el: HTMLElement, options: object) => { destroy: () => void } }).Typed;
-      if (!Typed || !typedRef.current) {
-        if (retryCount < maxRetries) {
-          retryCount++;
-          retryTimeoutId = setTimeout(tryInit, 100);
-        }
+    const typeSpeed = 100;
+    const backSpeed = 50;
+    const backDelay = 2000;
+
+    const tick = () => {
+      if (!isMounted || !typedRef.current) return;
+
+      const currentString = typedStrings[stringIndex] ?? "";
+      typedRef.current.textContent = currentString.slice(0, charIndex);
+
+      if (!isDeleting && charIndex < currentString.length) {
+        charIndex++;
+        timeoutId = setTimeout(tick, typeSpeed);
         return;
       }
 
-      typedInstance = new Typed(typedRef.current, {
-        strings: typedStrings,
-        loop: true,
-        typeSpeed: 100,
-        backSpeed: 50,
-        backDelay: 2000,
-        showCursor: true,
-      });
+      if (!isDeleting && charIndex === currentString.length) {
+        isDeleting = true;
+        timeoutId = setTimeout(tick, backDelay);
+        return;
+      }
+
+      if (isDeleting && charIndex > 0) {
+        charIndex--;
+        timeoutId = setTimeout(tick, backSpeed);
+        return;
+      }
+
+      isDeleting = false;
+      stringIndex = (stringIndex + 1) % typedStrings.length;
+      timeoutId = setTimeout(tick, typeSpeed);
     };
 
-    tryInit();
+    tick();
 
     return () => {
       isMounted = false;
-      if (retryTimeoutId) clearTimeout(retryTimeoutId);
-      typedInstance?.destroy();
+      if (timeoutId) clearTimeout(timeoutId);
+      if (typedRef.current) typedRef.current.textContent = "";
     };
   }, [locale, typedStrings]);
 
   return (
     <section id="hero" className="hero section dark-background">
-      <div className="hero-bg" data-aos="fade-in" />
+      <HeroNeuralBackground />
+      <HeroNeuralComet />
       <div className="container" data-aos="zoom-out" data-aos-delay="100">
         <h1>{translations[locale].hero.name}</h1>
         <h2 className="visually-hidden">{translations[locale].hero.subtitle}</h2>

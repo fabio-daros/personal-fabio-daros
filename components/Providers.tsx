@@ -2,11 +2,17 @@
 
 import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import type { Locale } from "@/lib/translations";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+type ProvidersProps = {
+  children: React.ReactNode;
+  initialLocale: Locale;
+};
+
+export default function Providers({ children, initialLocale }: ProvidersProps) {
   return (
     <ThemeProvider>
-      <LanguageProvider>{children}</LanguageProvider>
+      <LanguageProvider initialLocale={initialLocale}>{children}</LanguageProvider>
     </ThemeProvider>
   );
 }

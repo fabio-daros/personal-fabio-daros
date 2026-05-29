@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
 
-const PAGES = ["/", "/about", "/resume", "/expertise"] as const;
+const PAGES = ["/", "/about", "/resume", "/research", "/expertise"] as const;
 
 export default function SwipeNavigation() {
   const pathname = usePathname();

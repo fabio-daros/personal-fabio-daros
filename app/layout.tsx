@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { ViewTransitions } from "next-view-transitions";
+import { cookies, headers } from "next/headers";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,6 +11,8 @@ import SwipeNavigation from "@/components/SwipeNavigation";
 import SwipeDragWrapper from "@/components/SwipeDragWrapper";
 import GetInTouchButton from "@/components/GetInTouchButton";
 import LegacyBrowserNotice from "@/components/LegacyBrowserNotice";
+import { LOCALE_COOKIE, localeToHtmlLang, resolveLocale } from "@/lib/locale";
+import type { Locale } from "@/lib/translations";
 
 export const metadata: Metadata = {
   title: "Fabio Daros | Software Engineer • Biotechnology & AI",
@@ -30,14 +33,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const headerStore = await headers();
+  const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value;
+  const headerLocale = headerStore.get("x-site-locale");
+  const initialLocale: Locale = resolveLocale(cookieLocale ?? headerLocale, null);
+
   return (
     <ViewTransitions>
-    <html lang="en" data-theme="dark" suppressHydrationWarning>
+    <html
+      lang={localeToHtmlLang(initialLocale)}
+      data-locale={initialLocale}
+      data-theme="dark"
+      suppressHydrationWarning
+    >
       <head suppressHydrationWarning>
         <script
           type="application/ld+json"
@@ -86,7 +100,7 @@ export default function RootLayout({
             })();`,
           }}
         />
-        <Providers>
+        <Providers initialLocale={initialLocale}>
           <LegacyBrowserNotice />
           <SwipeDragWrapper>
             <Header />

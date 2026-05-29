@@ -8,6 +8,7 @@ const STORAGE_KEY = "site-theme";
 
 const ThemeContext = createContext<{
   theme: Theme;
+  mounted: boolean;
   setTheme: (theme: Theme) => void;
 } | null>(null);
 
@@ -43,7 +44,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme, mounted]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, mounted, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

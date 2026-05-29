@@ -4,7 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { usePathname } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
 
-const PAGES = ["/", "/about", "/resume", "/expertise"] as const;
+const PAGES = ["/", "/about", "/resume", "/research", "/expertise"] as const;
 const DRAG_RESISTANCE = 0.9;
 const RELEASE_THRESHOLD = 0.25;
 const SWIPE_COOLDOWN_MS = 350;

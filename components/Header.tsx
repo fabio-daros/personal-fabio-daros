@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/", labelKey: "home" as const },
   { href: "/about", labelKey: "about" as const },
   { href: "/resume", labelKey: "resume" as const },
+  { href: "/research", labelKey: "research" as const },
   { href: "/expertise", labelKey: "expertise" as const },
 ];
 
@@ -21,28 +22,32 @@ export default function Header() {
 
   return (
     <header id="header" className="header d-flex align-items-center fixed-top">
-      <div className="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+      <div className="container-fluid container-xl header-inner position-relative d-flex align-items-center">
         <Link href="/" className="logo d-flex align-items-center">
           <h1 className="sitename">Personal</h1>
         </Link>
 
-        <div className="d-flex align-items-center gap-3">
-          <nav id="navmenu" className="navmenu">
-            <ul>
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className={pathname === link.href ? "active" : undefined}
-                  >
-                    {t[link.labelKey]}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <i className="mobile-nav-toggle d-xl-none bi bi-list"></i>
-          </nav>
+        <nav id="navmenu" className="navmenu header-nav">
+          <ul>
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className={pathname === link.href ? "active" : undefined}
+                >
+                  {t[link.labelKey]}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <i className="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+        <div className="header-controls d-flex align-items-center">
           <LanguageSwitcher />
+          <span className="header-controls__divider" aria-hidden="true">
+            |
+          </span>
           <ThemeSwitcher />
         </div>
       </div>
