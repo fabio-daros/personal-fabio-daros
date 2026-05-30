@@ -23,8 +23,15 @@ export default function Header() {
   return (
     <header id="header" className="header d-flex align-items-center fixed-top">
       <div className="container-fluid container-xl header-inner position-relative d-flex align-items-center">
-        <Link href="/" className="logo d-flex align-items-center">
-          <h1 className="sitename">Personal</h1>
+        <Link href="/" className="logo d-flex align-items-center" aria-label={t.home}>
+          <img
+            src="/assets/img/header-logo.png"
+            alt=""
+            width={36}
+            height={36}
+            className="header-logo"
+            decoding="async"
+          />
         </Link>
 
         <nav id="navmenu" className="navmenu header-nav">

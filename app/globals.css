@@ -1484,6 +1484,13 @@ html[data-theme="light"] .language-switcher__option:focus-visible {
 .navmenu .active {
   text-decoration: none !important;
 }
+.header .logo .header-logo {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+}
 .navmenu>ul>li>a:before {
   display: none !important;
 }
