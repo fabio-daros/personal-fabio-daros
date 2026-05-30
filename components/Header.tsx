@@ -27,8 +27,8 @@ export default function Header() {
           <img
             src="/assets/img/header-logo.png"
             alt=""
-            width={36}
-            height={36}
+            width={52}
+            height={52}
             className="header-logo"
             decoding="async"
           />

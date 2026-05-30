@@ -1486,10 +1486,18 @@ html[data-theme="light"] .language-switcher__option:focus-visible {
 }
 .header .logo .header-logo {
   display: block;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 52px;
+  height: 52px;
+  max-height: 52px !important;
+  border-radius: 10px;
   object-fit: cover;
+}
+@media (max-width: 576px) {
+  .header .logo .header-logo {
+    width: 44px;
+    height: 44px;
+    max-height: 44px !important;
+  }
 }
 .navmenu>ul>li>a:before {
   display: none !important;
