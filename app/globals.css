@@ -1636,6 +1636,7 @@ html[data-theme="light"] .footer.dark-background {
   --background-color: #ffffff;
   --default-color: #1a1a1a;
   --heading-color: #000000;
+  --contrast-color: #ffffff;
   background-color: #ffffff;
 }
 
