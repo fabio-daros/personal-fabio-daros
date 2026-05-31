@@ -4,11 +4,18 @@ import type { ReactNode } from "react";
 interface PageTitleProps {
   title: string;
   description?: string;
+  afterDescription?: ReactNode;
   action?: ReactNode;
   breadcrumbs?: { label: string; href?: string }[];
 }
 
-export default function PageTitle({ title, description, action, breadcrumbs }: PageTitleProps) {
+export default function PageTitle({
+  title,
+  description,
+  afterDescription,
+  action,
+  breadcrumbs,
+}: PageTitleProps) {
   return (
     <div className="page-title" data-aos="fade">
       <div className="heading">
@@ -17,6 +24,7 @@ export default function PageTitle({ title, description, action, breadcrumbs }: P
             <div className="col-lg-8">
               <h1>{title}</h1>
               {description && <p className="mb-0">{description}</p>}
+              {afterDescription ? <div className="page-title__after-description">{afterDescription}</div> : null}
               {action ? <div className="page-title__action">{action}</div> : null}
             </div>
           </div>

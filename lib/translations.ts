@@ -213,6 +213,8 @@ export const translations = {
       title: "Pesquisa",
       pageDescription:
         "Projetos de pesquisa em IA biomédica, imagens médicas e engenharia de software aplicada à ciência.",
+      introImageAlt:
+        "Ilustração de perfil humano com cérebro e rede neural esférica, representando IA biomédica e neurociência.",
       breadcrumbHome: "Início",
       breadcrumbResearch: "Pesquisa",
       expandProject: "Expandir imagens do projeto",
@@ -435,6 +437,8 @@ export const translations = {
       title: "Research",
       pageDescription:
         "Research projects in biomedical AI, medical imaging and software engineering applied to science.",
+      introImageAlt:
+        "Illustration of a human head profile with brain and spherical neural network, representing biomedical AI and neuroscience.",
       breadcrumbHome: "Home",
       breadcrumbResearch: "Research",
       expandProject: "Expand project images",

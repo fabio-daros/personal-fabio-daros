@@ -151,6 +151,33 @@ html[data-theme="light"] .resume-cv-download__btn:focus-visible {
   pointer-events: none;
 }
 
+.page-title__after-description {
+  margin-top: 1.75rem;
+}
+
+.page-title:has(.page-title__after-description) .heading {
+  padding-bottom: 1.25rem;
+}
+
+.page-title:has(.page-title__after-description) nav {
+  padding: 12px 0;
+}
+
+#research.section {
+  padding-top: 1.25rem;
+}
+
+.research-intro__figure {
+  margin: 0;
+}
+
+.research-intro__img {
+  width: min(100%, 560px);
+  height: auto;
+  display: inline-block;
+  border-radius: 12px;
+}
+
 .research .research-accordions {
   display: flex;
   flex-direction: column;

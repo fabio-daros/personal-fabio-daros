@@ -81,6 +81,16 @@ export default function ResearchContent() {
       <PageTitle
         title={t.title}
         description={t.pageDescription}
+        afterDescription={
+          <figure className="research-intro__figure">
+            <img
+              src="/assets/img/research/research-intro.png"
+              alt={t.introImageAlt}
+              className="img-fluid research-intro__img"
+              loading="eager"
+            />
+          </figure>
+        }
         breadcrumbs={[{ label: t.breadcrumbHome, href: "/" }, { label: t.breadcrumbResearch }]}
       />
 
