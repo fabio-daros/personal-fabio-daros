@@ -172,7 +172,7 @@ html[data-theme="light"] .resume-cv-download__btn:focus-visible {
 }
 
 .research-intro__img {
-  width: min(100%, 560px);
+  width: min(100%, 250px);
   height: auto;
   display: inline-block;
   border-radius: 12px;
