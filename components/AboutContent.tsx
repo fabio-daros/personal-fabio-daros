@@ -60,7 +60,9 @@ export default function AboutContent() {
         <div className="container" data-aos="fade-up" data-aos-delay="100">
           <div className="row gy-4 justify-content-center">
             <div className="col-lg-4">
-              <img src="/assets/img/profile-img.jpg" className="img-fluid" alt="Fabio Daros" />
+              <div className="about-profile__frame">
+                <img src="/assets/img/profile-img.png" className="img-fluid about-profile__photo" alt="Fabio Daros" />
+              </div>
               <ProfileLinks />
             </div>
             <div className="col-lg-8 content">

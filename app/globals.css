@@ -484,6 +484,26 @@ html[data-theme="dark"] .research .research-gallery__img {
   pointer-events: none;
 }
 
+.about .about-profile__frame {
+  width: min(100%, 320px);
+  margin: 0 auto;
+  line-height: 0;
+}
+
+.about .about-profile__photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-mask-image:
+    linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 24%, #000 100%);
+  mask-image:
+    linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 24%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
 .about .profile-links {
   display: flex;
   flex-direction: row;
