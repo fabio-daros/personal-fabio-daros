@@ -6,7 +6,7 @@ Pasta padrão: [Drive folder](https://drive.google.com/drive/folders/1bJCtxUvKqc
 
 1. Coloque os PDFs na pasta com estes nomes (exatamente como no Drive, ou ajuste em `.env.local`):
    - `CV Fabio Daros.pdf` (português)
-   - `Resume_Fabio_Daros.pdf` (inglês)
+   - `Resume_Fabio_Daros.pdf` (inglês) — ou defina `GOOGLE_DRIVE_FILE_ID_EN` (padrão: [link direto](https://drive.google.com/file/d/1Xpnldj1iiPXvPUueS6VPYemPXagUHEfJ/view))
 2. Compartilhe a pasta e os arquivos: **Qualquer pessoa com o link** → Leitor.
 3. Em [Google Cloud Console](https://console.cloud.google.com/), crie uma **API Key** e ative a **Google Drive API**.
 4. Copie `.env.example` → `.env.local` e preencha `GOOGLE_DRIVE_API_KEY`.

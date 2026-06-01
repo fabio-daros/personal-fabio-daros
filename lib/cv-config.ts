@@ -3,6 +3,9 @@ import type { Locale } from "@/lib/translations";
 /** Default folder: https://drive.google.com/drive/folders/1bJCtxUvKqcBN3RusNny1vc9pUe7iTW3e */
 export const DEFAULT_CV_DRIVE_FOLDER_ID = "1bJCtxUvKqcBN3RusNny1vc9pUe7iTW3e";
 
+/** Default EN resume: https://drive.google.com/file/d/1Xpnldj1iiPXvPUueS6VPYemPXagUHEfJ/view */
+export const DEFAULT_CV_DRIVE_FILE_ID_EN = "1Xpnldj1iiPXvPUueS6VPYemPXagUHEfJ";
+
 const DEFAULT_DRIVE_FILENAMES: Record<Locale, string> = {
   pt: "CV Fabio Daros.pdf",
   en: "Resume_Fabio_Daros.pdf",
@@ -28,5 +31,7 @@ export function getCvDriveFileId(locale: Locale): string | undefined {
   const fromEnv =
     locale === "pt" ? process.env.GOOGLE_DRIVE_FILE_ID_PT : process.env.GOOGLE_DRIVE_FILE_ID_EN;
   const trimmed = fromEnv?.trim();
-  return trimmed || undefined;
+  if (trimmed) return trimmed;
+  if (locale === "en") return DEFAULT_CV_DRIVE_FILE_ID_EN;
+  return undefined;
 }
