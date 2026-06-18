@@ -80,8 +80,6 @@ export default async function RootLayout({
         <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
         <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
         <link href="/assets/vendor/aos/aos.css" rel="stylesheet" />
-        <link href="/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
-        <link href="/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet" />
         <link href="/assets/css/main.css" rel="stylesheet" />
         <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon_v2.png" />
         <style id="vt-dir-styles" suppressHydrationWarning />

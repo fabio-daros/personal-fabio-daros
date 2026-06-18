@@ -1,5 +1,6 @@
 "use client";
 
+import Script from "next/script";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
@@ -9,6 +10,10 @@ export default function ContactSection() {
 
   return (
     <section id="contact" className="contact section">
+      <Script
+        src="/assets/vendor/php-email-form/validate.js"
+        strategy="afterInteractive"
+      />
       <div className="container section-title" data-aos="fade-up">
         <h2>{t.title}</h2>
         <div><span className="description-title">{t.getInTouch}</span></div>

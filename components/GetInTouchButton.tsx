@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -46,7 +47,14 @@ export default function GetInTouchButton() {
       aria-label={t.getInTouch}
       title={t.getInTouch}
     >
-      <img src="/assets/img/speech-bubble.png" alt="" width={48} height={48} />
+      <Image
+        src="/assets/img/speech-bubble.png"
+        alt=""
+        width={48}
+        height={48}
+        sizes="48px"
+        unoptimized
+      />
     </Link>
   );
 }

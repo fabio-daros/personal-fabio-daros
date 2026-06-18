@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import PageTitle from "@/components/PageTitle";
 import ProfileLinks from "@/components/ProfileLinks";
 import { useLanguage } from "@/context/LanguageContext";
@@ -61,7 +62,15 @@ export default function AboutContent() {
           <div className="row gy-4 justify-content-center">
             <div className="col-lg-4">
               <div className="about-profile__frame">
-                <img src="/assets/img/profile-img.png" className="img-fluid about-profile__photo" alt="Fabio Daros" />
+                <Image
+                  src="/assets/img/profile-img.png"
+                  className="img-fluid about-profile__photo"
+                  alt="Fabio Daros"
+                  width={466}
+                  height={536}
+                  sizes="(max-width: 991px) 320px, 320px"
+                  unoptimized
+                />
               </div>
               <ProfileLinks />
             </div>

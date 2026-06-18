@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import PageTitle from "@/components/PageTitle";
 import { ResearchProjectCard, ResearchProjectPanel } from "@/components/ResearchAccordion";
@@ -11,26 +12,36 @@ const ONCOPIXEL_IMAGES = [
     src: "/assets/img/research/oncopixel/summary-results.png",
     altPt: "OncoPixel — tela de resultados resumidos com detecções em imagem de citologia",
     altEn: "OncoPixel — summary results screen with cytology image detections",
+    width: 1024,
+    height: 625,
   },
   {
     src: "/assets/img/research/oncopixel/oncobrain-api.png",
     altPt: "OncoBrain — página da API com documentação Swagger",
     altEn: "OncoBrain — API landing page with Swagger documentation",
+    width: 1024,
+    height: 625,
   },
   {
     src: "/assets/img/research/oncopixel/training-loss-kfold.png",
     altPt: "Gráfico de perda de treinamento — produção vs. validação cruzada K-Fold",
     altEn: "Training loss chart — production vs. K-Fold cross-validation",
+    width: 1024,
+    height: 586,
   },
   {
     src: "/assets/img/research/oncopixel/training-accuracy-kfold.png",
     altPt: "Gráfico de acurácia de treinamento — produção vs. validação cruzada K-Fold",
     altEn: "Training accuracy chart — production vs. K-Fold cross-validation",
+    width: 1024,
+    height: 586,
   },
   {
     src: "/assets/img/research/oncopixel/training-metrics.png",
     altPt: "Métricas de treinamento — perda e acurácia em treino e hold-out",
     altEn: "Training metrics — train and hold-out loss and accuracy",
+    width: 1024,
+    height: 426,
   },
 ] as const;
 
@@ -83,11 +94,14 @@ export default function ResearchContent() {
         description={t.pageDescription}
         afterDescription={
           <figure className="research-intro__figure">
-            <img
+            <Image
               src="/assets/img/research/research-intro.png"
               alt={t.introImageAlt}
               className="img-fluid research-intro__img"
-              loading="eager"
+              width={560}
+              height={560}
+              sizes="250px"
+              unoptimized
             />
           </figure>
         }
@@ -111,11 +125,15 @@ export default function ResearchContent() {
                       <div className="research-gallery research-gallery--modal">
                         {ONCOPIXEL_IMAGES.map((image, index) => (
                           <figure key={image.src} className="research-gallery__item">
-                            <img
+                            <Image
                               src={image.src}
                               alt={locale === "pt" ? image.altPt : image.altEn}
                               className="img-fluid research-gallery__img"
+                              width={image.width}
+                              height={image.height}
                               loading={index === 0 ? "eager" : "lazy"}
+                              sizes="(max-width: 991px) 90vw, 900px"
+                              unoptimized
                             />
                           </figure>
                         ))}
