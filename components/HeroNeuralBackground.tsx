@@ -15,8 +15,8 @@ const PARTICLE_PALETTES = {
     links: "#5ef59a",
   },
   light: {
-    colors: ["#0a7a3d", "#0d9e4e", "#084a28"],
-    links: "#7ee8a8",
+    colors: ["#064d2a", "#087a3f", "#0d9e4e", "#12b85e"],
+    links: "#0d9e4e",
   },
 } as const;
 
@@ -107,10 +107,10 @@ function buildParticleOptions(theme: Theme): ISourceOptions {
         color: {
           value: palette.links,
         },
-        distance: 108,
-        frequency: 0.72,
-        opacity: isLight ? 0.38 : 0.28,
-        width: isLight ? 0.95 : 1.05,
+        distance: isLight ? 92 : 108,
+        frequency: isLight ? 0.56 : 0.72,
+        opacity: isLight ? 0.58 : 0.42,
+        width: isLight ? 1.25 : 1.18,
       },
       move: {
         enable: true,
@@ -125,8 +125,8 @@ function buildParticleOptions(theme: Theme): ISourceOptions {
       opacity: isLight
         ? {
             value: {
-              min: 0.55,
-              max: 0.92,
+              min: 0.72,
+              max: 1,
             },
             animation: {
               enable: true,
@@ -137,7 +137,7 @@ function buildParticleOptions(theme: Theme): ISourceOptions {
           }
         : {
             value: {
-              min: 0.18,
+              min: 0.32,
               max: 1,
             },
             animation: {
@@ -150,8 +150,8 @@ function buildParticleOptions(theme: Theme): ISourceOptions {
       size: isLight
         ? {
             value: {
-              min: 2.2,
-              max: 3.6,
+              min: 2.4,
+              max: 4,
             },
             animation: {
               enable: true,
@@ -162,8 +162,8 @@ function buildParticleOptions(theme: Theme): ISourceOptions {
           }
         : {
             value: {
-              min: 0.8,
-              max: 3.1,
+              min: 1.2,
+              max: 3.4,
             },
             animation: {
               enable: true,

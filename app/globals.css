@@ -834,8 +834,8 @@ html[data-theme="dark"] .hero-neural-nebula__blob--c {
 .hero-neural-particles:not([data-theme="light"]) {
   mix-blend-mode: screen;
   filter:
-    drop-shadow(0 0 7px rgba(94, 245, 154, 0.42))
-    drop-shadow(0 0 14px rgba(24, 210, 110, 0.5));
+    drop-shadow(0 0 8px rgba(94, 245, 154, 0.52))
+    drop-shadow(0 0 16px rgba(24, 210, 110, 0.58));
 }
 .hero-neural-particles--light,
 .hero-neural-particles[data-theme="light"],
@@ -846,7 +846,9 @@ html[data-theme="light"] .hero-neural-particles {
 }
 
 html[data-theme="light"] .hero-neural-particles canvas {
-  filter: none !important;
+  filter:
+    drop-shadow(0 0 4px rgba(13, 158, 78, 0.32))
+    drop-shadow(0 0 9px rgba(13, 158, 78, 0.22)) !important;
 }
 .hero-neural-particles canvas {
   width: 100% !important;
