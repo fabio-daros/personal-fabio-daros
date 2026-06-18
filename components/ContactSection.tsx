@@ -1,7 +1,6 @@
 "use client";
 
-import Script from "next/script";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
@@ -48,29 +47,53 @@ export default function ContactSection() {
   const { locale } = useLanguage();
   const t = translations[locale].contact;
   const [confetti, setConfetti] = useState<ConfettiPiece[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
   const burstIdRef = useRef(0);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    const handleSent = () => {
-      const button = document.querySelector<HTMLButtonElement>("#contact-form button[type='submit']");
-      if (!button) return;
+  const triggerConfetti = () => {
+    if (!submitButtonRef.current) return;
 
-      burstIdRef.current += 1;
-      const burst = createConfettiBurst(button, burstIdRef.current);
-      setConfetti(burst);
-      window.setTimeout(() => setConfetti([]), 1400);
-    };
+    burstIdRef.current += 1;
+    const burst = createConfettiBurst(submitButtonRef.current, burstIdRef.current);
+    setConfetti(burst);
+    window.setTimeout(() => setConfetti([]), 1400);
+  };
 
-    window.addEventListener("contact-form:sent", handleSent);
-    return () => window.removeEventListener("contact-form:sent", handleSent);
-  }, []);
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+
+    setLoading(true);
+    setSent(false);
+    setError("");
+
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+      });
+
+      const data = await response.text();
+      if (!response.ok || data.trim() !== "OK") {
+        throw new Error(data || `${response.status} ${response.statusText}`);
+      }
+
+      setSent(true);
+      form.reset();
+      triggerConfetti();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section id="contact" className="contact section">
-      <Script
-        src="/assets/vendor/php-email-form/validate.js"
-        strategy="afterInteractive"
-      />
       <div className="container section-title" data-aos="fade-up">
         <h2>{t.title}</h2>
         <div><span className="description-title">{t.getInTouch}</span></div>
@@ -121,7 +144,7 @@ export default function ContactSection() {
           </div>
         </div>
 
-        <form id="contact-form" action="/api/contact" method="post" className="php-email-form" data-aos="fade-up" data-aos-delay="600">
+        <form id="contact-form" action="/api/contact" method="post" className="php-email-form" data-aos="fade-up" data-aos-delay="600" onSubmit={handleSubmit}>
           <input type="hidden" name="locale" value={locale} />
           <div className="row gy-4">
             <div className="col-md-6">
@@ -137,10 +160,10 @@ export default function ContactSection() {
               <textarea className="form-control" name="message" rows={6} placeholder={t.message} required></textarea>
             </div>
             <div className="col-md-12 text-center">
-              <div className="loading">{t.loading}</div>
-              <div className="error-message"></div>
-              <div className="sent-message">{t.sentMessage}</div>
-              <button type="submit">{t.sendMessage}</button>
+              <div className={`loading${loading ? " d-block" : ""}`}>{t.loading}</div>
+              <div className={`error-message${error ? " d-block" : ""}`}>{error}</div>
+              <div className={`sent-message${sent ? " d-block" : ""}`}>{t.sentMessage}</div>
+              <button type="submit" ref={submitButtonRef} disabled={loading}>{t.sendMessage}</button>
             </div>
           </div>
         </form>

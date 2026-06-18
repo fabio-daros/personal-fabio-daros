@@ -66,11 +66,6 @@
       thisForm.querySelector('.loading').classList.remove('d-block');
       if (data.trim() == 'OK') {
         thisForm.querySelector('.sent-message').classList.add('d-block');
-        window.dispatchEvent(new CustomEvent('contact-form:sent', {
-          detail: {
-            formId: thisForm.id
-          }
-        }));
         thisForm.reset(); 
       } else {
         throw new Error(data ? data : 'Form submission failed and no error message returned from: ' + action); 
