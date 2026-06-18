@@ -1158,6 +1158,59 @@ body.preloader-released #preloader {
   z-index: 10;
 }
 
+.contact-confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.contact-confetti__piece {
+  position: absolute;
+  left: var(--confetti-x);
+  top: var(--confetti-y);
+  width: var(--confetti-size);
+  height: calc(var(--confetti-size) * 1.6);
+  border-radius: 2px;
+  background: var(--confetti-color);
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: contact-confetti-burst var(--confetti-duration) cubic-bezier(0.16, 0.8, 0.28, 1) var(--confetti-delay) forwards;
+  will-change: transform, opacity;
+}
+
+.contact-confetti__piece:nth-child(3n) {
+  border-radius: 50%;
+}
+
+.contact-confetti__piece:nth-child(4n) {
+  width: calc(var(--confetti-size) * 1.8);
+  height: calc(var(--confetti-size) * 0.65);
+}
+
+@keyframes contact-confetti-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.75) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  68% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(
+        calc(-50% + var(--confetti-dx)),
+        calc(-50% + var(--confetti-dy) + 80px)
+      )
+      scale(0.96)
+      rotate(var(--confetti-rotate));
+  }
+}
+
 .hero .social-links a,
 .footer .social-links a,
 .contact .info-item .social-links a {

@@ -23,7 +23,7 @@ export const translations = {
       name: "Fabio Daros",
       subtitle: "Engenheiro de Software | Biotecnologia e IA Biomédica",
       im: "Sou",
-      typed: ["Engenheiro de Software", "Freelancer", "Engenheiro de IA", "Engenheiro de Bioinformática", "Product Owner"],
+      typed: ["Engenheiro de Software", "Freelancer", "Engenheiro de IA", "Engenheiro de Ciência de Dados", "Product Owner"],
     },
     home: {
       researchCta: "Pesquisas que estou envolvido",
@@ -247,7 +247,7 @@ export const translations = {
       name: "Fabio Daros",
       subtitle: "Software Engineer | Biotechnology & Biomedical AI",
       im: "I'm",
-      typed: ["Software Engineer", "Freelancer", "AI Engineer", "Bioinformatics Engineer", "Product Owner"],
+      typed: ["Software Engineer", "Freelancer", "AI Engineer", "Data Science Engineer", "Product Owner"],
     },
     home: {
       researchCta: "Research I'm involved in",

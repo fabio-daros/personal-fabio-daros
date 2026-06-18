@@ -1,12 +1,69 @@
 "use client";
 
 import Script from "next/script";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
+
+type ConfettiPiece = {
+  id: string;
+  color: string;
+  size: number;
+  x: number;
+  y: number;
+  dx: number;
+  dy: number;
+  rotate: number;
+  delay: number;
+  duration: number;
+};
+
+const CONFETTI_COLORS = ["#ef4444", "#2563eb", "#facc15", "#18d26e", "#0d9e4e", "#38bdf8"];
+
+function createConfettiBurst(button: HTMLButtonElement, burstId: number): ConfettiPiece[] {
+  const rect = button.getBoundingClientRect();
+  const originX = rect.left + rect.width / 2;
+  const originY = rect.top + rect.height / 2;
+
+  return Array.from({ length: 30 }, (_, index) => {
+    const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.15;
+    const distance = 72 + Math.random() * 96;
+
+    return {
+      id: `${burstId}-${index}`,
+      color: CONFETTI_COLORS[index % CONFETTI_COLORS.length],
+      size: 5 + Math.random() * 5,
+      x: originX,
+      y: originY,
+      dx: Math.cos(angle) * distance,
+      dy: Math.sin(angle) * distance + Math.random() * 30,
+      rotate: (Math.random() - 0.5) * 720,
+      delay: Math.random() * 0.08,
+      duration: 0.78 + Math.random() * 0.34,
+    };
+  });
+}
 
 export default function ContactSection() {
   const { locale } = useLanguage();
   const t = translations[locale].contact;
+  const [confetti, setConfetti] = useState<ConfettiPiece[]>([]);
+  const burstIdRef = useRef(0);
+
+  useEffect(() => {
+    const handleSent = () => {
+      const button = document.querySelector<HTMLButtonElement>("#contact-form button[type='submit']");
+      if (!button) return;
+
+      burstIdRef.current += 1;
+      const burst = createConfettiBurst(button, burstIdRef.current);
+      setConfetti(burst);
+      window.setTimeout(() => setConfetti([]), 1400);
+    };
+
+    window.addEventListener("contact-form:sent", handleSent);
+    return () => window.removeEventListener("contact-form:sent", handleSent);
+  }, []);
 
   return (
     <section id="contact" className="contact section">
@@ -87,6 +144,27 @@ export default function ContactSection() {
             </div>
           </div>
         </form>
+      </div>
+      <div className="contact-confetti" aria-hidden="true">
+        {confetti.map((piece) => (
+          <span
+            key={piece.id}
+            className="contact-confetti__piece"
+            style={
+              {
+                "--confetti-x": `${piece.x}px`,
+                "--confetti-y": `${piece.y}px`,
+                "--confetti-dx": `${piece.dx}px`,
+                "--confetti-dy": `${piece.dy}px`,
+                "--confetti-rotate": `${piece.rotate}deg`,
+                "--confetti-delay": `${piece.delay}s`,
+                "--confetti-duration": `${piece.duration}s`,
+                "--confetti-size": `${piece.size}px`,
+                "--confetti-color": piece.color,
+              } as CSSProperties
+            }
+          />
+        ))}
       </div>
     </section>
   );
