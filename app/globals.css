@@ -8,6 +8,57 @@
   padding: 1.5rem;
   pointer-events: none;
 }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 42px;
+}
+
+.site-section,
+#hero,
+#contact {
+  scroll-margin-top: 42px;
+}
+
+/* Keep section titles tight under the fixed header (overrides theme main.css). */
+.page-title .heading {
+  padding-top: 54px !important;
+  padding-bottom: 28px !important;
+}
+
+@media (max-width: 991.98px) {
+  html {
+    scroll-padding-top: 40px;
+  }
+
+  .site-section,
+  #hero,
+  #contact {
+    scroll-margin-top: 40px;
+  }
+
+  .page-title .heading {
+    padding-top: 44px !important;
+    padding-bottom: 22px !important;
+  }
+
+  .page-title .heading h2 {
+    font-size: 30px;
+  }
+
+  #contact-form {
+    scroll-margin-top: 64px;
+  }
+
+  /* Slightly less section padding so content sits closer under titles on phones. */
+  .site-section > .section,
+  .site-section > .about.section,
+  .site-section > .resume.section,
+  .site-section > .research.section,
+  .site-section > .services.section {
+    padding-top: 36px;
+  }
+}
 .legacy-browser-notice__backdrop {
   position: absolute;
   inset: 0;
@@ -81,7 +132,7 @@ body.aos-fallback [data-aos] {
 }
 
 .main [data-aos],
-#hero .hero-neural-bg,
+#hero .hero-video-bg,
 #hero .container {
   opacity: 1 !important;
   visibility: visible !important;
@@ -494,14 +545,7 @@ html[data-theme="dark"] .research .research-gallery__img {
   display: block;
   width: 100%;
   height: auto;
-  -webkit-mask-image:
-    linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%),
-    linear-gradient(to right, transparent 0%, #000 24%, #000 100%);
-  mask-image:
-    linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%),
-    linear-gradient(to right, transparent 0%, #000 24%, #000 100%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  border-radius: 12px;
 }
 
 .about .profile-links {
@@ -540,6 +584,68 @@ html[data-theme="dark"] .research .research-gallery__img {
   font-size: 20px;
   width: 50px;
   height: 50px;
+  background-color: rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+}
+
+.hero .social-links a:hover,
+.hero .social-links a:focus-visible {
+  background-color: var(--accent-color);
+  color: #ffffff;
+}
+
+.hero-video-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  background: #020304;
+}
+
+.hero-video-bg__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.hero-video-bg__media.is-front {
+  z-index: 2;
+  opacity: 1;
+}
+
+.hero-video-bg__media.is-back {
+  z-index: 1;
+}
+
+.hero-video-bg__media--static {
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Mobile: keep the person/cabin/tree in frame while cover crops the sides. */
+@media (max-width: 992px) {
+  .hero-video-bg__media {
+    object-fit: cover;
+    object-position: 62% 46%;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-video-bg__media {
+    object-position: 66% 44%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-video-bg__media {
+    opacity: 0.85;
+  }
 }
 
 .hero-neural-bg {
@@ -934,17 +1040,6 @@ html[data-theme="light"] .hero-neural-particles canvas {
 #hero.hero.section {
   min-height: 100vh;
 }
-#hero::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: clamp(72px, 11vh, 140px);
-  z-index: 6;
-  pointer-events: none;
-  background: linear-gradient(to bottom, transparent 0%, var(--hero-fade-to) 100%);
-}
 
 .language-switcher {
   position: relative;
@@ -1095,16 +1190,6 @@ html[data-theme="light"] .hero-neural-particles canvas {
   background-color: #000000;
 }
 
-.home-research-cta.section.dark-background {
-  --background-color: #000000;
-  background-color: #000000;
-}
-.home-research-cta.section {
-  padding: 1rem 0 2.5rem;
-  margin-top: -0.25rem;
-  position: relative;
-  z-index: 2;
-}
 .home-research-cta__btn {
   display: inline-flex;
   align-items: center;
@@ -1136,17 +1221,29 @@ html[data-theme="light"] .hero-neural-particles canvas {
   transform: translateX(3px);
 }
 
+.about-research-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+.about-research-cta .home-research-cta__btn {
+  font-size: 0.92rem;
+  padding: 9px 22px;
+  text-align: center;
+  max-width: 100%;
+}
+
 body.preloader-released #preloader {
   pointer-events: none;
 }
 
 #contact-form {
-  scroll-margin-top: 155px;
+  scroll-margin-top: 96px;
 }
 @media (min-width: 992px) {
-  /* Larger offset so balloon scroll hides footer (tall viewports need more margin) */
   #contact-form {
-    scroll-margin-top: clamp(320px, 32vh, 520px);
+    scroll-margin-top: 120px;
   }
 }
 #contact .php-email-form,
@@ -1438,13 +1535,8 @@ html[data-theme="light"] .scrolled .header {
 
 html[data-theme="light"] .hero.section.dark-background {
   --background-color: #ffffff;
-  --default-color: #1a1a1a;
-  --heading-color: #000000;
-  background-color: #ffffff;
-}
-html[data-theme="light"] .home-research-cta.section.dark-background {
-  --background-color: #ffffff;
-  --default-color: #444444;
+  --default-color: #ffffff;
+  --heading-color: #ffffff;
   background-color: #ffffff;
 }
 html[data-theme="light"] .home-research-cta__btn,
@@ -1454,6 +1546,9 @@ html[data-theme="light"] .home-research-cta__btn:focus-visible {
 }
 html[data-theme="light"] #hero {
   --hero-fade-to: #ffffff;
+}
+html[data-theme="light"] .hero-video-bg {
+  background: #020304;
 }
 html[data-theme="light"] .hero-neural-bg {
   background:
@@ -1510,17 +1605,13 @@ html[data-theme="light"] .hero-neural-vignette {
     radial-gradient(ellipse at center, transparent 52%, rgba(255, 255, 255, 0.22) 100%);
 }
 html[data-theme="light"] .hero .social-links a {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.45);
   color: #ffffff;
 }
-html[data-theme="light"] .hero .social-links a:hover {
+html[data-theme="light"] .hero .social-links a:hover,
+html[data-theme="light"] .hero .social-links a:focus-visible {
   background-color: var(--accent-color);
-  color: #fff;
-}
-@media (max-width: 992px) {
-  html[data-theme="light"] .hero .social-links a {
-    background-color: rgba(0, 0, 0, 0.35);
-  }
+  color: #ffffff;
 }
 
 html[data-theme="light"] .language-switcher__flag {

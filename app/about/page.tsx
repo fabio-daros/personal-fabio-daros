@@ -1,10 +1,5 @@
-import AboutContent from "@/components/AboutContent";
-
-export const metadata = {
-  title: "About - Fabio Daros",
-  description: "About me and my skills",
-};
+import HashRedirect from "@/components/HashRedirect";
 
 export default function AboutPage() {
-  return <AboutContent />;
+  return <HashRedirect id="about" />;
 }

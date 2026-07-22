@@ -10,15 +10,14 @@ export default function ResumeContent() {
   const t = translations[locale].resume;
 
   return (
-    <main className="main">
+    <div id="resume" className="site-section">
       <PageTitle
         title={t.title}
         description={t.pageDescription}
         action={<ResumeCvDownloadButton />}
-        breadcrumbs={[{ label: t.breadcrumbHome, href: "/" }, { label: t.breadcrumbResume }]}
       />
 
-      <section id="resume" className="resume section">
+      <section className="resume section">
         <div className="container">
           <div className="row">
             <div className="col-lg-6 order-2 order-lg-2" data-aos="fade-up" data-aos-delay="100">
@@ -158,6 +157,6 @@ export default function ResumeContent() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

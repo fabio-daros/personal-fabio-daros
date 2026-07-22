@@ -2,22 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
+import { scrollToSection } from "@/lib/nav";
 
 export default function GetInTouchButton() {
-  const pathname = usePathname();
   const { locale } = useLanguage();
   const t = translations[locale].contact;
   const [formInView, setFormInView] = useState(false);
 
   useEffect(() => {
-    if (pathname !== "/") {
-      setFormInView(false);
-      return;
-    }
     const form = document.getElementById("contact-form");
     if (!form) return;
 
@@ -27,16 +22,11 @@ export default function GetInTouchButton() {
     );
     observer.observe(form);
     return () => observer.disconnect();
-  }, [pathname]);
+  }, []);
 
   const handleClick = (e: React.MouseEvent) => {
-    if (pathname === "/") {
-      const el = document.getElementById("contact-form");
-      if (el) {
-        e.preventDefault();
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }
+    e.preventDefault();
+    scrollToSection("contact-form");
   };
 
   return (

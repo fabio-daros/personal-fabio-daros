@@ -1,15 +1,168 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
-import HeroNeuralBackground from "@/components/HeroNeuralBackground";
-import HeroNeuralComet from "@/components/HeroNeuralComet";
+
+/** Flip to `false` to restore the animated video background. */
+const USE_STATIC_HERO = false;
+
+const HERO_IMAGE_SRC = "/assets/img/hero-clouds.jpg";
+const HERO_VIDEO_SRC = "/assets/video/hero-clouds.mp4";
+/** Playback speed (< 1 = slower). */
+const HERO_PLAYBACK_RATE = 0.6;
+/** Seconds before the end to start blending into the beginning. */
+const CROSSFADE_SECONDS = 2.1;
+
+function prepareVideo(video: HTMLVideoElement) {
+  video.defaultMuted = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.loop = false;
+  video.preload = "auto";
+  video.playbackRate = HERO_PLAYBACK_RATE;
+  video.setAttribute("muted", "");
+  video.setAttribute("playsinline", "");
+  video.setAttribute("webkit-playsinline", "");
+}
+
+function tryPlay(video: HTMLVideoElement) {
+  video.playbackRate = HERO_PLAYBACK_RATE;
+  const playPromise = video.play();
+  if (playPromise) {
+    playPromise.catch(() => {
+      /* Autoplay can fail until the element is ready; callers retry on media events. */
+    });
+  }
+}
 
 export default function HeroSection() {
   const typedRef = useRef<HTMLSpanElement>(null);
+  const primaryRef = useRef<HTMLVideoElement>(null);
+  const secondaryRef = useRef<HTMLVideoElement>(null);
   const { locale } = useLanguage();
   const typedStrings = translations[locale].hero.typed;
+
+  useEffect(() => {
+    if (USE_STATIC_HERO) return;
+
+    const primary = primaryRef.current;
+    const secondary = secondaryRef.current;
+    if (!primary || !secondary) return;
+
+    prepareVideo(primary);
+    prepareVideo(secondary);
+
+    let active: HTMLVideoElement = primary;
+    let inactive: HTMLVideoElement = secondary;
+    let fading = false;
+    let rafId = 0;
+    let disposed = false;
+
+    const setFront = (video: HTMLVideoElement, isFront: boolean) => {
+      video.classList.toggle("is-front", isFront);
+      video.classList.toggle("is-back", !isFront);
+    };
+
+    const resetLayers = () => {
+      setFront(primary, true);
+      setFront(secondary, false);
+      primary.style.opacity = "1";
+      secondary.style.opacity = "0";
+    };
+
+    resetLayers();
+
+    const tryPlayBoth = () => {
+      if (disposed) return;
+      primary.playbackRate = HERO_PLAYBACK_RATE;
+      secondary.playbackRate = HERO_PLAYBACK_RATE;
+      tryPlay(primary);
+    };
+
+    const onReady = () => {
+      tryPlayBoth();
+    };
+
+    const swapRoles = () => {
+      const previous = active;
+      active = inactive;
+      inactive = previous;
+      setFront(active, true);
+      setFront(inactive, false);
+      fading = false;
+    };
+
+    const startCrossfade = () => {
+      if (fading || disposed) return;
+      fading = true;
+
+      inactive.currentTime = 0;
+      tryPlay(inactive);
+
+      const durationMs = (CROSSFADE_SECONDS / HERO_PLAYBACK_RATE) * 1000;
+      const startedAt = performance.now();
+
+      const tick = (now: number) => {
+        if (disposed) return;
+
+        const progress = Math.min(1, (now - startedAt) / durationMs);
+        const eased = progress * progress * (3 - 2 * progress);
+
+        active.style.opacity = String(1 - eased);
+        inactive.style.opacity = String(eased);
+
+        if (progress < 1) {
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+
+        active.pause();
+        active.currentTime = 0;
+        active.style.opacity = "0";
+        inactive.style.opacity = "1";
+        swapRoles();
+      };
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const onTimeUpdate = () => {
+      if (fading || disposed) return;
+      const duration = active.duration;
+      if (!Number.isFinite(duration) || duration <= CROSSFADE_SECONDS) return;
+      if (active.currentTime >= duration - CROSSFADE_SECONDS) {
+        startCrossfade();
+      }
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") tryPlay(active);
+    };
+
+    primary.addEventListener("loadeddata", onReady);
+    primary.addEventListener("canplay", onReady);
+    primary.addEventListener("timeupdate", onTimeUpdate);
+    secondary.addEventListener("timeupdate", onTimeUpdate);
+    document.addEventListener("visibilitychange", onVisibility);
+
+    primary.style.opacity = "1";
+    secondary.style.opacity = "0";
+    tryPlayBoth();
+
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(rafId);
+      primary.removeEventListener("loadeddata", onReady);
+      primary.removeEventListener("canplay", onReady);
+      primary.removeEventListener("timeupdate", onTimeUpdate);
+      secondary.removeEventListener("timeupdate", onTimeUpdate);
+      document.removeEventListener("visibilitychange", onVisibility);
+      primary.pause();
+      secondary.pause();
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined" || !typedRef.current) return;
@@ -64,9 +217,39 @@ export default function HeroSection() {
 
   return (
     <section id="hero" className="hero section dark-background">
-      <HeroNeuralBackground />
-      <HeroNeuralComet />
-      <div className="container" data-aos="zoom-out" data-aos-delay="100">
+      <div className="hero-video-bg" aria-hidden="true">
+        {USE_STATIC_HERO ? (
+          <Image
+            src={HERO_IMAGE_SRC}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="hero-video-bg__media hero-video-bg__media--static is-front"
+          />
+        ) : (
+          <>
+            <video
+              ref={primaryRef}
+              className="hero-video-bg__media is-front"
+              src={HERO_VIDEO_SRC}
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+            />
+            <video
+              ref={secondaryRef}
+              className="hero-video-bg__media is-back"
+              src={HERO_VIDEO_SRC}
+              muted
+              playsInline
+              preload="auto"
+            />
+          </>
+        )}
+      </div>
+      <div className="container">
         <h1>{translations[locale].hero.name}</h1>
         <h2 className="visually-hidden">{translations[locale].hero.subtitle}</h2>
         <p>

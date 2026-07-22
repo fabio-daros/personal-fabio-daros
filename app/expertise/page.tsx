@@ -1,10 +1,5 @@
-import ExpertiseContent from "@/components/ExpertiseContent";
-
-export const metadata = {
-  title: "Expertise - Fabio Daros",
-  description: "Areas of expertise",
-};
+import HashRedirect from "@/components/HashRedirect";
 
 export default function ExpertisePage() {
-  return <ExpertiseContent />;
+  return <HashRedirect id="expertise" />;
 }

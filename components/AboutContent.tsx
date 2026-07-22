@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import PageTitle from "@/components/PageTitle";
 import ProfileLinks from "@/components/ProfileLinks";
 import { useLanguage } from "@/context/LanguageContext";
@@ -48,16 +49,16 @@ const SKILLS = [
 export default function AboutContent() {
   const { locale } = useLanguage();
   const t = translations[locale].about;
+  const researchCta = translations[locale].home.researchCta;
 
   return (
-    <main className="main">
+    <div id="about" className="site-section">
       <PageTitle
         title={t.title}
         description={t.pageDescription}
-        breadcrumbs={[{ label: t.breadcrumbHome, href: "/" }, { label: t.breadcrumbAbout }]}
       />
 
-      <section id="about" className="about section">
+      <section className="about section">
         <div className="container" data-aos="fade-up" data-aos-delay="100">
           <div className="row gy-4 justify-content-center">
             <div className="col-lg-4">
@@ -66,13 +67,28 @@ export default function AboutContent() {
                   src="/assets/img/profile-img.png"
                   className="img-fluid about-profile__photo"
                   alt="Fabio Daros"
-                  width={466}
-                  height={536}
+                  width={819}
+                  height={1024}
                   sizes="(max-width: 991px) 320px, 320px"
                   unoptimized
                 />
               </div>
               <ProfileLinks />
+              <div className="about-research-cta">
+                <Link
+                  href="/#research"
+                  className="home-research-cta__btn"
+                  aria-label={researchCta}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    document.getElementById("research")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    history.replaceState(null, "", "#research");
+                  }}
+                >
+                  <span>{researchCta}</span>
+                  <i className="bi bi-arrow-right" aria-hidden="true" />
+                </Link>
+              </div>
             </div>
             <div className="col-lg-8 content">
               <h2>{t.heading}</h2>
@@ -121,6 +137,6 @@ export default function AboutContent() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

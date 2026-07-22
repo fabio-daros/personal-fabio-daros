@@ -22,7 +22,7 @@ export default function PageTitle({
         <div className="container">
           <div className="row d-flex justify-content-center text-center">
             <div className="col-lg-8">
-              <h1>{title}</h1>
+              <h2>{title}</h2>
               {description && <p className="mb-0">{description}</p>}
               {afterDescription ? <div className="page-title__after-description">{afterDescription}</div> : null}
               {action ? <div className="page-title__action">{action}</div> : null}

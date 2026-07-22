@@ -88,7 +88,7 @@ export default function ResearchContent() {
   }, [openId]);
 
   return (
-    <main className="main">
+    <div id="research" className="site-section">
       <PageTitle
         title={t.title}
         description={t.pageDescription}
@@ -105,10 +105,9 @@ export default function ResearchContent() {
             />
           </figure>
         }
-        breadcrumbs={[{ label: t.breadcrumbHome, href: "/" }, { label: t.breadcrumbResearch }]}
       />
 
-      <section id="research" className={`research section${openId ? " is-panel-open" : ""}`}>
+      <section className={`research section${openId ? " is-panel-open" : ""}`}>
         <div className="container">
           <div className="row">
             <div className="col-lg-10 mx-auto" data-aos="fade-up" data-aos-delay="100">
@@ -165,6 +164,6 @@ export default function ResearchContent() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

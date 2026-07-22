@@ -18,14 +18,13 @@ export default function ExpertiseContent() {
   const t = translations[locale].expertise;
 
   return (
-    <main className="main">
+    <div id="expertise" className="site-section">
       <PageTitle
         title={t.title}
         description={t.pageDescription}
-        breadcrumbs={[{ label: t.breadcrumbHome, href: "/" }, { label: t.breadcrumbExpertise }]}
       />
 
-      <section id="expertise" className="services section">
+      <section className="services section">
         <div className="container">
           <div className="row gy-4">
             {t.items.map((item, i) => (
@@ -42,6 +41,6 @@ export default function ExpertiseContent() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

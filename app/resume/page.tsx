@@ -1,10 +1,5 @@
-import ResumeContent from "@/components/ResumeContent";
-
-export const metadata = {
-  title: "Resume - Fabio Daros",
-  description: "Resume and professional experience",
-};
+import HashRedirect from "@/components/HashRedirect";
 
 export default function ResumePage() {
-  return <ResumeContent />;
+  return <HashRedirect id="resume" />;
 }

@@ -1,10 +1,5 @@
-import ResearchContent from "@/components/ResearchContent";
-
-export const metadata = {
-  title: "Research - Fabio Daros",
-  description: "Research projects in biomedical AI and medical imaging",
-};
+import HashRedirect from "@/components/HashRedirect";
 
 export default function ResearchPage() {
-  return <ResearchContent />;
+  return <HashRedirect id="research" />;
 }
