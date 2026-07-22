@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
@@ -37,12 +37,94 @@ function tryPlay(video: HTMLVideoElement) {
   }
 }
 
+function whenPreloaderReleased(): Promise<void> {
+  return new Promise((resolve) => {
+    if (document.body.classList.contains("preloader-released")) {
+      resolve();
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      if (!document.body.classList.contains("preloader-released")) return;
+      observer.disconnect();
+      resolve();
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // Layout script adds the class at 1.5s; hard fallback keeps UI unblocked.
+    window.setTimeout(() => {
+      document.body.classList.add("preloader-released");
+      observer.disconnect();
+      resolve();
+    }, 2200);
+  });
+}
+
 export default function HeroSection() {
+  const sectionRef = useRef<HTMLElement>(null);
   const typedRef = useRef<HTMLSpanElement>(null);
   const primaryRef = useRef<HTMLVideoElement>(null);
   const secondaryRef = useRef<HTMLVideoElement>(null);
+  const [introReady, setIntroReady] = useState(false);
+  const [introKey, setIntroKey] = useState(0);
   const { locale } = useLanguage();
   const typedStrings = translations[locale].hero.typed;
+
+  // First entrance is pure CSS via body.preloader-released.
+  // Replay remounts the content block so CSS animations run again.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    let cancelled = false;
+    let away = false;
+    let canReplay = false;
+    let typedDelay: ReturnType<typeof setTimeout> | null = null;
+
+    const armTyped = () => {
+      if (typedDelay) clearTimeout(typedDelay);
+      setIntroReady(false);
+      typedDelay = setTimeout(() => {
+        if (!cancelled) setIntroReady(true);
+      }, 2000);
+    };
+
+    void whenPreloaderReleased().then(() => {
+      if (cancelled) return;
+      armTyped();
+      // Avoid accidental replay while the first intro is still playing.
+      window.setTimeout(() => {
+        if (!cancelled) canReplay = true;
+      }, 2800);
+    });
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry || cancelled || !canReplay) return;
+
+        if (entry.intersectionRatio < 0.35) {
+          away = true;
+          return;
+        }
+
+        if (away && entry.intersectionRatio >= 0.6) {
+          away = false;
+          setIntroReady(false);
+          setIntroKey((key) => key + 1);
+          armTyped();
+        }
+      },
+      { threshold: [0, 0.35, 0.6, 1] },
+    );
+
+    observer.observe(section);
+
+    return () => {
+      cancelled = true;
+      if (typedDelay) clearTimeout(typedDelay);
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (USE_STATIC_HERO) return;
@@ -165,7 +247,7 @@ export default function HeroSection() {
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !typedRef.current) return;
+    if (!introReady || typeof window === "undefined" || !typedRef.current) return;
 
     let isMounted = true;
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -213,10 +295,10 @@ export default function HeroSection() {
       if (timeoutId) clearTimeout(timeoutId);
       if (typedRef.current) typedRef.current.textContent = "";
     };
-  }, [locale, typedStrings]);
+  }, [introReady, locale, typedStrings]);
 
   return (
-    <section id="hero" className="hero section dark-background">
+    <section id="hero" ref={sectionRef} className="hero section dark-background">
       <div className="hero-video-bg" aria-hidden="true">
         {USE_STATIC_HERO ? (
           <Image
@@ -249,15 +331,15 @@ export default function HeroSection() {
           </>
         )}
       </div>
-      <div className="container">
-        <h1>{translations[locale].hero.name}</h1>
+      <div key={introKey} className="container hero-content">
+        <h1 className="hero-content__name">{translations[locale].hero.name}</h1>
         <h2 className="visually-hidden">{translations[locale].hero.subtitle}</h2>
-        <p>
+        <p className="hero-content__line">
           {translations[locale].hero.im}{" "}
           <span ref={typedRef} className="typed"></span>
           <span className="typed-cursor typed-cursor--blink"></span>
         </p>
-        <div className="social-links">
+        <div className="social-links hero-content__social">
           <a href="https://github.com/fabio-daros" target="_blank" rel="noopener noreferrer">
             <i className="bi bi-github"></i>
           </a>

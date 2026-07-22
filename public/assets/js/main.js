@@ -75,13 +75,9 @@
   document.addEventListener('scroll', toggleScrollTop);
 
   function aosInit() {
-    if (typeof AOS === 'undefined') return;
-    AOS.init({
-      duration: 600,
-      easing: 'ease-in-out',
-      once: true,
-      mirror: false
-    });
+    // Section entrances are handled by GSAP ScrollTrigger.
+    // Keep AOS available as a no-op so legacy calls do not throw.
+    if (typeof AOS === "undefined") return;
   }
   window.addEventListener('load', aosInit);
 

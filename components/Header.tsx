@@ -14,31 +14,29 @@ export default function Header() {
   const [activeId, setActiveId] = useState<SiteSectionId>("hero");
 
   useEffect(() => {
-    const sections = SITE_SECTIONS.map((section) => document.getElementById(section.id)).filter(
-      (el): el is HTMLElement => Boolean(el)
-    );
-    if (sections.length === 0) return;
+    const updateActive = () => {
+      // Active section = last section whose top has crossed just below the fixed header.
+      const marker = 96;
+      let current: SiteSectionId = SITE_SECTIONS[0].id;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        const top = visible[0];
-        if (!top?.target.id) return;
-        const id = top.target.id as SiteSectionId;
-        if (SITE_SECTIONS.some((section) => section.id === id)) {
-          setActiveId(id);
+      for (const { id } of SITE_SECTIONS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top - marker <= 0) {
+          current = id;
         }
-      },
-      {
-        rootMargin: "-25% 0px -55% 0px",
-        threshold: [0, 0.1, 0.25, 0.5, 0.75],
       }
-    );
 
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
+      setActiveId((prev) => (prev === current ? prev : current));
+    };
+
+    updateActive();
+    window.addEventListener("scroll", updateActive, { passive: true });
+    window.addEventListener("resize", updateActive);
+    return () => {
+      window.removeEventListener("scroll", updateActive);
+      window.removeEventListener("resize", updateActive);
+    };
   }, []);
 
   useEffect(() => {

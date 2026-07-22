@@ -131,13 +131,137 @@ body.aos-fallback [data-aos] {
   transform: none !important;
 }
 
-.main [data-aos],
-#hero .hero-video-bg,
-#hero .container {
+/* Keep hero video visible; do not force transforms on text. */
+#hero .hero-video-bg {
   opacity: 1 !important;
   visibility: visible !important;
-  transform: none !important;
+  pointer-events: none !important;
+}
+
+#hero .container {
   pointer-events: auto !important;
+}
+
+/* Hero entrance — driven by body.preloader-released (no React required). */
+@keyframes hero-intro-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(-40px, 96px, 0) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+#hero .hero-content__name,
+#hero .hero-content__line,
+#hero .hero-content__social a {
+  opacity: 0;
+  transform: translate3d(-40px, 96px, 0) scale(0.92);
+  will-change: opacity, transform;
+}
+
+body.preloader-released #hero .hero-content__name,
+#hero .hero-content--animate .hero-content__name {
+  animation: hero-intro-rise 1.25s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both !important;
+}
+
+body.preloader-released #hero .hero-content__line,
+#hero .hero-content--animate .hero-content__line {
+  animation: hero-intro-rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both !important;
+}
+
+body.preloader-released #hero .hero-content__social a,
+#hero .hero-content--animate .hero-content__social a {
+  animation: hero-intro-rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+
+body.preloader-released #hero .hero-content__social a:nth-child(1),
+#hero .hero-content--animate .hero-content__social a:nth-child(1) {
+  animation-delay: 0.85s;
+}
+body.preloader-released #hero .hero-content__social a:nth-child(2),
+#hero .hero-content--animate .hero-content__social a:nth-child(2) {
+  animation-delay: 0.98s;
+}
+body.preloader-released #hero .hero-content__social a:nth-child(3),
+#hero .hero-content--animate .hero-content__social a:nth-child(3) {
+  animation-delay: 1.11s;
+}
+body.preloader-released #hero .hero-content__social a:nth-child(4),
+#hero .hero-content--animate .hero-content__social a:nth-child(4) {
+  animation-delay: 1.24s;
+}
+body.preloader-released #hero .hero-content__social a:nth-child(5),
+#hero .hero-content--animate .hero-content__social a:nth-child(5) {
+  animation-delay: 1.37s;
+}
+
+.main [data-aos] {
+  pointer-events: auto !important;
+}
+
+/* Scroll reveals for About → Contact — hide instantly, animate in on reveal.
+   !important beats body.aos-fallback [data-aos] so titles stay hidden until revealed.
+   Expertise body is excluded: cards use Anime.js stagger instead. */
+.scroll-reveal .site-section > .page-title,
+.scroll-reveal .site-section:not(#expertise) > .section,
+.scroll-reveal .site-section:not(#expertise) > section,
+.scroll-reveal #contact .section-title,
+.scroll-reveal #contact .info-item,
+.scroll-reveal #contact .php-email-form {
+  opacity: 0 !important;
+  transform: translate3d(-36px, 80px, 0) scale(0.96) !important;
+  transition: none;
+  will-change: opacity, transform;
+}
+
+.scroll-reveal .site-section.is-revealed > .page-title,
+.scroll-reveal .site-section:not(#expertise).is-revealed > .section,
+.scroll-reveal .site-section:not(#expertise).is-revealed > section,
+.scroll-reveal #contact.is-revealed .section-title,
+.scroll-reveal #contact.is-revealed .info-item,
+.scroll-reveal #contact.is-revealed .php-email-form {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) scale(1) !important;
+  transition:
+    opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal .site-section.is-revealed > .page-title,
+.scroll-reveal #contact.is-revealed .section-title {
+  transition-delay: 0s;
+}
+
+.scroll-reveal .site-section:not(#expertise).is-revealed > section:nth-of-type(1),
+.scroll-reveal .site-section:not(#expertise).is-revealed > .section:nth-of-type(1),
+.scroll-reveal #contact.is-revealed .info-item {
+  transition-delay: 0.16s;
+}
+
+.scroll-reveal .site-section:not(#expertise).is-revealed > section:nth-of-type(2),
+.scroll-reveal .site-section:not(#expertise).is-revealed > .section:nth-of-type(2),
+.scroll-reveal #contact.is-revealed .php-email-form {
+  transition-delay: 0.3s;
+}
+
+.scroll-reveal #contact.is-revealed .info-item:nth-child(2) {
+  transition-delay: 0.22s;
+}
+.scroll-reveal #contact.is-revealed .info-item:nth-child(3) {
+  transition-delay: 0.28s;
+}
+.scroll-reveal #contact.is-revealed .info-item:nth-child(4) {
+  transition-delay: 0.34s;
+}
+
+/* Expertise cards — Anime.js stagger targets */
+#expertise .expertise-card {
+  opacity: 0;
+  transform: translate3d(0, 48px, 0) scale(0.96);
+  will-change: opacity, transform;
 }
 
 .skills .skills-list .skill-tag {
