@@ -5,14 +5,13 @@ import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
-/** Flip to `false` to restore the animated video background. */
 const USE_STATIC_HERO = false;
 
 const HERO_IMAGE_SRC = "/assets/img/hero-clouds.jpg";
 const HERO_VIDEO_SRC = "/assets/video/hero-clouds.mp4";
-/** Playback speed (< 1 = slower). */
+
 const HERO_PLAYBACK_RATE = 0.6;
-/** Seconds before the end to start blending into the beginning. */
+
 const CROSSFADE_SECONDS = 2.1;
 
 function prepareVideo(video: HTMLVideoElement) {
@@ -31,9 +30,7 @@ function tryPlay(video: HTMLVideoElement) {
   video.playbackRate = HERO_PLAYBACK_RATE;
   const playPromise = video.play();
   if (playPromise) {
-    playPromise.catch(() => {
-      /* Autoplay can fail until the element is ready; callers retry on media events. */
-    });
+    playPromise.catch(() => {});
   }
 }
 
@@ -51,7 +48,6 @@ function whenPreloaderReleased(): Promise<void> {
     });
     observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
-    // Layout script adds the class at 1.5s; hard fallback keeps UI unblocked.
     window.setTimeout(() => {
       document.body.classList.add("preloader-released");
       observer.disconnect();
@@ -70,8 +66,6 @@ export default function HeroSection() {
   const { locale } = useLanguage();
   const typedStrings = translations[locale].hero.typed;
 
-  // First entrance is pure CSS via body.preloader-released.
-  // Replay remounts the content block so CSS animations run again.
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -92,7 +86,6 @@ export default function HeroSection() {
     void whenPreloaderReleased().then(() => {
       if (cancelled) return;
       armTyped();
-      // Avoid accidental replay while the first intro is still playing.
       window.setTimeout(() => {
         if (!cancelled) canReplay = true;
       }, 2800);

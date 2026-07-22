@@ -10,7 +10,6 @@ const CV_FILENAMES: Record<Locale, string> = {
   en: "Fabio-Daros-CV-EN.pdf",
 };
 
-/** CV URL: `NEXT_PUBLIC_CV_URL_PT` / `NEXT_PUBLIC_CV_URL_EN`, or PDFs in `public/assets/cv/`. */
 export function getCvDownloadUrl(locale: Locale): string {
   const fromEnv = locale === "pt" ? process.env.NEXT_PUBLIC_CV_URL_PT : process.env.NEXT_PUBLIC_CV_URL_EN;
   const trimmed = fromEnv?.trim();

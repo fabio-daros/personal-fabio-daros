@@ -32,7 +32,6 @@ export default function ResumeCvDownloadButton() {
           setCvUrl(data.url);
         }
       } catch {
-        /* unavailable */
       } finally {
         if (!cancelled) setLoading(false);
       }

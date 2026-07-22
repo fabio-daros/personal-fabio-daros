@@ -31,7 +31,6 @@ export function LanguageProvider({ children, initialLocale }: LanguageProviderPr
     }
 
     persistLocaleClient(resolved);
-    // Sync once on mount; user changes go through setLocale.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

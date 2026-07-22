@@ -45,7 +45,6 @@ export default function LegacyBrowserNotice() {
       const loadId = (typeof window !== "undefined" && (window as unknown as { __legacyLoadId?: number }).__legacyLoadId) || Date.now();
       if (sessionStorage.getItem("lb-dismiss") === String(loadId)) return;
     } catch {
-      /* ignore */
     }
     setIsLegacy(isLegacyBrowser());
   }, []);
@@ -56,7 +55,6 @@ export default function LegacyBrowserNotice() {
       const loadId = (typeof window !== "undefined" && (window as unknown as { __legacyLoadId?: number }).__legacyLoadId) || 0;
       sessionStorage.setItem("lb-dismiss", String(loadId));
     } catch {
-      /* ignore */
     }
   };
 

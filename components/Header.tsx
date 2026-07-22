@@ -15,7 +15,6 @@ export default function Header() {
 
   useEffect(() => {
     const updateActive = () => {
-      // Active section = last section whose top has crossed just below the fixed header.
       const marker = 96;
       let current: SiteSectionId = SITE_SECTIONS[0].id;
 

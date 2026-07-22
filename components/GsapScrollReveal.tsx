@@ -25,11 +25,6 @@ function whenPreloaderReleased(): Promise<void> {
   });
 }
 
-/**
- * Scroll entrance for About → Contact.
- * Replays when a section leaves and re-enters the viewport.
- * Uses isIntersecting (not ratio) so tall sections like Resume stay visible.
- */
 export default function GsapScrollReveal({ children }: GsapScrollRevealProps) {
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -77,7 +72,6 @@ export default function GsapScrollReveal({ children }: GsapScrollRevealProps) {
           }
         },
         {
-          // Any overlap with the central band counts — works for short and tall sections.
           threshold: 0,
           rootMargin: "-12% 0px -12% 0px",
         },

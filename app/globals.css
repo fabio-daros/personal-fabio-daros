@@ -20,7 +20,6 @@ html {
   scroll-margin-top: 42px;
 }
 
-/* Keep section titles tight under the fixed header (overrides theme main.css). */
 .page-title .heading {
   padding-top: 54px !important;
   padding-bottom: 28px !important;
@@ -50,7 +49,7 @@ html {
     scroll-margin-top: 64px;
   }
 
-  /* Slightly less section padding so content sits closer under titles on phones. */
+  
   .site-section > .section,
   .site-section > .about.section,
   .site-section > .resume.section,
@@ -131,7 +130,6 @@ body.aos-fallback [data-aos] {
   transform: none !important;
 }
 
-/* Keep hero video visible; do not force transforms on text. */
 #hero .hero-video-bg {
   opacity: 1 !important;
   visibility: visible !important;
@@ -142,7 +140,6 @@ body.aos-fallback [data-aos] {
   pointer-events: auto !important;
 }
 
-/* Hero entrance — driven by body.preloader-released (no React required). */
 @keyframes hero-intro-rise {
   from {
     opacity: 0;
@@ -202,9 +199,6 @@ body.preloader-released #hero .hero-content__social a:nth-child(5),
   pointer-events: auto !important;
 }
 
-/* Scroll reveals for About → Contact — hide instantly, animate in on reveal.
-   !important beats body.aos-fallback [data-aos] so titles stay hidden until revealed.
-   Expertise body is excluded: cards use Anime.js stagger instead. */
 .scroll-reveal .site-section > .page-title,
 .scroll-reveal .site-section:not(#expertise) > .section,
 .scroll-reveal .site-section:not(#expertise) > section,
@@ -257,7 +251,6 @@ body.preloader-released #hero .hero-content__social a:nth-child(5),
   transition-delay: 0.34s;
 }
 
-/* Expertise cards — Anime.js stagger targets */
 #expertise .expertise-card {
   opacity: 0;
   transform: translate3d(0, 48px, 0) scale(0.96);
@@ -752,7 +745,6 @@ html[data-theme="dark"] .research .research-gallery__img {
   object-position: center;
 }
 
-/* Mobile: keep the person/cabin/tree in frame while cover crops the sides. */
 @media (max-width: 992px) {
   .hero-video-bg__media {
     object-fit: cover;
@@ -1157,7 +1149,6 @@ html[data-theme="light"] .hero-neural-particles canvas {
   pointer-events: none;
 }
 
-/* Suave transição hero → secção seguinte */
 #hero {
   --hero-fade-to: #000000;
 }

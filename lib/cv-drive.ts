@@ -59,7 +59,6 @@ async function findFileIdInFolder(
   return fileId;
 }
 
-/** Resolves a direct download URL from Drive (file ID in env, or folder + filename lookup). */
 export async function resolveCvUrlFromDrive(locale: Locale): Promise<string | null> {
   const fileIdFromEnv = getCvDriveFileId(locale);
   if (fileIdFromEnv) {
