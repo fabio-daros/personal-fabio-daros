@@ -11,18 +11,21 @@ const EMAIL_LABELS: Record<string, { name: string; email: string; subject: strin
   pt: { name: "Nome", email: "Email", subject: "Assunto", message: "Mensagem" },
   en: { name: "Name", email: "Email", subject: "Subject", message: "Message" },
 };
-const RESEND_FROM = process.env.RESEND_FROM || "Fabio Daros <contact@fabiodaros.com>";
+
+const RESEND_FROM =
+  process.env.RESEND_FROM?.trim() || "Fabio Daros Site <noreply@fabiodaros.com>";
 
 export async function POST(request: NextRequest) {
   if (!RESEND_API_KEY) {
-    console.error("[Contact API] RESEND_API_KEY is not set. Add it to .env.local");
+    console.error("[Contact API] RESEND_API_KEY is not set");
     return new NextResponse("Email service not configured", { status: 500 });
   }
 
   try {
     const formData = await request.formData();
     const locale = ((formData.get("locale") as string)?.trim() || "en") as keyof typeof CONTACT_EMAILS;
-    const toEmail = CONTACT_EMAILS[locale] || CONTACT_EMAILS.en;
+    const override = process.env.CONTACT_EMAIL_OVERRIDE?.trim();
+    const toEmail = override || CONTACT_EMAILS[locale] || CONTACT_EMAILS.en;
     const name = (formData.get("name") as string)?.trim() || "";
     const email = (formData.get("email") as string)?.trim() || "";
     const subject = (formData.get("subject") as string)?.trim() || "";
@@ -53,6 +56,13 @@ export async function POST(request: NextRequest) {
       console.error("[Contact API] Resend error:", JSON.stringify(error, null, 2));
       return new NextResponse(error.message || "Failed to send email", { status: 500 });
     }
+
+    console.info("[Contact API] Sent", {
+      id: data?.id,
+      to: toEmail,
+      locale,
+      override: Boolean(override),
+    });
 
     return new NextResponse("OK", {
       status: 200,

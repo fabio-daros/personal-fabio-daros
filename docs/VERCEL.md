@@ -7,7 +7,8 @@ Configure **antes** do deploy para o download do currículo e o formulário de c
 | Variável | Sensível | Uso |
 |----------|----------|-----|
 | `RESEND_API_KEY` | Sim | Envio do formulário de contato |
-| `CONTACT_EMAIL_OVERRIDE` | Não | (Opcional) Redireciona e-mails em testes |
+| `RESEND_FROM` | Não | Remetente Resend (ex.: `Fabio Daros Site <noreply@fabiodaros.com>`) |
+| `CONTACT_EMAIL_OVERRIDE` | Não | (Opcional) Redireciona todos os envios para este endereço (útil em testes) |
 | `GOOGLE_DRIVE_API_KEY` | Sim | Backup: busca por pasta no Drive |
 | `GOOGLE_DRIVE_CV_FOLDER_ID` | Não | ID da pasta do Drive |
 | `CV_DRIVE_FILENAME_PT` | Não | Nome do PDF em PT |
