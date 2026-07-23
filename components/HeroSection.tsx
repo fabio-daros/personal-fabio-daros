@@ -61,8 +61,8 @@ export default function HeroSection() {
   const typedRef = useRef<HTMLSpanElement>(null);
   const primaryRef = useRef<HTMLVideoElement>(null);
   const secondaryRef = useRef<HTMLVideoElement>(null);
-  const [introReady, setIntroReady] = useState(false);
-  const [introKey, setIntroKey] = useState(0);
+  const [typedArmed, setTypedArmed] = useState(false);
+  const [entranceKey, setEntranceKey] = useState(0);
   const { locale } = useLanguage();
   const typedStrings = translations[locale].hero.typed;
 
@@ -75,17 +75,11 @@ export default function HeroSection() {
     let canReplay = false;
     let typedDelay: ReturnType<typeof setTimeout> | null = null;
 
-    const armTyped = () => {
-      if (typedDelay) clearTimeout(typedDelay);
-      setIntroReady(false);
-      typedDelay = setTimeout(() => {
-        if (!cancelled) setIntroReady(true);
-      }, 2000);
-    };
-
     void whenPreloaderReleased().then(() => {
       if (cancelled) return;
-      armTyped();
+      typedDelay = setTimeout(() => {
+        if (!cancelled) setTypedArmed(true);
+      }, 2000);
       window.setTimeout(() => {
         if (!cancelled) canReplay = true;
       }, 2800);
@@ -102,9 +96,7 @@ export default function HeroSection() {
 
         if (away && entry.intersectionRatio >= 0.6) {
           away = false;
-          setIntroReady(false);
-          setIntroKey((key) => key + 1);
-          armTyped();
+          setEntranceKey((key) => key + 1);
         }
       },
       { threshold: [0, 0.35, 0.6, 1] },
@@ -240,7 +232,7 @@ export default function HeroSection() {
   }, []);
 
   useEffect(() => {
-    if (!introReady || typeof window === "undefined" || !typedRef.current) return;
+    if (!typedArmed || typeof window === "undefined" || !typedRef.current) return;
 
     let isMounted = true;
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -286,9 +278,8 @@ export default function HeroSection() {
     return () => {
       isMounted = false;
       if (timeoutId) clearTimeout(timeoutId);
-      if (typedRef.current) typedRef.current.textContent = "";
     };
-  }, [introReady, locale, typedStrings]);
+  }, [typedArmed, locale, typedStrings]);
 
   return (
     <section id="hero" ref={sectionRef} className="hero section dark-background">
@@ -324,15 +315,17 @@ export default function HeroSection() {
           </>
         )}
       </div>
-      <div key={introKey} className="container hero-content">
-        <h1 className="hero-content__name">{translations[locale].hero.name}</h1>
+      <div className="container hero-content">
+        <h1 key={`hero-name-${entranceKey}`} className="hero-content__name">
+          {translations[locale].hero.name}
+        </h1>
         <h2 className="visually-hidden">{translations[locale].hero.subtitle}</h2>
         <p className="hero-content__line">
           {translations[locale].hero.im}{" "}
           <span ref={typedRef} className="typed"></span>
           <span className="typed-cursor typed-cursor--blink"></span>
         </p>
-        <div className="social-links hero-content__social">
+        <div key={`hero-social-${entranceKey}`} className="social-links hero-content__social">
           <a href="https://github.com/fabio-daros" target="_blank" rel="noopener noreferrer">
             <i className="bi bi-github"></i>
           </a>
