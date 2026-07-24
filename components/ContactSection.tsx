@@ -155,22 +155,22 @@ export default function ContactSection() {
                     href="https://orcid.org/0009-0000-7734-2971"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="social-link--accent"
                     aria-label="ORCID"
                     title="ORCID"
                   >
                     <SiOrcid size={24} aria-hidden="true" />
                   </a>
-                  <a
-                    href="https://lattes.cnpq.br/9283661108380889"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-link--accent"
-                    aria-label="Currículo Lattes"
-                    title="Currículo Lattes"
-                  >
-                    <span className="lattes-icon" aria-hidden="true" />
-                  </a>
+                  {locale === "pt" && (
+                    <a
+                      href="https://lattes.cnpq.br/9283661108380889"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Currículo Lattes"
+                      title="Currículo Lattes"
+                    >
+                      <span className="lattes-icon" aria-hidden="true" />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

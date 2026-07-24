@@ -1526,15 +1526,6 @@ body.preloader-released #preloader {
   z-index: 10;
 }
 
-.contact .info-item .social-links a.social-link--accent {
-  color: var(--accent-color);
-}
-
-.contact .info-item .social-links a.social-link--accent:hover {
-  opacity: 0.85;
-  color: var(--accent-color);
-}
-
 .contact .info-item .social-links .lattes-icon {
   display: inline-block;
   width: 24px;
