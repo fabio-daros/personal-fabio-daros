@@ -8,7 +8,7 @@ import { translations } from "@/lib/translations";
 function ResearchAdvisor({ name }: { name: string }) {
   return (
     <p className="resume-advisor">
-      <i className="bi bi-flask" aria-hidden="true" />
+      <i className="bi bi-person" aria-hidden="true" />
       <em>{name}</em>
     </p>
   );
