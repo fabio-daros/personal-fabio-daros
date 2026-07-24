@@ -56,9 +56,6 @@ export default function ResumeContent() {
                 <ul>
                   <li>{t.researchMsLi1}</li>
                   <li>{t.researchMsLi2}</li>
-                  <li>{t.researchMsLi3}</li>
-                  <li>{t.researchMsLi4}</li>
-                  <li>{t.researchMsLi5}</li>
                 </ul>
               </div>
               <div className="resume-item">
