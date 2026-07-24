@@ -43,6 +43,7 @@ export default function ResumeContent() {
                 <h4><span className="resume-flag" aria-hidden>{t.researchMsFlag}</span> {t.researchMsTitle}</h4>
                 <h5>{t.researchMsPeriod}</h5>
                 <p><em>{t.researchMsRole}</em></p>
+                <p><em>{t.researchMsAdvisor}</em></p>
                 <p><em>{t.researchMsLocation}</em></p>
                 <div className="resume-research-links">
                   <span className="resume-research-links-label">{t.research1LabLabel}</span>
