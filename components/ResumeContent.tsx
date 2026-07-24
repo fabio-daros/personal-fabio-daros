@@ -5,11 +5,29 @@ import ResumeCvDownloadButton from "@/components/ResumeCvDownloadButton";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
-function ResearchAdvisor({ name }: { name: string }) {
+function ResearchAdvisor({
+  name,
+  linkedinUrl,
+  linkedinLabel,
+}: {
+  name: string;
+  linkedinUrl?: string;
+  linkedinLabel?: string;
+}) {
   return (
     <p className="resume-advisor">
-      <i className="bi bi-person" aria-hidden="true" />
       <em>{name}</em>
+      {linkedinUrl ? (
+        <a
+          href={linkedinUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="resume-link resume-advisor__link"
+          aria-label={linkedinLabel ?? "LinkedIn"}
+        >
+          <i className="bi bi-linkedin" aria-hidden="true" />
+        </a>
+      ) : null}
     </p>
   );
 }
@@ -53,7 +71,11 @@ export default function ResumeContent() {
                 <p><em>{t.researchMsLocation}</em></p>
                 <h5>{t.researchMsPeriod}</h5>
                 <p><em>{t.researchMsRole}</em></p>
-                <ResearchAdvisor name={t.researchMsAdvisor} />
+                <ResearchAdvisor
+                  name={t.researchMsAdvisor}
+                  linkedinUrl="https://www.linkedin.com/in/eegkozlova0587/"
+                  linkedinLabel="Edgar Gonzalez-Kozlova LinkedIn"
+                />
                 <div className="resume-research-links">
                   <span className="resume-research-links-label">{t.research1LabLabel}</span>
                   <a href="https://eegk.github.io/" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Gonzalez-Kozlova Lab website">
@@ -73,7 +95,11 @@ export default function ResumeContent() {
                 <p><em>{t.research1Location}</em></p>
                 <h5>{t.research1Period}</h5>
                 <p><em>{t.research1Role}</em></p>
-                <ResearchAdvisor name={t.research1Advisor} />
+                <ResearchAdvisor
+                  name={t.research1Advisor}
+                  linkedinUrl="https://www.linkedin.com/in/edroaldo-lummertz-da-rocha-6b976033/"
+                  linkedinLabel="Edroaldo Lummertz da Rocha LinkedIn"
+                />
                 <div className="resume-research-links">
                   <span className="resume-research-links-label">{t.research1LabLabel}</span>
                   <a href="https://www.lummertzdarocha-lab.org/" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Lummertz da Rocha Lab website">
