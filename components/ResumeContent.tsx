@@ -5,6 +5,15 @@ import ResumeCvDownloadButton from "@/components/ResumeCvDownloadButton";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
+function ResearchAdvisor({ name }: { name: string }) {
+  return (
+    <p className="resume-advisor">
+      <i className="bi bi-flask" aria-hidden="true" />
+      <em>{name}</em>
+    </p>
+  );
+}
+
 export default function ResumeContent() {
   const { locale } = useLanguage();
   const t = translations[locale].resume;
@@ -43,7 +52,7 @@ export default function ResumeContent() {
                 <h4><span className="resume-flag" aria-hidden>{t.researchMsFlag}</span> {t.researchMsTitle}</h4>
                 <h5>{t.researchMsPeriod}</h5>
                 <p><em>{t.researchMsRole}</em></p>
-                <p><em>{t.researchMsAdvisor}</em></p>
+                <ResearchAdvisor name={t.researchMsAdvisor} />
                 <p><em>{t.researchMsLocation}</em></p>
                 <div className="resume-research-links">
                   <span className="resume-research-links-label">{t.research1LabLabel}</span>
@@ -62,7 +71,8 @@ export default function ResumeContent() {
               <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.research1Flag}</span> {t.research1Title}</h4>
                 <h5>{t.research1Period}</h5>
-                <p><em>{t.research1Advisor}</em></p>
+                <p><em>{t.research1Role}</em></p>
+                <ResearchAdvisor name={t.research1Advisor} />
                 <p><em>{t.research1Location}</em></p>
                 <div className="resume-research-links">
                   <span className="resume-research-links-label">{t.research1LabLabel}</span>
@@ -80,13 +90,15 @@ export default function ResumeContent() {
               <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.research2Flag}</span> {t.research2Title}</h4>
                 <h5>{t.research2Period}</h5>
-                <p><em>{t.research2Advisor}</em></p>
+                <p><em>{t.research2Role}</em></p>
+                <ResearchAdvisor name={t.research2Advisor} />
                 <p><em>{t.research2Location}</em></p>
               </div>
               <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.research3Flag}</span> {t.research3Title}</h4>
                 <h5>{t.research3Period}</h5>
-                <p><em>{t.research3Advisor}</em></p>
+                <p><em>{t.research3Role}</em></p>
+                <ResearchAdvisor name={t.research3Advisor} />
                 <p><em>{t.research3Location}</em></p>
               </div>
 
