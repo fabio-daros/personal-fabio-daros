@@ -128,12 +128,6 @@ export default function ResumeContent() {
                 <ResearchAdvisor name={t.research3Advisor} />
               </div>
 
-              <h3 className="resume-title">{t.communityService}</h3>
-              <div className="resume-item">
-                <h4><span className="resume-flag" aria-hidden>{t.comm1Flag}</span> {t.comm1Title}</h4>
-                <h5>{t.comm1Period}</h5>
-                <p><em>{t.comm1Location}</em></p>
-              </div>
             </div>
 
             <div className="col-lg-6 order-1 order-lg-1" data-aos="fade-up" data-aos-delay="200">
