@@ -111,10 +111,22 @@ export default function ContactSection() {
           </div>
           <div className="col-md-6">
             <div className="info-item d-flex align-items-center" data-aos="fade-up" data-aos-delay="300">
-              <i className="icon bi bi-telephone flex-shrink-0"></i>
+              <a
+                href="https://wa.me/353834677853"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon flex-shrink-0"
+                aria-label="WhatsApp"
+              >
+                <i className="bi bi-whatsapp"></i>
+              </a>
               <div>
                 <h3>{t.callMe}</h3>
-                <p>+353 83 467 7853</p>
+                <p>
+                  <a href="https://wa.me/353834677853" target="_blank" rel="noopener noreferrer">
+                    +353 83 467 7853
+                  </a>
+                </p>
               </div>
             </div>
           </div>

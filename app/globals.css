@@ -1526,6 +1526,20 @@ body.preloader-released #preloader {
   z-index: 10;
 }
 
+.contact .info-item a.icon {
+  text-decoration: none;
+  color: var(--contrast-color);
+}
+
+.contact .info-item p a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.contact .info-item p a:hover {
+  color: var(--accent-color);
+}
+
 .swipe-nav-btn {
   position: fixed;
   top: 50%;
