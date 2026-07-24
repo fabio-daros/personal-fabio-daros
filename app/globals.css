@@ -717,8 +717,24 @@ html[data-theme="dark"] .research .research-gallery__img {
     padding-bottom: clamp(10rem, 26vh, 14rem);
   }
 
+  #hero .hero-content {
+    padding-right: 4.25rem;
+  }
+
   #hero .hero-content__social {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.55rem;
     margin-top: 1.5rem;
+  }
+
+  #hero .hero-content__social a {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    margin-right: 0;
+    flex-shrink: 0;
   }
 }
 
