@@ -179,18 +179,28 @@ export default function ContactSection() {
 
         <form id="contact-form" action="/api/contact" method="post" className="php-email-form" data-aos="fade-up" data-aos-delay="600" onSubmit={handleSubmit}>
           <input type="hidden" name="locale" value={locale} />
+          <div className="contact-honeypot" aria-hidden="true">
+            <label htmlFor="company_website">Company website</label>
+            <input
+              type="text"
+              id="company_website"
+              name="company_website"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
           <div className="row gy-4">
             <div className="col-md-6">
-              <input type="text" name="name" className="form-control" placeholder={t.yourName} required />
+              <input type="text" name="name" className="form-control" placeholder={t.yourName} required maxLength={120} />
             </div>
             <div className="col-md-6">
-              <input type="email" className="form-control" name="email" placeholder={t.yourEmail} required />
+              <input type="email" className="form-control" name="email" placeholder={t.yourEmail} required maxLength={254} />
             </div>
             <div className="col-md-12">
-              <input type="text" className="form-control" name="subject" placeholder={t.subject} required />
+              <input type="text" className="form-control" name="subject" placeholder={t.subject} required maxLength={200} />
             </div>
             <div className="col-md-12">
-              <textarea className="form-control" name="message" rows={6} placeholder={t.message} required></textarea>
+              <textarea className="form-control" name="message" rows={6} placeholder={t.message} required maxLength={5000}></textarea>
             </div>
             <div className="col-md-12 text-center">
               <div className={`loading${loading ? " d-block" : ""}`}>{t.loading}</div>
