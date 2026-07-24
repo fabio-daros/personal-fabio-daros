@@ -50,10 +50,10 @@ export default function ResumeContent() {
               <h3 className="resume-title">{t.researchExperience}</h3>
               <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.researchMsFlag}</span> {t.researchMsTitle}</h4>
+                <p><em>{t.researchMsLocation}</em></p>
                 <h5>{t.researchMsPeriod}</h5>
                 <p><em>{t.researchMsRole}</em></p>
                 <ResearchAdvisor name={t.researchMsAdvisor} />
-                <p><em>{t.researchMsLocation}</em></p>
                 <div className="resume-research-links">
                   <span className="resume-research-links-label">{t.research1LabLabel}</span>
                   <a href="https://eegk.github.io/" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Gonzalez-Kozlova Lab website">
@@ -70,10 +70,10 @@ export default function ResumeContent() {
               </div>
               <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.research1Flag}</span> {t.research1Title}</h4>
+                <p><em>{t.research1Location}</em></p>
                 <h5>{t.research1Period}</h5>
                 <p><em>{t.research1Role}</em></p>
                 <ResearchAdvisor name={t.research1Advisor} />
-                <p><em>{t.research1Location}</em></p>
                 <div className="resume-research-links">
                   <span className="resume-research-links-label">{t.research1LabLabel}</span>
                   <a href="https://www.lummertzdarocha-lab.org/" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Lummertz da Rocha Lab website">
@@ -89,17 +89,17 @@ export default function ResumeContent() {
               </div>
               <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.research2Flag}</span> {t.research2Title}</h4>
+                <p><em>{t.research2Location}</em></p>
                 <h5>{t.research2Period}</h5>
                 <p><em>{t.research2Role}</em></p>
                 <ResearchAdvisor name={t.research2Advisor} />
-                <p><em>{t.research2Location}</em></p>
               </div>
               <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.research3Flag}</span> {t.research3Title}</h4>
+                <p><em>{t.research3Location}</em></p>
                 <h5>{t.research3Period}</h5>
                 <p><em>{t.research3Role}</em></p>
                 <ResearchAdvisor name={t.research3Advisor} />
-                <p><em>{t.research3Location}</em></p>
               </div>
 
               <h3 className="resume-title">{t.communityService}</h3>
