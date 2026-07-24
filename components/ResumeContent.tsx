@@ -72,7 +72,9 @@ export default function ResumeContent() {
                     <i className="bi bi-linkedin" />
                   </a>
                 </div>
-                <p>{t.research1Desc}</p>
+                <ul>
+                  <li>{t.research1Desc}</li>
+                </ul>
               </div>
               <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.research2Flag}</span> {t.research2Title}</h4>
