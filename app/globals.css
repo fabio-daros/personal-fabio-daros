@@ -714,7 +714,7 @@ html[data-theme="dark"] .research .research-gallery__img {
 @media (max-width: 768px) {
   #hero.hero {
     align-items: flex-end;
-    padding-bottom: clamp(5rem, 14vh, 8rem);
+    padding-bottom: clamp(10rem, 26vh, 14rem);
   }
 
   #hero .hero-content__social {
