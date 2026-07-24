@@ -40,6 +40,28 @@ export default function ResumeContent() {
 
               <h3 className="resume-title">{t.researchExperience}</h3>
               <div className="resume-item">
+                <h4><span className="resume-flag" aria-hidden>{t.researchMsFlag}</span> {t.researchMsTitle}</h4>
+                <h5>{t.researchMsPeriod}</h5>
+                <p><em>{t.researchMsRole}</em></p>
+                <p><em>{t.researchMsLocation}</em></p>
+                <div className="resume-research-links">
+                  <span className="resume-research-links-label">{t.research1LabLabel}</span>
+                  <a href="https://eegk.github.io/" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Gonzalez-Kozlova Lab website">
+                    <i className="bi bi-globe" />
+                  </a>
+                  <a href="https://www.linkedin.com/school/icahnmountsinai/" target="_blank" rel="noopener noreferrer" className="resume-link" aria-label="Icahn School of Medicine at Mount Sinai LinkedIn">
+                    <i className="bi bi-linkedin" />
+                  </a>
+                </div>
+                <ul>
+                  <li>{t.researchMsLi1}</li>
+                  <li>{t.researchMsLi2}</li>
+                  <li>{t.researchMsLi3}</li>
+                  <li>{t.researchMsLi4}</li>
+                  <li>{t.researchMsLi5}</li>
+                </ul>
+              </div>
+              <div className="resume-item">
                 <h4><span className="resume-flag" aria-hidden>{t.research1Flag}</span> {t.research1Title}</h4>
                 <h5>{t.research1Period}</h5>
                 <p><em>{t.research1Advisor}</em></p>
