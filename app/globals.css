@@ -711,6 +711,12 @@ html[data-theme="dark"] .research .research-gallery__img {
   color: #ffffff;
 }
 
+@media (max-width: 768px) {
+  #hero .hero-content__social {
+    margin-top: clamp(4.5rem, 18vh, 9rem);
+  }
+}
+
 .hero-video-bg {
   position: absolute;
   inset: 0;
