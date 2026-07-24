@@ -1526,6 +1526,25 @@ body.preloader-released #preloader {
   z-index: 10;
 }
 
+.contact .info-item .social-links a.social-link--accent {
+  color: var(--accent-color);
+}
+
+.contact .info-item .social-links a.social-link--accent:hover {
+  opacity: 0.85;
+  color: var(--accent-color);
+}
+
+.contact .info-item .social-links .lattes-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  vertical-align: -0.2em;
+  background-color: currentColor;
+  -webkit-mask: url(/assets/img/lattes-icon.png) center/contain no-repeat;
+  mask: url(/assets/img/lattes-icon.png) center/contain no-repeat;
+}
+
 .contact .info-item a.icon {
   text-decoration: none;
   color: var(--contrast-color);

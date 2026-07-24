@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { SiOrcid } from "react-icons/si";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
@@ -145,11 +146,31 @@ export default function ContactSection() {
               <div>
                 <h3>{t.socialProfiles}</h3>
                 <div className="social-links">
-                  <a href="https://github.com/fabio-daros" target="_blank" rel="noopener noreferrer"><i className="bi bi-github"></i></a>
-                  <a href="https://www.facebook.com/fabio.daros.7/" target="_blank" rel="noopener noreferrer"><i className="bi bi-facebook"></i></a>
-                  <a href="https://www.instagram.com/fabio__daros/" target="_blank" rel="noopener noreferrer"><i className="bi bi-instagram"></i></a>
-                  <a href="https://wa.me/353834677853" target="_blank" rel="noopener noreferrer"><i className="bi bi-whatsapp"></i></a>
-                  <a href="https://www.linkedin.com/in/daros-fabio" target="_blank" rel="noopener noreferrer"><i className="bi bi-linkedin"></i></a>
+                  <a href="https://github.com/fabio-daros" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i className="bi bi-github"></i></a>
+                  <a href="https://www.facebook.com/fabio.daros.7/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i className="bi bi-facebook"></i></a>
+                  <a href="https://www.instagram.com/fabio__daros/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i className="bi bi-instagram"></i></a>
+                  <a href="https://wa.me/353834677853" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i className="bi bi-whatsapp"></i></a>
+                  <a href="https://www.linkedin.com/in/daros-fabio" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i className="bi bi-linkedin"></i></a>
+                  <a
+                    href="https://orcid.org/0009-0000-7734-2971"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-link--accent"
+                    aria-label="ORCID"
+                    title="ORCID"
+                  >
+                    <SiOrcid size={24} aria-hidden="true" />
+                  </a>
+                  <a
+                    href="https://lattes.cnpq.br/9283661108380889"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-link--accent"
+                    aria-label="Currículo Lattes"
+                    title="Currículo Lattes"
+                  >
+                    <span className="lattes-icon" aria-hidden="true" />
+                  </a>
                 </div>
               </div>
             </div>
