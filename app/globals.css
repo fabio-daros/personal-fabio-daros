@@ -731,6 +731,17 @@ html[data-theme="dark"] .research .research-gallery__img {
   will-change: opacity;
 }
 
+.hero-video-bg__media::-webkit-media-controls,
+.hero-video-bg__media::-webkit-media-controls-enclosure,
+.hero-video-bg__media::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 .hero-video-bg__media.is-front {
   z-index: 2;
   opacity: 1;

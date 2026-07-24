@@ -17,16 +17,23 @@ const CROSSFADE_SECONDS = 2.1;
 function prepareVideo(video: HTMLVideoElement) {
   video.defaultMuted = true;
   video.muted = true;
+  video.volume = 0;
   video.playsInline = true;
+  video.controls = false;
+  video.disablePictureInPicture = true;
   video.loop = false;
   video.preload = "auto";
   video.playbackRate = HERO_PLAYBACK_RATE;
   video.setAttribute("muted", "");
   video.setAttribute("playsinline", "");
   video.setAttribute("webkit-playsinline", "");
+  video.setAttribute("x-webkit-airplay", "deny");
+  video.removeAttribute("controls");
 }
 
 function tryPlay(video: HTMLVideoElement) {
+  video.muted = true;
+  video.volume = 0;
   video.playbackRate = HERO_PLAYBACK_RATE;
   const playPromise = video.play();
   if (playPromise) {
@@ -214,6 +221,14 @@ export default function HeroSection() {
     secondary.addEventListener("timeupdate", onTimeUpdate);
     document.addEventListener("visibilitychange", onVisibility);
 
+    const unlockPlayback = () => {
+      tryPlay(active);
+      document.removeEventListener("touchstart", unlockPlayback);
+      document.removeEventListener("click", unlockPlayback);
+    };
+    document.addEventListener("touchstart", unlockPlayback, { once: true, passive: true });
+    document.addEventListener("click", unlockPlayback, { once: true });
+
     primary.style.opacity = "1";
     secondary.style.opacity = "0";
     tryPlayBoth();
@@ -226,6 +241,8 @@ export default function HeroSection() {
       primary.removeEventListener("timeupdate", onTimeUpdate);
       secondary.removeEventListener("timeupdate", onTimeUpdate);
       document.removeEventListener("visibilitychange", onVisibility);
+      document.removeEventListener("touchstart", unlockPlayback);
+      document.removeEventListener("click", unlockPlayback);
       primary.pause();
       secondary.pause();
     };
@@ -303,14 +320,19 @@ export default function HeroSection() {
               muted
               playsInline
               preload="auto"
+              controls={false}
+              disablePictureInPicture
             />
             <video
               ref={secondaryRef}
               className="hero-video-bg__media is-back"
               src={HERO_VIDEO_SRC}
+              autoPlay
               muted
               playsInline
               preload="auto"
+              controls={false}
+              disablePictureInPicture
             />
           </>
         )}
