@@ -627,7 +627,11 @@ html[data-theme="dark"] .research .research-gallery__img {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  margin: 0 0 0.35rem;
+  margin: 0;
+}
+.resume .resume-advisor + .resume-research-links {
+  margin-top: 0.1rem;
+  margin-bottom: 0.35rem;
 }
 .resume .resume-advisor em {
   font-style: italic;
