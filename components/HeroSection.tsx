@@ -65,6 +65,7 @@ function whenPreloaderReleased(): Promise<void> {
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const heroBgRef = useRef<HTMLDivElement>(null);
   const typedRef = useRef<HTMLSpanElement>(null);
   const primaryRef = useRef<HTMLVideoElement>(null);
   const secondaryRef = useRef<HTMLVideoElement>(null);
@@ -139,10 +140,15 @@ export default function HeroSection() {
       video.classList.toggle("is-back", !isFront);
     };
 
+    const armPlaying = (video: HTMLVideoElement) => {
+      video.classList.add("is-playing");
+      heroBgRef.current?.classList.add("is-video-live");
+    };
+
     const resetLayers = () => {
       setFront(primary, true);
       setFront(secondary, false);
-      primary.style.opacity = "1";
+      primary.style.opacity = "";
       secondary.style.opacity = "0";
     };
 
@@ -157,6 +163,11 @@ export default function HeroSection() {
 
     const onReady = () => {
       tryPlayBoth();
+    };
+
+    const onPlaying = (event: Event) => {
+      const video = event.currentTarget as HTMLVideoElement;
+      armPlaying(video);
     };
 
     const swapRoles = () => {
@@ -217,6 +228,8 @@ export default function HeroSection() {
 
     primary.addEventListener("loadeddata", onReady);
     primary.addEventListener("canplay", onReady);
+    primary.addEventListener("playing", onPlaying);
+    secondary.addEventListener("playing", onPlaying);
     primary.addEventListener("timeupdate", onTimeUpdate);
     secondary.addEventListener("timeupdate", onTimeUpdate);
     document.addEventListener("visibilitychange", onVisibility);
@@ -229,8 +242,6 @@ export default function HeroSection() {
     document.addEventListener("touchstart", unlockPlayback, { once: true, passive: true });
     document.addEventListener("click", unlockPlayback, { once: true });
 
-    primary.style.opacity = "1";
-    secondary.style.opacity = "0";
     tryPlayBoth();
 
     return () => {
@@ -238,6 +249,8 @@ export default function HeroSection() {
       cancelAnimationFrame(rafId);
       primary.removeEventListener("loadeddata", onReady);
       primary.removeEventListener("canplay", onReady);
+      primary.removeEventListener("playing", onPlaying);
+      secondary.removeEventListener("playing", onPlaying);
       primary.removeEventListener("timeupdate", onTimeUpdate);
       secondary.removeEventListener("timeupdate", onTimeUpdate);
       document.removeEventListener("visibilitychange", onVisibility);
@@ -300,7 +313,7 @@ export default function HeroSection() {
 
   return (
     <section id="hero" ref={sectionRef} className="hero section dark-background">
-      <div className="hero-video-bg" aria-hidden="true">
+      <div ref={heroBgRef} className="hero-video-bg" aria-hidden="true">
         {USE_STATIC_HERO ? (
           <Image
             src={HERO_IMAGE_SRC}
@@ -308,10 +321,18 @@ export default function HeroSection() {
             fill
             priority
             sizes="100vw"
-            className="hero-video-bg__media hero-video-bg__media--static is-front"
+            className="hero-video-bg__media hero-video-bg__media--static is-front is-playing"
           />
         ) : (
           <>
+            <Image
+              src={HERO_IMAGE_SRC}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="hero-video-bg__poster"
+            />
             <video
               ref={primaryRef}
               className="hero-video-bg__media is-front"
@@ -322,6 +343,7 @@ export default function HeroSection() {
               preload="auto"
               controls={false}
               disablePictureInPicture
+              poster={HERO_IMAGE_SRC}
             />
             <video
               ref={secondaryRef}
@@ -333,6 +355,7 @@ export default function HeroSection() {
               preload="auto"
               controls={false}
               disablePictureInPicture
+              poster={HERO_IMAGE_SRC}
             />
           </>
         )}
