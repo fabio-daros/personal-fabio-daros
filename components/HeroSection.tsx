@@ -140,9 +140,29 @@ export default function HeroSection() {
       video.classList.toggle("is-back", !isFront);
     };
 
-    const armPlaying = (video: HTMLVideoElement) => {
+    let revealed = false;
+
+    const revealWhenLive = (video: HTMLVideoElement) => {
       video.classList.add("is-playing");
-      heroBgRef.current?.classList.add("is-video-live");
+      if (revealed || disposed) return;
+      if (video.paused || video.ended) return;
+
+      const goLive = () => {
+        if (revealed || disposed) return;
+        revealed = true;
+        heroBgRef.current?.classList.add("is-video-live");
+      };
+
+      const anyVideo = video as HTMLVideoElement & {
+        requestVideoFrameCallback?: (cb: () => void) => number;
+      };
+
+      if (typeof anyVideo.requestVideoFrameCallback === "function") {
+        anyVideo.requestVideoFrameCallback(() => goLive());
+        return;
+      }
+
+      window.setTimeout(goLive, 50);
     };
 
     const resetLayers = () => {
@@ -167,7 +187,7 @@ export default function HeroSection() {
 
     const onPlaying = (event: Event) => {
       const video = event.currentTarget as HTMLVideoElement;
-      armPlaying(video);
+      revealWhenLive(video);
     };
 
     const swapRoles = () => {
@@ -235,7 +255,8 @@ export default function HeroSection() {
     document.addEventListener("visibilitychange", onVisibility);
 
     const unlockPlayback = () => {
-      tryPlay(active);
+      tryPlay(primary);
+      tryPlay(secondary);
       document.removeEventListener("touchstart", unlockPlayback);
       document.removeEventListener("click", unlockPlayback);
     };
@@ -325,38 +346,27 @@ export default function HeroSection() {
           />
         ) : (
           <>
-            <Image
-              src={HERO_IMAGE_SRC}
-              alt=""
-              fill
-              priority
-              sizes="100vw"
-              className="hero-video-bg__poster"
-            />
             <video
               ref={primaryRef}
               className="hero-video-bg__media is-front"
               src={HERO_VIDEO_SRC}
-              autoPlay
               muted
               playsInline
               preload="auto"
               controls={false}
               disablePictureInPicture
-              poster={HERO_IMAGE_SRC}
             />
             <video
               ref={secondaryRef}
               className="hero-video-bg__media is-back"
               src={HERO_VIDEO_SRC}
-              autoPlay
               muted
               playsInline
               preload="auto"
               controls={false}
               disablePictureInPicture
-              poster={HERO_IMAGE_SRC}
             />
+            <div className="hero-video-bg__cover" />
           </>
         )}
       </div>

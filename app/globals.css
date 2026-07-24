@@ -720,20 +720,22 @@ html[data-theme="dark"] .research .research-gallery__img {
   background: #020304;
 }
 
-.hero-video-bg__poster {
+.hero-video-bg__cover {
   position: absolute;
   inset: 0;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  z-index: 10;
+  background-color: #020304;
+  background-image: url("/assets/img/hero-clouds.jpg");
+  background-size: cover;
+  background-position: center;
   opacity: 1;
-  transition: opacity 0.45s ease;
+  transition: opacity 0.5s ease;
 }
 
-.hero-video-bg.is-video-live .hero-video-bg__poster {
+.hero-video-bg.is-video-live .hero-video-bg__cover {
   opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0s linear 0.5s;
 }
 
 .hero-video-bg__media {
@@ -745,23 +747,19 @@ html[data-theme="dark"] .research .research-gallery__img {
   object-fit: cover;
   object-position: center;
   opacity: 0;
-  visibility: hidden;
   will-change: opacity;
 }
 
 .hero-video-bg__media::-webkit-media-controls,
 .hero-video-bg__media::-webkit-media-controls-enclosure,
-.hero-video-bg__media::-webkit-media-controls-start-playback-button {
+.hero-video-bg__media::-webkit-media-controls-start-playback-button,
+.hero-video-bg__media::-webkit-media-controls-overlay-play-button {
   display: none !important;
   -webkit-appearance: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
   width: 0 !important;
   height: 0 !important;
-}
-
-.hero-video-bg__media.is-playing {
-  visibility: visible;
 }
 
 .hero-video-bg__media.is-front.is-playing {
@@ -776,21 +774,23 @@ html[data-theme="dark"] .research .research-gallery__img {
 .hero-video-bg__media--static {
   object-fit: cover;
   object-position: center;
-  visibility: visible;
   opacity: 1;
+  z-index: 3;
 }
 
 @media (max-width: 992px) {
   .hero-video-bg__media,
-  .hero-video-bg__poster {
+  .hero-video-bg__cover {
     object-fit: cover;
+    background-position: 62% 46%;
     object-position: 62% 46%;
   }
 }
 
 @media (max-width: 576px) {
   .hero-video-bg__media,
-  .hero-video-bg__poster {
+  .hero-video-bg__cover {
+    background-position: 66% 44%;
     object-position: 66% 44%;
   }
 }
