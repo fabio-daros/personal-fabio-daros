@@ -197,7 +197,7 @@ export default function ContactSection() {
           </div>
         </div>
 
-        <form id="contact-form" action="/api/contact" method="post" className="php-email-form" data-aos="fade-up" data-aos-delay="600" onSubmit={handleSubmit}>
+        <form id="contact-form" action="/api/contact" method="post" className="php-email-form" data-aos-delay="600" onSubmit={handleSubmit}>
           <input type="hidden" name="locale" value={locale} />
           <div className="contact-honeypot" aria-hidden="true">
             <label htmlFor="company_website">Company website</label>

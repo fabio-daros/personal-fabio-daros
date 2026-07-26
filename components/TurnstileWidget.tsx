@@ -9,7 +9,7 @@ type TurnstileApi = {
     options: {
       sitekey: string;
       theme?: "light" | "dark" | "auto";
-      size?: "normal" | "flexible" | "compact";
+      size?: "normal" | "compact";
       appearance?: "always" | "execute" | "interaction-only";
       retry?: "auto" | "never";
       callback?: (token: string) => void;
@@ -71,16 +71,54 @@ function currentTheme(): "light" | "dark" {
   return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
 }
 
+function waitUntilVisible(element: HTMLElement): Promise<void> {
+  return new Promise((resolve) => {
+    const style = window.getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    const visible =
+      style.visibility !== "hidden" &&
+      style.display !== "none" &&
+      Number(style.opacity || "1") > 0.05 &&
+      rect.width > 0 &&
+      rect.height > 0;
+
+    if (visible) {
+      resolve();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry?.isIntersecting) return;
+        const next = window.getComputedStyle(element);
+        if (Number(next.opacity || "1") <= 0.05) return;
+        observer.disconnect();
+        window.setTimeout(() => resolve(), 120);
+      },
+      { threshold: 0.2 },
+    );
+
+    observer.observe(element);
+    window.setTimeout(() => {
+      observer.disconnect();
+      resolve();
+    }, 4000);
+  });
+}
+
 export default function TurnstileWidget({
   onTokenChange,
   onStatusChange,
   resetSignal = 0,
 }: TurnstileWidgetProps) {
+  const hostRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const onTokenChangeRef = useRef(onTokenChange);
   const onStatusChangeRef = useRef(onStatusChange);
   const [failed, setFailed] = useState(false);
+  const [mountKey, setMountKey] = useState(0);
 
   useEffect(() => {
     onTokenChangeRef.current = onTokenChange;
@@ -91,20 +129,23 @@ export default function TurnstileWidget({
   }, [onStatusChange]);
 
   useEffect(() => {
-    if (!SITE_KEY || !containerRef.current) return;
+    if (!SITE_KEY || !hostRef.current || !containerRef.current) return;
 
     let cancelled = false;
     onStatusChangeRef.current?.("loading");
+    setFailed(false);
 
     const mount = async () => {
       try {
+        await waitUntilVisible(hostRef.current!);
+        if (cancelled) return;
+
         await loadTurnstileScript();
         if (cancelled || !containerRef.current || !window.turnstile) return;
 
         await new Promise<void>((resolve) => {
           window.turnstile!.ready(() => resolve());
         });
-
         if (cancelled || !containerRef.current || !window.turnstile) return;
 
         if (widgetIdRef.current) {
@@ -120,7 +161,7 @@ export default function TurnstileWidget({
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: SITE_KEY,
           theme: currentTheme(),
-          size: "flexible",
+          size: "normal",
           appearance: "always",
           retry: "auto",
           callback: (token) => {
@@ -164,30 +205,24 @@ export default function TurnstileWidget({
         widgetIdRef.current = null;
       }
     };
-  }, []);
+  }, [mountKey]);
 
   useEffect(() => {
-    if (!resetSignal || !widgetIdRef.current || !window.turnstile) return;
-    setFailed(false);
+    if (!resetSignal) return;
+    setMountKey((value) => value + 1);
     onTokenChange("");
     onStatusChangeRef.current?.("loading");
-    try {
-      window.turnstile.reset(widgetIdRef.current);
-    } catch {
-      /* ignore */
-    }
   }, [resetSignal, onTokenChange]);
 
   if (!SITE_KEY) return null;
 
   return (
-    <div className="contact-turnstile-wrap">
+    <div ref={hostRef} className="contact-turnstile-wrap">
       <div ref={containerRef} className="contact-turnstile" />
       {failed ? (
         <p className="contact-turnstile-error">
-          Anti-spam check failed to load. Allow challenges.cloudflare.com (disable Brave shields /
-          adblock on this site), confirm fabiodaros.com and www.fabiodaros.com are in the Turnstile
-          hostnames, then reload.
+          Anti-spam check failed to load. If you use Brave/adblock, allow this site (or
+          challenges.cloudflare.com), then tap retry.
         </p>
       ) : null}
     </div>
