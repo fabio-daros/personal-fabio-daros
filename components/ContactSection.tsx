@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Form
 import { SiOrcid } from "react-icons/si";
 import TurnstileWidget, {
   isTurnstileConfigured,
+  type TurnstileFailure,
   type TurnstileStatus,
 } from "@/components/TurnstileWidget";
 import { useLanguage } from "@/context/LanguageContext";
@@ -73,6 +74,7 @@ export default function ContactSection() {
   const [turnstileStatus, setTurnstileStatus] = useState<TurnstileStatus>(
     turnstileAvailable ? "loading" : "error"
   );
+  const [turnstileFailure, setTurnstileFailure] = useState<TurnstileFailure | null>(null);
   const [showMathAlternative, setShowMathAlternative] = useState(!turnstileAvailable);
 
   const [captcha, setCaptcha] = useState<CaptchaChallenge | null>(null);
@@ -102,6 +104,7 @@ export default function ContactSection() {
     setCaptchaMode("turnstile");
     setShowMathAlternative(false);
     setTurnstileToken("");
+    setTurnstileFailure(null);
     setTurnstileStatus("loading");
     setCaptchaAnswer("");
     setTurnstileReset((value) => value + 1);
@@ -119,19 +122,17 @@ export default function ContactSection() {
     }
   }, [captchaMode, loadMathCaptcha]);
 
-  // After a confirmed Turnstile load failure, offer the math alternative —
-  // still a real captcha, never skipped by browser/user-agent detection.
   useEffect(() => {
     if (!turnstileAvailable) return;
     if (captchaMode !== "turnstile") return;
-    if (turnstileStatus !== "blocked" && turnstileStatus !== "error") return;
+    if (turnstileStatus !== "error" || !turnstileFailure) return;
 
     const id = window.setTimeout(() => {
       setShowMathAlternative(true);
     }, 500);
 
     return () => window.clearTimeout(id);
-  }, [turnstileAvailable, captchaMode, turnstileStatus]);
+  }, [turnstileAvailable, captchaMode, turnstileStatus, turnstileFailure]);
 
   const triggerConfetti = () => {
     if (!submitButtonRef.current) return;
@@ -211,9 +212,13 @@ export default function ContactSection() {
     ? t.captchaLabel.replace("{question}", captcha.question)
     : t.captchaLabel.replace("{question}", "…");
 
-  const turnstileBlocked =
-    captchaMode === "turnstile" &&
-    (turnstileStatus === "blocked" || turnstileStatus === "error");
+  const turnstileHasError = captchaMode === "turnstile" && turnstileStatus === "error" && turnstileFailure;
+
+  const turnstileErrorText = turnstileFailure
+    ? turnstileFailure.isClientBlock
+      ? t.captchaBlocked.replace("{code}", turnstileFailure.code)
+      : t.captchaError.replace("{code}", turnstileFailure.code)
+    : "";
 
   const submitDisabled =
     loading ||
@@ -336,14 +341,15 @@ export default function ContactSection() {
                 <TurnstileWidget
                   onTokenChange={setTurnstileToken}
                   onStatusChange={setTurnstileStatus}
+                  onFailureChange={setTurnstileFailure}
                   resetSignal={turnstileReset}
                 />
                 {turnstileStatus === "loading" ? (
                   <p className="contact-captcha-hint">{t.captchaLoading}</p>
                 ) : null}
-                {turnstileBlocked ? (
+                {turnstileHasError ? (
                   <div className="contact-captcha-blocked" role="status">
-                    <p className="contact-captcha-blocked__text">{t.captchaBlocked}</p>
+                    <p className="contact-captcha-blocked__text">{turnstileErrorText}</p>
                     <button
                       type="button"
                       className="contact-captcha-refresh contact-captcha-retry"
@@ -358,12 +364,18 @@ export default function ContactSection() {
 
             {(captchaMode === "math" || showMathAlternative) && (
               <div className="col-md-12">
-                {turnstileAvailable && turnstileBlocked && captchaMode === "turnstile" ? (
+                {turnstileAvailable && turnstileHasError && captchaMode === "turnstile" ? (
                   <p className="contact-captcha-hint">{t.captchaFallbackHint}</p>
                 ) : null}
                 {captchaMode === "math" && turnstileAvailable ? (
                   <div className="contact-captcha-blocked contact-captcha-blocked--compact" role="status">
-                    <p className="contact-captcha-blocked__text">{t.captchaBlocked}</p>
+                    <p className="contact-captcha-blocked__text">
+                      {turnstileFailure
+                        ? turnstileFailure.isClientBlock
+                          ? t.captchaBlocked.replace("{code}", turnstileFailure.code)
+                          : t.captchaError.replace("{code}", turnstileFailure.code)
+                        : t.captchaError.replace("{code}", "fallback")}
+                    </p>
                     <button
                       type="button"
                       className="contact-captcha-refresh contact-captcha-retry"
@@ -373,7 +385,7 @@ export default function ContactSection() {
                     </button>
                   </div>
                 ) : null}
-                {captchaMode === "turnstile" && showMathAlternative && turnstileBlocked ? (
+                {captchaMode === "turnstile" && showMathAlternative && turnstileHasError ? (
                   <button
                     type="button"
                     className="contact-captcha-alt"

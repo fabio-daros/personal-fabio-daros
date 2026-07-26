@@ -57,18 +57,28 @@ As variáveis abaixo estão em **Production**, **Preview** e **Development**:
 
 ### Anti-spam do contato (híbrido)
 
-1. **Preferência:** Cloudflare Turnstile, se `NEXT_PUBLIC_TURNSTILE_SITE_KEY` estiver definida.
-2. **Se o script for bloqueado** (Brave Shields / adblock em `challenges.cloudflare.com`): o formulário mostra uma mensagem amigável + **Tentar novamente**. Não há bypass por user-agent.
-3. **Alternativa opcional:** o visitante pode escolher a soma assinada (HMAC) — ainda é captcha validado no servidor.
-4. Honeypot + rate limit (3 / 10 min / IP) continuam ativos.
+1. **Preferência:** Cloudflare Turnstile (`api.js?render=explicit` + `turnstile.ready` → `turnstile.render`).
+2. **Erros:** o UI mostra o **código real** (Cloudflare `error-callback`, `script_onerror`, etc.). Mensagem de bloqueio do browser só para `ERR_BLOCKED_BY_CLIENT` ou `blocked:csp`.
+3. **Alternativa:** soma HMAC opcional após falha — ainda validada no servidor. Sem bypass por user-agent.
+4. Honeypot + rate limit (3 / 10 min / IP).
 
-CSP do site inclui `script-src` / `frame-src` / `connect-src` para `https://challenges.cloudflare.com`.
+CSP: `script-src` / `frame-src` / `connect-src` incluem `https://challenges.cloudflare.com`.
 
-Domínios no dashboard Turnstile: `fabiodaros.com`, `www.fabiodaros.com`, `localhost`.
+Domínios no dashboard Turnstile (keys reais): `fabiodaros.com`, `www.fabiodaros.com`, `localhost`.
+
+### Chaves de teste (Development / Preview apenas)
+
+Para isolar bug de integração vs keys reais, use as chaves oficiais *always passes*:
+
+| | Valor |
+|--|--|
+| Site key | `1x00000000000000000000AA` |
+| Secret | `1x0000000000000000000000000000000AA` |
+
+**Não** use essas chaves em **Production**. Production deve manter o par real do dashboard Cloudflare.
 
 Opcional: `CONTACT_CAPTCHA_SECRET` para assinar o fallback; sem ela, usa `RESEND_API_KEY`.
 
-**Nota Brave:** Shields costuma bloquear `challenges.cloudflare.com`. O visitante precisa permitir o site (ou esse domínio) para o widget da Cloudflare carregar.
 
 ## Testar em produção
 

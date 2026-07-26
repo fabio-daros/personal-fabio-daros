@@ -48,8 +48,9 @@ export const translations = {
       captchaRequired: "Complete a verificação anti-spam antes de enviar.",
       captchaRefresh: "Nova pergunta",
       captchaLoading: "Carregando verificação anti-spam…",
+      captchaError: "Turnstile falhou (código: {code}). Veja o Console para detalhes e tente novamente.",
       captchaBlocked:
-        "A verificação anti-spam da Cloudflare não carregou. Se você usa Brave ou um bloqueador de anúncios, permita este site (ou challenges.cloudflare.com) e toque em tentar novamente.",
+        "O navegador bloqueou o script do Turnstile ({code}). Permita challenges.cloudflare.com neste site e tente novamente.",
       captchaRetry: "Tentar Cloudflare novamente",
       captchaFallbackHint: "Enquanto isso, você pode usar a verificação alternativa abaixo.",
       captchaUseAlternative: "Usar verificação alternativa (soma)",
@@ -288,8 +289,9 @@ export const translations = {
       captchaRequired: "Please complete the anti-spam check before sending.",
       captchaRefresh: "New question",
       captchaLoading: "Loading anti-spam check…",
+      captchaError: "Turnstile failed (code: {code}). Check the Console for details and try again.",
       captchaBlocked:
-        "The Cloudflare anti-spam check failed to load. If you use Brave or an ad blocker, allow this site (or challenges.cloudflare.com), then tap retry.",
+        "The browser blocked the Turnstile script ({code}). Allow challenges.cloudflare.com on this site, then retry.",
       captchaRetry: "Retry Cloudflare check",
       captchaFallbackHint: "Meanwhile, you can use the alternative check below.",
       captchaUseAlternative: "Use alternative check (sum)",

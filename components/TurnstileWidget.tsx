@@ -3,14 +3,14 @@
 import { useEffect, useRef } from "react";
 
 type TurnstileApi = {
-  ready?: (callback: () => void) => void;
+  ready: (callback: () => void) => void;
   render: (
     container: HTMLElement,
     options: {
       sitekey: string;
       theme?: "light" | "dark" | "auto";
       callback?: (token: string) => void;
-      "error-callback"?: () => void;
+      "error-callback"?: (errorCode: string) => void;
       "expired-callback"?: () => void;
       "timeout-callback"?: () => void;
     }
@@ -25,38 +25,78 @@ declare global {
   }
 }
 
-export type TurnstileStatus = "loading" | "ready" | "blocked" | "error";
+export type TurnstileStatus = "loading" | "ready" | "error";
+
+/** Only use client-block messaging for these confirmed failure modes. */
+export type TurnstileBlockCode = "ERR_BLOCKED_BY_CLIENT" | "blocked:csp";
+
+export type TurnstileFailure = {
+  code: string;
+  /** True only for ERR_BLOCKED_BY_CLIENT or blocked:csp */
+  isClientBlock: boolean;
+};
 
 type TurnstileWidgetProps = {
   onTokenChange: (token: string) => void;
   onStatusChange: (status: TurnstileStatus) => void;
+  onFailureChange?: (failure: TurnstileFailure | null) => void;
   resetSignal?: number;
 };
 
 const SCRIPT_ID = "cf-turnstile-script";
 const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-const LOAD_TIMEOUT_MS = 15000;
 
-function loadTurnstileScript(): Promise<TurnstileApi> {
+let scriptLoadPromise: Promise<void> | null = null;
+
+function isClientBlockCode(code: string): code is TurnstileBlockCode {
+  return code === "ERR_BLOCKED_BY_CLIENT" || code === "blocked:csp";
+}
+
+function classifyScriptLoadFailure(cspBlocked: boolean): string {
+  // Only label a client/CSP block when we have direct evidence.
+  // Do not infer Brave/adblock from a generic script.onerror (Safari and others).
+  if (cspBlocked) return "blocked:csp";
+  return "script_onerror";
+}
+
+function ensureTurnstileScript(cspBlockedRef: { current: boolean }): Promise<void> {
   if (typeof window === "undefined") {
-    return Promise.reject(new Error("blocked"));
+    return Promise.reject(new Error("ssr"));
   }
-  if (window.turnstile) return Promise.resolve(window.turnstile);
 
-  return new Promise((resolve, reject) => {
-    const finish = () => {
-      if (window.turnstile) resolve(window.turnstile);
-      else reject(new Error("blocked"));
+  if (window.turnstile) {
+    console.info("[Turnstile] window.turnstile available");
+    return Promise.resolve();
+  }
+
+  if (scriptLoadPromise) return scriptLoadPromise;
+
+  scriptLoadPromise = new Promise<void>((resolve, reject) => {
+    const onReady = () => {
+      console.info("[Turnstile] script loaded");
+      if (window.turnstile) {
+        console.info("[Turnstile] window.turnstile available");
+        resolve();
+        return;
+      }
+      scriptLoadPromise = null;
+      reject(new Error("turnstile_api_missing"));
+    };
+
+    const onFailed = () => {
+      scriptLoadPromise = null;
+      const code = classifyScriptLoadFailure(cspBlockedRef.current);
+      reject(new Error(code));
     };
 
     const existing = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
     if (existing) {
       if (window.turnstile) {
-        resolve(window.turnstile);
+        onReady();
         return;
       }
-      existing.addEventListener("load", finish, { once: true });
-      existing.addEventListener("error", () => reject(new Error("blocked")), { once: true });
+      existing.addEventListener("load", onReady, { once: true });
+      existing.addEventListener("error", onFailed, { once: true });
       return;
     }
 
@@ -64,17 +104,12 @@ function loadTurnstileScript(): Promise<TurnstileApi> {
     script.id = SCRIPT_ID;
     script.src = SCRIPT_SRC;
     script.async = true;
-    script.onload = finish;
-    script.onerror = () => reject(new Error("blocked"));
+    script.addEventListener("load", onReady, { once: true });
+    script.addEventListener("error", onFailed, { once: true });
     document.head.appendChild(script);
   });
-}
 
-async function whenTurnstileReady(api: TurnstileApi): Promise<void> {
-  if (typeof api.ready !== "function") return;
-  await new Promise<void>((resolve) => {
-    api.ready!(() => resolve());
-  });
+  return scriptLoadPromise;
 }
 
 export function isTurnstileConfigured(): boolean {
@@ -84,98 +119,133 @@ export function isTurnstileConfigured(): boolean {
 export default function TurnstileWidget({
   onTokenChange,
   onStatusChange,
+  onFailureChange,
   resetSignal = 0,
 }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const onTokenChangeRef = useRef(onTokenChange);
   const onStatusChangeRef = useRef(onStatusChange);
+  const onFailureChangeRef = useRef(onFailureChange);
 
   onTokenChangeRef.current = onTokenChange;
   onStatusChangeRef.current = onStatusChange;
+  onFailureChangeRef.current = onFailureChange;
 
   useEffect(() => {
-    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
-    if (!siteKey) {
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
+    const siteKeyPresent = Boolean(siteKey);
+
+    console.info("[Turnstile] site key present:", siteKeyPresent, {
+      length: siteKey.length,
+      isTestKey: siteKey.startsWith("1x00000000000000000000"),
+      // Do not log the full key or any secret.
+    });
+
+    if (!siteKeyPresent) {
+      console.error("[Turnstile] site key ausente");
+      onFailureChangeRef.current?.({ code: "missing_sitekey", isClientBlock: false });
       onStatusChangeRef.current("error");
       return;
     }
 
     let cancelled = false;
-    let rendered = false;
+    const cspBlockedRef = { current: false };
 
-    const report = (status: TurnstileStatus) => {
-      if (!cancelled) onStatusChangeRef.current(status);
+    const onCspViolation = (event: SecurityPolicyViolationEvent) => {
+      const blockedUri = event.blockedURI || "";
+      if (blockedUri.includes("challenges.cloudflare.com")) {
+        cspBlockedRef.current = true;
+        console.error("[Turnstile] CSP blocked challenges.cloudflare.com", {
+          violatedDirective: event.violatedDirective,
+          blockedURI: blockedUri,
+        });
+      }
     };
 
-    const timeoutId = window.setTimeout(() => {
-      if (!cancelled && !rendered) {
-        report("blocked");
-      }
-    }, LOAD_TIMEOUT_MS);
+    document.addEventListener("securitypolicyviolation", onCspViolation);
 
-    report("loading");
+    const reportFailure = (code: string) => {
+      if (cancelled) return;
+      const isClientBlock = isClientBlockCode(code);
+      onFailureChangeRef.current?.({ code, isClientBlock });
+      onStatusChangeRef.current("error");
+    };
+
+    const clearFailure = () => {
+      if (!cancelled) onFailureChangeRef.current?.(null);
+    };
+
+    onStatusChangeRef.current("loading");
     onTokenChangeRef.current("");
+    clearFailure();
 
     (async () => {
       try {
-        const api = await loadTurnstileScript();
-        if (cancelled || !containerRef.current) return;
-
-        await whenTurnstileReady(api);
+        await ensureTurnstileScript(cspBlockedRef);
         if (cancelled || !containerRef.current || !window.turnstile) return;
 
-        if (widgetIdRef.current) {
-          try {
-            window.turnstile.remove(widgetIdRef.current);
-          } catch {
-            // ignore
-          }
-          widgetIdRef.current = null;
-        }
+        // Official explicit render: wait for ready, then render into a plain container
+        // (no className="cf-turnstile" — that would be implicit rendering).
+        window.turnstile.ready(() => {
+          if (cancelled || !containerRef.current || !window.turnstile) return;
 
-        containerRef.current.innerHTML = "";
-
-        widgetIdRef.current = window.turnstile.render(containerRef.current, {
-          sitekey: siteKey,
-          theme: "dark",
-          callback: (token) => {
-            if (cancelled) return;
-            onTokenChangeRef.current(token);
-            report("ready");
-          },
-          "error-callback": () => {
-            if (cancelled || rendered) {
-              onTokenChangeRef.current("");
-              return;
+          if (widgetIdRef.current) {
+            try {
+              window.turnstile.remove(widgetIdRef.current);
+            } catch {
+              // ignore
             }
-            onTokenChangeRef.current("");
-            report("error");
-          },
-          "expired-callback": () => {
-            if (cancelled) return;
-            onTokenChangeRef.current("");
-          },
-          "timeout-callback": () => {
-            if (cancelled) return;
-            onTokenChangeRef.current("");
-            if (!rendered) report("blocked");
-          },
-        });
+            widgetIdRef.current = null;
+          }
 
-        rendered = true;
-        window.clearTimeout(timeoutId);
-        if (!cancelled) report("ready");
+          containerRef.current.innerHTML = "";
+
+          widgetIdRef.current = window.turnstile.render(containerRef.current, {
+            sitekey: siteKey,
+            theme: "dark",
+            callback: (token) => {
+              if (cancelled) return;
+              console.info("[Turnstile] token received");
+              onTokenChangeRef.current(token);
+              clearFailure();
+              onStatusChangeRef.current("ready");
+            },
+            "error-callback": (errorCode) => {
+              if (cancelled) return;
+              const code = errorCode || "unknown_cf_error";
+              console.error("Turnstile error:", code);
+              onTokenChangeRef.current("");
+              reportFailure(code);
+            },
+            "expired-callback": () => {
+              if (cancelled) return;
+              console.info("[Turnstile] token expired");
+              onTokenChangeRef.current("");
+            },
+            "timeout-callback": () => {
+              if (cancelled) return;
+              console.error("Turnstile error:", "timeout");
+              onTokenChangeRef.current("");
+              reportFailure("timeout");
+            },
+          });
+
+          console.info("[Turnstile] widget rendered", widgetIdRef.current);
+          // Widget is mounted; token may arrive asynchronously via callback.
+          if (!cancelled) onStatusChangeRef.current("ready");
+        });
       } catch (err) {
-        window.clearTimeout(timeoutId);
-        const message = err instanceof Error ? err.message : "";
-        report(message === "blocked" ? "blocked" : "error");
+        if (cancelled) return;
+        const code = err instanceof Error ? err.message : "script_load_failed";
+        console.error("Turnstile error:", code);
+        reportFailure(code);
       }
     })();
 
     return () => {
       cancelled = true;
-      window.clearTimeout(timeoutId);
+      document.removeEventListener("securitypolicyviolation", onCspViolation);
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
@@ -189,7 +259,8 @@ export default function TurnstileWidget({
 
   return (
     <div className="contact-turnstile-wrap">
-      <div ref={containerRef} className="contact-turnstile" />
+      {/* Explicit render target only — do not use className="cf-turnstile". */}
+      <div ref={containerRef} />
     </div>
   );
 }
