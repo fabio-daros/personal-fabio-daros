@@ -106,9 +106,15 @@ export default function ContactSection() {
   }, [captchaMode, loadMathCaptcha]);
 
   useEffect(() => {
-    if (captchaMode === "turnstile" && turnstileStatus === "error") {
+    if (captchaMode !== "turnstile" || turnstileStatus !== "error") return;
+
+    // Debounce fallback so React Strict Mode remount / Turnstile remove
+    // does not permanently abandon Cloudflare for the math challenge.
+    const id = window.setTimeout(() => {
       switchToMath();
-    }
+    }, 400);
+
+    return () => window.clearTimeout(id);
   }, [captchaMode, turnstileStatus, switchToMath]);
 
   const triggerConfetti = () => {
