@@ -58,24 +58,15 @@ As variáveis abaixo estão em **Production**, **Preview** e **Development**:
 ### Anti-spam do contato (híbrido)
 
 1. **Preferência:** Cloudflare Turnstile (`api.js?render=explicit` + `turnstile.ready` → `turnstile.render`).
-2. **Erros:** o UI mostra o **código real** (Cloudflare `error-callback`, `script_onerror`, etc.). Mensagem de bloqueio do browser só para `ERR_BLOCKED_BY_CLIENT` ou `blocked:csp`.
-3. **Alternativa:** soma HMAC opcional após falha — ainda validada no servidor. Sem bypass por user-agent.
-4. Honeypot + rate limit (3 / 10 min / IP).
+2. **Env obrigatório:** `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` (keys reais do dashboard). Sem fallback para chaves de teste da Cloudflare.
+3. Se qualquer uma faltar (ou for dummy `1x000…`), `/api/contact` responde **503** e não envia e-mail.
+4. Com token Turnstile, o backend chama `siteverify` com `TURNSTILE_SECRET_KEY` **antes** do Resend.
+5. Alternativa opcional: soma HMAC após falha de carga do widget (ainda validada no servidor).
+6. Honeypot + rate limit (3 / 10 min / IP).
 
 CSP: `script-src` / `frame-src` / `connect-src` incluem `https://challenges.cloudflare.com`.
 
-Domínios no dashboard Turnstile (keys reais): `fabiodaros.com`, `www.fabiodaros.com`, `localhost`.
-
-### Chaves de teste (Development / Preview apenas)
-
-Para isolar bug de integração vs keys reais, use as chaves oficiais *always passes*:
-
-| | Valor |
-|--|--|
-| Site key | `1x00000000000000000000AA` |
-| Secret | `1x0000000000000000000000000000000AA` |
-
-**Não** use essas chaves em **Production**. Production deve manter o par real do dashboard Cloudflare.
+Domínios no dashboard Turnstile: `fabiodaros.com`, `www.fabiodaros.com`, `localhost`.
 
 Opcional: `CONTACT_CAPTCHA_SECRET` para assinar o fallback; sem ela, usa `RESEND_API_KEY`.
 

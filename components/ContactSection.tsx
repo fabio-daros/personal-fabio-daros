@@ -147,6 +147,12 @@ export default function ContactSection() {
     event.preventDefault();
     const form = event.currentTarget;
 
+    if (!isTurnstileConfigured()) {
+      console.error("[Contact] Turnstile configuration missing (NEXT_PUBLIC_TURNSTILE_SITE_KEY)");
+      setError(t.captchaConfigMissing);
+      return;
+    }
+
     if (captchaMode === "turnstile") {
       if (!turnstileToken) {
         setError(t.captchaRequired);

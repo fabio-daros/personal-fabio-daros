@@ -69,6 +69,13 @@ function ensureTurnstileScript(cspBlockedRef: { current: boolean }): Promise<voi
     return Promise.resolve();
   }
 
+  // Replace any previous api.js tag that used async/defer (incompatible with ready()).
+  const stale = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
+  if (stale && (stale.async || stale.defer)) {
+    stale.remove();
+    scriptLoadPromise = null;
+  }
+
   if (scriptLoadPromise) return scriptLoadPromise;
 
   scriptLoadPromise = new Promise<void>((resolve, reject) => {
@@ -103,7 +110,9 @@ function ensureTurnstileScript(cspBlockedRef: { current: boolean }): Promise<voi
     const script = document.createElement("script");
     script.id = SCRIPT_ID;
     script.src = SCRIPT_SRC;
-    script.async = true;
+    // Dynamically inserted scripts default to async=true; turnstile.ready() requires
+    // async/defer to be absent/false on the api.js tag.
+    script.async = false;
     script.addEventListener("load", onReady, { once: true });
     script.addEventListener("error", onFailed, { once: true });
     document.head.appendChild(script);
@@ -138,13 +147,19 @@ export default function TurnstileWidget({
 
     console.info("[Turnstile] site key present:", siteKeyPresent, {
       length: siteKey.length,
-      isTestKey: siteKey.startsWith("1x00000000000000000000"),
-      // Do not log the full key or any secret.
+      // Do not log the key value or any secret.
     });
 
     if (!siteKeyPresent) {
-      console.error("[Turnstile] site key ausente");
+      console.error("[Turnstile] site key ausente (NEXT_PUBLIC_TURNSTILE_SITE_KEY)");
       onFailureChangeRef.current?.({ code: "missing_sitekey", isClientBlock: false });
+      onStatusChangeRef.current("error");
+      return;
+    }
+
+    if (/^1x0+AA$/i.test(siteKey) || /^2x0+AB$/i.test(siteKey) || /^3x0+FF$/i.test(siteKey)) {
+      console.error("[Turnstile] Cloudflare dummy/test site key is not allowed");
+      onFailureChangeRef.current?.({ code: "test_sitekey_forbidden", isClientBlock: false });
       onStatusChangeRef.current("error");
       return;
     }
@@ -185,9 +200,7 @@ export default function TurnstileWidget({
         await ensureTurnstileScript(cspBlockedRef);
         if (cancelled || !containerRef.current || !window.turnstile) return;
 
-        // Official explicit render: wait for ready, then render into a plain container
-        // (no className="cf-turnstile" — that would be implicit rendering).
-        window.turnstile.ready(() => {
+        const renderWidget = () => {
           if (cancelled || !containerRef.current || !window.turnstile) return;
 
           if (widgetIdRef.current) {
@@ -199,6 +212,7 @@ export default function TurnstileWidget({
             widgetIdRef.current = null;
           }
 
+          // Plain container only — do not use className="cf-turnstile" (implicit mode).
           containerRef.current.innerHTML = "";
 
           widgetIdRef.current = window.turnstile.render(containerRef.current, {
@@ -234,7 +248,21 @@ export default function TurnstileWidget({
           console.info("[Turnstile] widget rendered", widgetIdRef.current);
           // Widget is mounted; token may arrive asynchronously via callback.
           if (!cancelled) onStatusChangeRef.current("ready");
-        });
+        };
+
+        // Official explicit path: ready() then render(). If a prior HMR load used
+        // async api.js, ready() throws — script is already available, so render directly.
+        try {
+          window.turnstile.ready(renderWidget);
+        } catch (readyErr) {
+          const message = readyErr instanceof Error ? readyErr.message : String(readyErr);
+          if (/async\/defer|turnstile\.ready/i.test(message)) {
+            console.warn("[Turnstile] ready() rejected async script; rendering after load");
+            renderWidget();
+          } else {
+            throw readyErr;
+          }
+        }
       } catch (err) {
         if (cancelled) return;
         const code = err instanceof Error ? err.message : "script_load_failed";

@@ -2,8 +2,39 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { verifyMathChallenge } from "@/lib/contactCaptcha";
 
-async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
-  const secret = process.env.TURNSTILE_SECRET_KEY?.trim();
+/** Cloudflare's documented dummy keys — never accept these in this project. */
+function isCloudflareDummySiteKey(value: string): boolean {
+  return /^1x0+AA$/i.test(value) || /^2x0+AB$/i.test(value) || /^3x0+FF$/i.test(value);
+}
+
+function isCloudflareDummySecretKey(value: string): boolean {
+  return /^1x0+AA$/i.test(value) || /^2x0+BB$/i.test(value) || /^3x0+DD$/i.test(value);
+}
+
+function getTurnstileConfig():
+  | { ok: true; siteKey: string; secret: string }
+  | { ok: false; reason: string } {
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
+  const secret = process.env.TURNSTILE_SECRET_KEY?.trim() ?? "";
+
+  if (!siteKey || !secret) {
+    return {
+      ok: false,
+      reason: "NEXT_PUBLIC_TURNSTILE_SITE_KEY and/or TURNSTILE_SECRET_KEY is missing",
+    };
+  }
+
+  if (isCloudflareDummySiteKey(siteKey) || isCloudflareDummySecretKey(secret)) {
+    return {
+      ok: false,
+      reason: "Cloudflare Turnstile dummy/test keys are not allowed",
+    };
+  }
+
+  return { ok: true, siteKey, secret };
+}
+
+async function verifyTurnstile(secret: string, token: string, ip: string): Promise<boolean> {
   if (!secret || !token) return false;
 
   try {
@@ -138,13 +169,22 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const turnstileConfig = getTurnstileConfig();
+    if (!turnstileConfig.ok) {
+      console.error("[Contact API] Turnstile configuration missing/invalid:", turnstileConfig.reason);
+      return new NextResponse("Anti-spam is not configured", { status: 503 });
+    }
+
     const turnstileToken = readField(formData, "cf-turnstile-response");
     const captchaToken = readField(formData, "captcha_token");
     const captchaAnswer = readField(formData, "captcha_answer");
 
     let captchaOk = false;
     if (turnstileToken) {
-      captchaOk = await verifyTurnstile(turnstileToken, ip);
+      captchaOk = await verifyTurnstile(turnstileConfig.secret, turnstileToken, ip);
+      if (captchaOk) {
+        console.info("[Contact API] Turnstile siteverify ok", { ip });
+      }
     }
     if (!captchaOk && captchaToken && captchaAnswer) {
       captchaOk = verifyMathChallenge(captchaToken, captchaAnswer);

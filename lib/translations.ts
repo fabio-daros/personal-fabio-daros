@@ -51,6 +51,7 @@ export const translations = {
       captchaError: "Turnstile falhou (código: {code}). Veja o Console para detalhes e tente novamente.",
       captchaBlocked:
         "O navegador bloqueou o script do Turnstile ({code}). Permita challenges.cloudflare.com neste site e tente novamente.",
+      captchaConfigMissing: "Anti-spam não configurado (chaves Turnstile ausentes).",
       captchaRetry: "Tentar Cloudflare novamente",
       captchaFallbackHint: "Enquanto isso, você pode usar a verificação alternativa abaixo.",
       captchaUseAlternative: "Usar verificação alternativa (soma)",
@@ -292,6 +293,7 @@ export const translations = {
       captchaError: "Turnstile failed (code: {code}). Check the Console for details and try again.",
       captchaBlocked:
         "The browser blocked the Turnstile script ({code}). Allow challenges.cloudflare.com on this site, then retry.",
+      captchaConfigMissing: "Anti-spam is not configured (Turnstile keys missing).",
       captchaRetry: "Retry Cloudflare check",
       captchaFallbackHint: "Meanwhile, you can use the alternative check below.",
       captchaUseAlternative: "Use alternative check (sum)",
