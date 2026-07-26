@@ -43,6 +43,7 @@ export const translations = {
       sendMessage: "Enviar mensagem",
       loading: "Carregando",
       sentMessage: "Sua mensagem foi enviada. Obrigado!",
+      captchaRequired: "Complete a verificação anti-spam antes de enviar.",
     },
     footer: {
       tagline: "Where Software meets Biology...",
@@ -273,6 +274,7 @@ export const translations = {
       sendMessage: "Send Message",
       loading: "Loading",
       sentMessage: "Your message has been sent. Thank you!",
+      captchaRequired: "Please complete the anti-spam check before sending.",
     },
     footer: {
       tagline: "Where Software meets Biology...",

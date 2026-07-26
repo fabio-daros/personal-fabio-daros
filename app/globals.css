@@ -1563,6 +1563,12 @@ body.preloader-released #preloader {
   position: relative;
 }
 
+.contact-turnstile {
+  display: inline-flex;
+  justify-content: center;
+  min-height: 65px;
+}
+
 .swipe-nav-btn {
   position: fixed;
   top: 50%;

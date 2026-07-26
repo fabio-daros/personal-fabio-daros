@@ -2,6 +2,7 @@
 
 import { useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { SiOrcid } from "react-icons/si";
+import TurnstileWidget, { isTurnstileConfigured } from "@/components/TurnstileWidget";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
@@ -51,8 +52,11 @@ export default function ContactSection() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const burstIdRef = useRef(0);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
+  const turnstileEnabled = isTurnstileConfigured();
 
   const triggerConfetti = () => {
     if (!submitButtonRef.current) return;
@@ -67,14 +71,24 @@ export default function ContactSection() {
     event.preventDefault();
     const form = event.currentTarget;
 
+    if (turnstileEnabled && !turnstileToken) {
+      setError(t.captchaRequired);
+      return;
+    }
+
     setLoading(true);
     setSent(false);
     setError("");
 
     try {
+      const body = new FormData(form);
+      if (turnstileToken) {
+        body.set("cf-turnstile-response", turnstileToken);
+      }
+
       const response = await fetch(form.action, {
         method: "POST",
-        body: new FormData(form),
+        body,
         headers: { "X-Requested-With": "XMLHttpRequest" },
       });
 
@@ -85,9 +99,13 @@ export default function ContactSection() {
 
       setSent(true);
       form.reset();
+      setTurnstileToken("");
+      setTurnstileReset((value) => value + 1);
       triggerConfetti();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
+      setTurnstileToken("");
+      setTurnstileReset((value) => value + 1);
     } finally {
       setLoading(false);
     }
@@ -202,11 +220,18 @@ export default function ContactSection() {
             <div className="col-md-12">
               <textarea className="form-control" name="message" rows={6} placeholder={t.message} required maxLength={5000}></textarea>
             </div>
+            {turnstileEnabled ? (
+              <div className="col-md-12 d-flex justify-content-center">
+                <TurnstileWidget onTokenChange={setTurnstileToken} resetSignal={turnstileReset} />
+              </div>
+            ) : null}
             <div className="col-md-12 text-center">
               <div className={`loading${loading ? " d-block" : ""}`}>{t.loading}</div>
               <div className={`error-message${error ? " d-block" : ""}`}>{error}</div>
               <div className={`sent-message${sent ? " d-block" : ""}`}>{t.sentMessage}</div>
-              <button type="submit" ref={submitButtonRef} disabled={loading}>{t.sendMessage}</button>
+              <button type="submit" ref={submitButtonRef} disabled={loading || (turnstileEnabled && !turnstileToken)}>
+                {t.sendMessage}
+              </button>
             </div>
           </div>
         </form>

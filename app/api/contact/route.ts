@@ -73,6 +73,32 @@ function normalizeLocale(raw: string): "pt" | "en" {
   return raw === "pt" ? "pt" : "en";
 }
 
+async function verifyTurnstileToken(token: string, ip: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY?.trim();
+  if (!secret) return false;
+
+  const body = new URLSearchParams({
+    secret,
+    response: token,
+  });
+  if (ip && ip !== "unknown") body.set("remoteip", ip);
+
+  const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body,
+  });
+
+  if (!response.ok) return false;
+
+  const result = (await response.json()) as { success?: boolean };
+  return result.success === true;
+}
+
+function requiresTurnstile(): boolean {
+  return Boolean(process.env.TURNSTILE_SECRET_KEY?.trim());
+}
+
 export async function POST(request: NextRequest) {
   if (!RESEND_API_KEY) {
     console.error("[Contact API] RESEND_API_KEY is not set");
@@ -95,6 +121,22 @@ export async function POST(request: NextRequest) {
         status: 200,
         headers: { "Content-Type": "text/plain" },
       });
+    }
+
+    if (requiresTurnstile()) {
+      const turnstileToken = readField(formData, "cf-turnstile-response");
+      if (!turnstileToken) {
+        return new NextResponse("Captcha required", { status: 400 });
+      }
+
+      const captchaOk = await verifyTurnstileToken(turnstileToken, ip);
+      if (!captchaOk) {
+        console.info("[Contact API] Rejected invalid Turnstile token", { ip });
+        return new NextResponse("Captcha verification failed", { status: 403 });
+      }
+    } else if (process.env.NODE_ENV === "production") {
+      console.error("[Contact API] TURNSTILE_SECRET_KEY is not set in production");
+      return new NextResponse("Captcha not configured", { status: 500 });
     }
 
     const locale = normalizeLocale(readField(formData, "locale") || "en");
