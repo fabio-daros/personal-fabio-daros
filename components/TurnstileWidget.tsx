@@ -1,25 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 type TurnstileApi = {
   ready: (callback: () => void) => void;
   render: (
-    element: HTMLElement,
+    container: HTMLElement,
     options: {
       sitekey: string;
       theme?: "light" | "dark" | "auto";
-      size?: "normal" | "compact";
-      appearance?: "always" | "execute" | "interaction-only";
-      retry?: "auto" | "never";
       callback?: (token: string) => void;
-      "expired-callback"?: () => void;
       "error-callback"?: () => void;
+      "expired-callback"?: () => void;
       "timeout-callback"?: () => void;
-    },
+    }
   ) => string;
-  reset: (widgetId?: string) => void;
-  remove: (widgetId?: string) => void;
+  remove: (widgetId: string) => void;
+  reset: (widgetId: string) => void;
 };
 
 declare global {
@@ -30,35 +27,35 @@ declare global {
 
 type TurnstileWidgetProps = {
   onTokenChange: (token: string) => void;
-  onStatusChange?: (status: "loading" | "ready" | "error") => void;
+  onStatusChange: (status: "loading" | "ready" | "error") => void;
   resetSignal?: number;
 };
 
 const SCRIPT_ID = "cf-turnstile-script";
-const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || "";
+const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const LOAD_TIMEOUT_MS = 8000;
 
 function loadTurnstileScript(): Promise<void> {
-  if (typeof window === "undefined") return Promise.resolve();
+  if (typeof window === "undefined") return Promise.reject(new Error("ssr"));
   if (window.turnstile) return Promise.resolve();
 
-  const existing = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
-  if (existing) {
-    return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
+    const existing = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
+    if (existing) {
       if (window.turnstile) {
         resolve();
         return;
       }
-      existing.addEventListener("load", () => resolve(), { once: true });
-      existing.addEventListener("error", () => reject(new Error("Turnstile script failed")), {
-        once: true,
-      });
-    });
-  }
+      const onLoad = () => resolve();
+      const onError = () => reject(new Error("Turnstile script failed"));
+      existing.addEventListener("load", onLoad, { once: true });
+      existing.addEventListener("error", onError, { once: true });
+      return;
+    }
 
-  return new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.id = SCRIPT_ID;
-    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.src = SCRIPT_SRC;
     script.async = true;
     script.defer = true;
     script.onload = () => resolve();
@@ -67,44 +64,8 @@ function loadTurnstileScript(): Promise<void> {
   });
 }
 
-function currentTheme(): "light" | "dark" {
-  return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
-}
-
-function waitUntilVisible(element: HTMLElement): Promise<void> {
-  return new Promise((resolve) => {
-    const style = window.getComputedStyle(element);
-    const rect = element.getBoundingClientRect();
-    const visible =
-      style.visibility !== "hidden" &&
-      style.display !== "none" &&
-      Number(style.opacity || "1") > 0.05 &&
-      rect.width > 0 &&
-      rect.height > 0;
-
-    if (visible) {
-      resolve();
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (!entry?.isIntersecting) return;
-        const next = window.getComputedStyle(element);
-        if (Number(next.opacity || "1") <= 0.05) return;
-        observer.disconnect();
-        window.setTimeout(() => resolve(), 120);
-      },
-      { threshold: 0.2 },
-    );
-
-    observer.observe(element);
-    window.setTimeout(() => {
-      observer.disconnect();
-      resolve();
-    }, 4000);
-  });
+export function isTurnstileConfigured(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim());
 }
 
 export default function TurnstileWidget({
@@ -117,118 +78,96 @@ export default function TurnstileWidget({
   const widgetIdRef = useRef<string | null>(null);
   const onTokenChangeRef = useRef(onTokenChange);
   const onStatusChangeRef = useRef(onStatusChange);
-  const [failed, setFailed] = useState(false);
-  const [mountKey, setMountKey] = useState(0);
+
+  onTokenChangeRef.current = onTokenChange;
+  onStatusChangeRef.current = onStatusChange;
 
   useEffect(() => {
-    onTokenChangeRef.current = onTokenChange;
-  }, [onTokenChange]);
-
-  useEffect(() => {
-    onStatusChangeRef.current = onStatusChange;
-  }, [onStatusChange]);
-
-  useEffect(() => {
-    if (!SITE_KEY || !hostRef.current || !containerRef.current) return;
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
+    if (!siteKey) {
+      onStatusChangeRef.current("error");
+      return;
+    }
 
     let cancelled = false;
-    onStatusChangeRef.current?.("loading");
-    setFailed(false);
+    const timeoutId = window.setTimeout(() => {
+      if (!cancelled) onStatusChangeRef.current("error");
+    }, LOAD_TIMEOUT_MS);
 
-    const mount = async () => {
+    onStatusChangeRef.current("loading");
+    onTokenChangeRef.current("");
+
+    (async () => {
       try {
-        await waitUntilVisible(hostRef.current!);
-        if (cancelled) return;
-
         await loadTurnstileScript();
-        if (cancelled || !containerRef.current || !window.turnstile) return;
+        if (cancelled || !containerRef.current || !window.turnstile) {
+          throw new Error("Turnstile unavailable");
+        }
 
         await new Promise<void>((resolve) => {
           window.turnstile!.ready(() => resolve());
         });
-        if (cancelled || !containerRef.current || !window.turnstile) return;
+
+        if (cancelled || !containerRef.current || !window.turnstile) {
+          throw new Error("Turnstile unavailable");
+        }
 
         if (widgetIdRef.current) {
           try {
             window.turnstile.remove(widgetIdRef.current);
           } catch {
-            /* ignore */
+            // ignore
           }
           widgetIdRef.current = null;
         }
 
         containerRef.current.innerHTML = "";
+
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
-          sitekey: SITE_KEY,
-          theme: currentTheme(),
-          size: "normal",
-          appearance: "always",
-          retry: "auto",
+          sitekey: siteKey,
+          theme: "dark",
           callback: (token) => {
-            setFailed(false);
-            onStatusChangeRef.current?.("ready");
             onTokenChangeRef.current(token);
-          },
-          "expired-callback": () => {
-            onTokenChangeRef.current("");
-            onStatusChangeRef.current?.("loading");
-          },
-          "timeout-callback": () => {
-            onTokenChangeRef.current("");
-            setFailed(true);
-            onStatusChangeRef.current?.("error");
+            onStatusChangeRef.current("ready");
           },
           "error-callback": () => {
             onTokenChangeRef.current("");
-            setFailed(true);
-            onStatusChangeRef.current?.("error");
+            onStatusChangeRef.current("error");
+          },
+          "expired-callback": () => {
+            onTokenChangeRef.current("");
+          },
+          "timeout-callback": () => {
+            onTokenChangeRef.current("");
+            onStatusChangeRef.current("error");
           },
         });
-      } catch {
-        if (cancelled) return;
-        setFailed(true);
-        onTokenChangeRef.current("");
-        onStatusChangeRef.current?.("error");
-      }
-    };
 
-    void mount();
+        window.clearTimeout(timeoutId);
+        if (!cancelled) onStatusChangeRef.current("ready");
+      } catch {
+        window.clearTimeout(timeoutId);
+        if (!cancelled) onStatusChangeRef.current("error");
+      }
+    })();
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timeoutId);
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
         } catch {
-          /* ignore */
+          // ignore
         }
         widgetIdRef.current = null;
       }
     };
-  }, [mountKey]);
-
-  useEffect(() => {
-    if (!resetSignal) return;
-    setMountKey((value) => value + 1);
-    onTokenChange("");
-    onStatusChangeRef.current?.("loading");
-  }, [resetSignal, onTokenChange]);
-
-  if (!SITE_KEY) return null;
+  }, [resetSignal]);
 
   return (
     <div ref={hostRef} className="contact-turnstile-wrap">
       <div ref={containerRef} className="contact-turnstile" />
-      {failed ? (
-        <p className="contact-turnstile-error">
-          Anti-spam check failed to load. If you use Brave/adblock, allow this site (or
-          challenges.cloudflare.com), then tap retry.
-        </p>
-      ) : null}
     </div>
   );
-}
-
-export function isTurnstileConfigured(): boolean {
-  return Boolean(SITE_KEY);
 }

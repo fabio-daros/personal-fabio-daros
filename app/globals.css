@@ -1563,6 +1563,54 @@ body.preloader-released #preloader {
   position: relative;
 }
 
+.contact-captcha-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: color-mix(in srgb, var(--default-color) 85%, transparent);
+  font-size: 0.95rem;
+}
+
+.contact-captcha-hint {
+  margin: 0 0 0.65rem;
+  max-width: 28rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--default-color) 70%, transparent);
+}
+
+.contact-captcha-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.65rem;
+  max-width: 22rem;
+}
+
+.contact-captcha-row .form-control {
+  flex: 1;
+}
+
+.contact-captcha-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  border: 1px solid color-mix(in srgb, var(--accent-color) 55%, transparent);
+  background: transparent;
+  color: var(--accent-color);
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.contact-captcha-refresh:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+}
+
+.contact-captcha-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .contact-turnstile-wrap {
   width: min(100%, 320px);
   display: flex;
@@ -1576,29 +1624,6 @@ body.preloader-released #preloader {
   justify-content: center;
   width: 100%;
   min-height: 65px;
-}
-
-.contact-turnstile-error {
-  margin: 0;
-  max-width: 28rem;
-  text-align: center;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  color: #f87171;
-}
-
-.contact-turnstile-retry {
-  border: 1px solid color-mix(in srgb, var(--accent-color) 55%, transparent);
-  background: transparent;
-  color: var(--accent-color);
-  border-radius: 999px;
-  padding: 0.35rem 0.9rem;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.contact-turnstile-retry:hover {
-  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
 }
 
 .swipe-nav-btn {

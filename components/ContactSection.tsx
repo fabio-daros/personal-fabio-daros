@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { SiOrcid } from "react-icons/si";
 import TurnstileWidget, { isTurnstileConfigured } from "@/components/TurnstileWidget";
 import { useLanguage } from "@/context/LanguageContext";
@@ -18,6 +18,13 @@ type ConfettiPiece = {
   delay: number;
   duration: number;
 };
+
+type CaptchaChallenge = {
+  question: string;
+  token: string;
+};
+
+type CaptchaMode = "turnstile" | "math";
 
 const CONFETTI_COLORS = ["#ef4444", "#2563eb", "#facc15", "#18d26e", "#0d9e4e", "#38bdf8"];
 
@@ -48,17 +55,61 @@ function createConfettiBurst(button: HTMLButtonElement, burstId: number): Confet
 export default function ContactSection() {
   const { locale } = useLanguage();
   const t = translations[locale].contact;
+  const turnstileAvailable = isTurnstileConfigured();
+
   const [confetti, setConfetti] = useState<ConfettiPiece[]>([]);
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+
+  const [captchaMode, setCaptchaMode] = useState<CaptchaMode>(
+    turnstileAvailable ? "turnstile" : "math"
+  );
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileReset, setTurnstileReset] = useState(0);
-  const [turnstileStatus, setTurnstileStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [turnstileStatus, setTurnstileStatus] = useState<"loading" | "ready" | "error">(
+    turnstileAvailable ? "loading" : "error"
+  );
+
+  const [captcha, setCaptcha] = useState<CaptchaChallenge | null>(null);
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captchaLoading, setCaptchaLoading] = useState(false);
+
   const burstIdRef = useRef(0);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const turnstileEnabled = isTurnstileConfigured();
-  const turnstileBlocking = turnstileEnabled && turnstileStatus !== "ready";
+
+  const loadMathCaptcha = useCallback(async () => {
+    setCaptchaLoading(true);
+    setCaptchaAnswer("");
+    try {
+      const response = await fetch("/api/contact/challenge", { cache: "no-store" });
+      if (!response.ok) throw new Error("challenge failed");
+      const data = (await response.json()) as CaptchaChallenge;
+      if (!data.question || !data.token) throw new Error("invalid challenge");
+      setCaptcha(data);
+    } catch {
+      setCaptcha(null);
+    } finally {
+      setCaptchaLoading(false);
+    }
+  }, []);
+
+  const switchToMath = useCallback(() => {
+    setCaptchaMode("math");
+    setTurnstileToken("");
+  }, []);
+
+  useEffect(() => {
+    if (captchaMode === "math") {
+      void loadMathCaptcha();
+    }
+  }, [captchaMode, loadMathCaptcha]);
+
+  useEffect(() => {
+    if (captchaMode === "turnstile" && turnstileStatus === "error") {
+      switchToMath();
+    }
+  }, [captchaMode, turnstileStatus, switchToMath]);
 
   const triggerConfetti = () => {
     if (!submitButtonRef.current) return;
@@ -73,7 +124,12 @@ export default function ContactSection() {
     event.preventDefault();
     const form = event.currentTarget;
 
-    if (turnstileEnabled && !turnstileToken) {
+    if (captchaMode === "turnstile") {
+      if (!turnstileToken) {
+        setError(t.captchaRequired);
+        return;
+      }
+    } else if (!captcha?.token || !captchaAnswer.trim()) {
       setError(t.captchaRequired);
       return;
     }
@@ -84,8 +140,14 @@ export default function ContactSection() {
 
     try {
       const body = new FormData(form);
-      if (turnstileToken) {
+      if (captchaMode === "turnstile") {
         body.set("cf-turnstile-response", turnstileToken);
+        body.delete("captcha_token");
+        body.delete("captcha_answer");
+      } else {
+        body.set("captcha_token", captcha!.token);
+        body.set("captcha_answer", captchaAnswer.trim());
+        body.delete("cf-turnstile-response");
       }
 
       const response = await fetch(form.action, {
@@ -102,16 +164,36 @@ export default function ContactSection() {
       setSent(true);
       form.reset();
       setTurnstileToken("");
-      setTurnstileReset((value) => value + 1);
+      setCaptchaAnswer("");
+      if (captchaMode === "turnstile") {
+        setTurnstileReset((value) => value + 1);
+      } else {
+        await loadMathCaptcha();
+      }
       triggerConfetti();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
       setTurnstileToken("");
-      setTurnstileReset((value) => value + 1);
+      setCaptchaAnswer("");
+      if (captchaMode === "turnstile") {
+        setTurnstileReset((value) => value + 1);
+      } else {
+        await loadMathCaptcha();
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  const captchaLabel = captcha
+    ? t.captchaLabel.replace("{question}", captcha.question)
+    : t.captchaLabel.replace("{question}", "…");
+
+  const submitDisabled =
+    loading ||
+    (captchaMode === "turnstile"
+      ? turnstileStatus === "loading" || !turnstileToken
+      : captchaLoading || !captcha);
 
   return (
     <section id="contact" className="contact section">
@@ -222,33 +304,59 @@ export default function ContactSection() {
             <div className="col-md-12">
               <textarea className="form-control" name="message" rows={6} placeholder={t.message} required maxLength={5000}></textarea>
             </div>
-            {turnstileEnabled ? (
+
+            {captchaMode === "turnstile" ? (
               <div className="col-md-12 d-flex flex-column align-items-center gap-2">
                 <TurnstileWidget
                   onTokenChange={setTurnstileToken}
                   onStatusChange={setTurnstileStatus}
                   resetSignal={turnstileReset}
                 />
-                {turnstileStatus === "error" ? (
-                  <button
-                    type="button"
-                    className="contact-turnstile-retry"
-                    onClick={() => {
-                      setTurnstileToken("");
-                      setTurnstileStatus("loading");
-                      setTurnstileReset((value) => value + 1);
-                    }}
-                  >
-                    {t.captchaRetry}
-                  </button>
+                {turnstileStatus === "loading" ? (
+                  <p className="contact-captcha-hint">{t.captchaLoading}</p>
                 ) : null}
               </div>
-            ) : null}
+            ) : (
+              <div className="col-md-12">
+                {turnstileAvailable ? (
+                  <p className="contact-captcha-hint">{t.captchaFallbackHint}</p>
+                ) : null}
+                <label className="contact-captcha-label" htmlFor="captcha_answer">
+                  {captchaLabel}
+                </label>
+                <div className="contact-captcha-row">
+                  <input
+                    id="captcha_answer"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    className="form-control"
+                    name="captcha_answer"
+                    value={captchaAnswer}
+                    onChange={(event) => setCaptchaAnswer(event.target.value)}
+                    placeholder={t.captchaPlaceholder}
+                    required
+                    disabled={captchaLoading || !captcha}
+                  />
+                  <button
+                    type="button"
+                    className="contact-captcha-refresh"
+                    onClick={() => void loadMathCaptcha()}
+                    disabled={captchaLoading}
+                    aria-label={t.captchaRefresh}
+                    title={t.captchaRefresh}
+                  >
+                    <i className="bi bi-arrow-clockwise" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="col-md-12 text-center">
               <div className={`loading${loading ? " d-block" : ""}`}>{t.loading}</div>
               <div className={`error-message${error ? " d-block" : ""}`}>{error}</div>
               <div className={`sent-message${sent ? " d-block" : ""}`}>{t.sentMessage}</div>
-              <button type="submit" ref={submitButtonRef} disabled={loading || turnstileBlocking}>
+              <button type="submit" ref={submitButtonRef} disabled={submitDisabled}>
                 {t.sendMessage}
               </button>
             </div>

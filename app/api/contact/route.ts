@@ -1,5 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { verifyMathChallenge } from "@/lib/contactCaptcha";
+
+async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY?.trim();
+  if (!secret || !token) return false;
+
+  try {
+    const body = new URLSearchParams();
+    body.set("secret", secret);
+    body.set("response", token);
+    if (ip && ip !== "unknown") body.set("remoteip", ip);
+
+    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      body,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+
+    if (!response.ok) return false;
+    const data = (await response.json()) as { success?: boolean };
+    return Boolean(data.success);
+  } catch (err) {
+    console.error("[Contact API] Turnstile verify failed:", err);
+    return false;
+  }
+}
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const CONTACT_EMAILS: Record<"pt" | "en", string> = {
@@ -23,7 +49,7 @@ const LIMITS = {
 } as const;
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_MAX = 3;
 
 type RateBucket = { count: number; resetAt: number };
 
@@ -73,32 +99,6 @@ function normalizeLocale(raw: string): "pt" | "en" {
   return raw === "pt" ? "pt" : "en";
 }
 
-async function verifyTurnstileToken(token: string, ip: string): Promise<boolean> {
-  const secret = process.env.TURNSTILE_SECRET_KEY?.trim();
-  if (!secret) return false;
-
-  const body = new URLSearchParams({
-    secret,
-    response: token,
-  });
-  if (ip && ip !== "unknown") body.set("remoteip", ip);
-
-  const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
-
-  if (!response.ok) return false;
-
-  const result = (await response.json()) as { success?: boolean };
-  return result.success === true;
-}
-
-function requiresTurnstile(): boolean {
-  return Boolean(process.env.TURNSTILE_SECRET_KEY?.trim());
-}
-
 export async function POST(request: NextRequest) {
   if (!RESEND_API_KEY) {
     console.error("[Contact API] RESEND_API_KEY is not set");
@@ -123,20 +123,19 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (requiresTurnstile()) {
-      const turnstileToken = readField(formData, "cf-turnstile-response");
-      if (!turnstileToken) {
-        return new NextResponse("Captcha required", { status: 400 });
-      }
+    const turnstileToken = readField(formData, "cf-turnstile-response");
+    const captchaToken = readField(formData, "captcha_token");
+    const captchaAnswer = readField(formData, "captcha_answer");
 
-      const captchaOk = await verifyTurnstileToken(turnstileToken, ip);
-      if (!captchaOk) {
-        console.info("[Contact API] Rejected invalid Turnstile token", { ip });
-        return new NextResponse("Captcha verification failed", { status: 403 });
-      }
-    } else if (process.env.NODE_ENV === "production") {
-      console.error("[Contact API] TURNSTILE_SECRET_KEY is not set in production");
-      return new NextResponse("Captcha not configured", { status: 500 });
+    let captchaOk = false;
+    if (turnstileToken) {
+      captchaOk = await verifyTurnstile(turnstileToken, ip);
+    }
+    if (!captchaOk && captchaToken && captchaAnswer) {
+      captchaOk = verifyMathChallenge(captchaToken, captchaAnswer);
+    }
+    if (!captchaOk) {
+      return new NextResponse("Captcha verification failed", { status: 403 });
     }
 
     const locale = normalizeLocale(readField(formData, "locale") || "en");
@@ -194,7 +193,6 @@ export async function POST(request: NextRequest) {
       return new NextResponse(error.message || "Failed to send email", { status: 500 });
     }
 
-    // `override` only means CONTACT_EMAIL_OVERRIDE is set in env (routes all mail to that inbox).
     console.info("[Contact API] Sent", {
       id: data?.id,
       to: toEmail,

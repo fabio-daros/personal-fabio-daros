@@ -6,10 +6,11 @@ Configure **antes** do deploy para o download do currículo e o formulário de c
 
 | Variável | Sensível | Uso |
 |----------|----------|-----|
-| `RESEND_API_KEY` | Sim | Envio do formulário de contato |
+| `RESEND_API_KEY` | Sim | Envio do formulário de contato (também assina o captcha matemático se `CONTACT_CAPTCHA_SECRET` não existir) |
 | `RESEND_FROM` | Não | Remetente Resend (ex.: `Fabio Daros Site <noreply@fabiodaros.com>`) |
 | `CONTACT_EMAIL_OVERRIDE` | Não | (Opcional) Redireciona todos os envios para este endereço (útil em testes) |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Não | Cloudflare Turnstile site key (widget do formulário) |
+| `CONTACT_CAPTCHA_SECRET` | Sim | (Opcional) Segredo HMAC do captcha matemático (fallback) |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Não | Cloudflare Turnstile site key (widget preferido) |
 | `TURNSTILE_SECRET_KEY` | Sim | Cloudflare Turnstile secret (validação server-side) |
 | `GOOGLE_DRIVE_API_KEY` | Sim | Backup: busca por pasta no Drive |
 | `GOOGLE_DRIVE_CV_FOLDER_ID` | Não | ID da pasta do Drive |
@@ -46,23 +47,23 @@ Depois faça push ou redeploy.
 
 ## Status atual (df-projects/personal-fabio-daros)
 
-As 8 variáveis abaixo estão em **Production**, **Preview** e **Development**:
+As variáveis abaixo estão em **Production**, **Preview** e **Development**:
 
 - `RESEND_API_KEY`, `CONTACT_EMAIL_OVERRIDE`
-- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` (Cloudflare Turnstile no formulário)
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`
 - `GOOGLE_DRIVE_API_KEY`, `GOOGLE_DRIVE_CV_FOLDER_ID`
 - `CV_DRIVE_FILENAME_PT`, `CV_DRIVE_FILENAME_EN`
 - `GOOGLE_DRIVE_FILE_ID_PT`, `GOOGLE_DRIVE_FILE_ID_EN`
 
-### Cloudflare Turnstile (anti-spam do contato)
+### Anti-spam do contato (híbrido)
 
-1. Crie um widget em [dash.cloudflare.com → Turnstile](https://dash.cloudflare.com/?to=/:account/turnstile)
-2. Domínios: `fabiodaros.com`, `www.fabiodaros.com`, `localhost`
-3. Copie **Site Key** → `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
-4. Copie **Secret Key** → `TURNSTILE_SECRET_KEY`
-5. Adicione as duas no Vercel (e no `.env.local`) e faça **Redeploy**
+1. **Preferência:** Cloudflare Turnstile, se `NEXT_PUBLIC_TURNSTILE_SITE_KEY` estiver definida.
+2. **Fallback:** se o script for bloqueado (Brave/adblock) ou falhar em ~8s, o formulário troca automaticamente para captcha matemático (soma + token HMAC).
+3. O servidor aceita **Turnstile ou** a soma. Honeypot + rate limit (3 / 10 min / IP) continuam ativos.
 
-Sem `TURNSTILE_SECRET_KEY` em produção, o `/api/contact` recusa envios.
+Domínios no dashboard Turnstile: `fabiodaros.com`, `www.fabiodaros.com`, `localhost`.
+
+Opcional: `CONTACT_CAPTCHA_SECRET` para assinar o fallback; sem ela, usa `RESEND_API_KEY`.
 
 ## Testar em produção
 
