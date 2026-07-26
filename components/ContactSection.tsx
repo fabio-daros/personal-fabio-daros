@@ -54,9 +54,11 @@ export default function ContactSection() {
   const [error, setError] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileReset, setTurnstileReset] = useState(0);
+  const [turnstileStatus, setTurnstileStatus] = useState<"loading" | "ready" | "error">("loading");
   const burstIdRef = useRef(0);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const turnstileEnabled = isTurnstileConfigured();
+  const turnstileBlocking = turnstileEnabled && turnstileStatus !== "ready";
 
   const triggerConfetti = () => {
     if (!submitButtonRef.current) return;
@@ -221,15 +223,32 @@ export default function ContactSection() {
               <textarea className="form-control" name="message" rows={6} placeholder={t.message} required maxLength={5000}></textarea>
             </div>
             {turnstileEnabled ? (
-              <div className="col-md-12 d-flex justify-content-center">
-                <TurnstileWidget onTokenChange={setTurnstileToken} resetSignal={turnstileReset} />
+              <div className="col-md-12 d-flex flex-column align-items-center gap-2">
+                <TurnstileWidget
+                  onTokenChange={setTurnstileToken}
+                  onStatusChange={setTurnstileStatus}
+                  resetSignal={turnstileReset}
+                />
+                {turnstileStatus === "error" ? (
+                  <button
+                    type="button"
+                    className="contact-turnstile-retry"
+                    onClick={() => {
+                      setTurnstileToken("");
+                      setTurnstileStatus("loading");
+                      setTurnstileReset((value) => value + 1);
+                    }}
+                  >
+                    {t.captchaRetry}
+                  </button>
+                ) : null}
               </div>
             ) : null}
             <div className="col-md-12 text-center">
               <div className={`loading${loading ? " d-block" : ""}`}>{t.loading}</div>
               <div className={`error-message${error ? " d-block" : ""}`}>{error}</div>
               <div className={`sent-message${sent ? " d-block" : ""}`}>{t.sentMessage}</div>
-              <button type="submit" ref={submitButtonRef} disabled={loading || (turnstileEnabled && !turnstileToken)}>
+              <button type="submit" ref={submitButtonRef} disabled={loading || turnstileBlocking}>
                 {t.sendMessage}
               </button>
             </div>

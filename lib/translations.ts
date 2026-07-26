@@ -44,6 +44,7 @@ export const translations = {
       loading: "Carregando",
       sentMessage: "Sua mensagem foi enviada. Obrigado!",
       captchaRequired: "Complete a verificação anti-spam antes de enviar.",
+      captchaRetry: "Tentar verificação novamente",
     },
     footer: {
       tagline: "Where Software meets Biology...",
@@ -275,6 +276,7 @@ export const translations = {
       loading: "Loading",
       sentMessage: "Your message has been sent. Thank you!",
       captchaRequired: "Please complete the anti-spam check before sending.",
+      captchaRetry: "Retry anti-spam check",
     },
     footer: {
       tagline: "Where Software meets Biology...",

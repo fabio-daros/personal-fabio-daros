@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type TurnstileApi = {
+  ready: (callback: () => void) => void;
   render: (
     element: HTMLElement,
     options: {
       sitekey: string;
       theme?: "light" | "dark" | "auto";
+      size?: "normal" | "flexible" | "compact";
+      appearance?: "always" | "execute" | "interaction-only";
+      retry?: "auto" | "never";
       callback?: (token: string) => void;
       "expired-callback"?: () => void;
       "error-callback"?: () => void;
+      "timeout-callback"?: () => void;
     },
   ) => string;
   reset: (widgetId?: string) => void;
@@ -25,6 +30,7 @@ declare global {
 
 type TurnstileWidgetProps = {
   onTokenChange: (token: string) => void;
+  onStatusChange?: (status: "loading" | "ready" | "error") => void;
   resetSignal?: number;
 };
 
@@ -38,6 +44,10 @@ function loadTurnstileScript(): Promise<void> {
   const existing = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
   if (existing) {
     return new Promise((resolve, reject) => {
+      if (window.turnstile) {
+        resolve();
+        return;
+      }
       existing.addEventListener("load", () => resolve(), { once: true });
       existing.addEventListener("error", () => reject(new Error("Turnstile script failed")), {
         once: true,
@@ -61,26 +71,48 @@ function currentTheme(): "light" | "dark" {
   return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
 }
 
-export default function TurnstileWidget({ onTokenChange, resetSignal = 0 }: TurnstileWidgetProps) {
+export default function TurnstileWidget({
+  onTokenChange,
+  onStatusChange,
+  resetSignal = 0,
+}: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const onTokenChangeRef = useRef(onTokenChange);
+  const onStatusChangeRef = useRef(onStatusChange);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     onTokenChangeRef.current = onTokenChange;
   }, [onTokenChange]);
 
   useEffect(() => {
+    onStatusChangeRef.current = onStatusChange;
+  }, [onStatusChange]);
+
+  useEffect(() => {
     if (!SITE_KEY || !containerRef.current) return;
 
     let cancelled = false;
+    onStatusChangeRef.current?.("loading");
 
-    void loadTurnstileScript()
-      .then(() => {
+    const mount = async () => {
+      try {
+        await loadTurnstileScript();
+        if (cancelled || !containerRef.current || !window.turnstile) return;
+
+        await new Promise<void>((resolve) => {
+          window.turnstile!.ready(() => resolve());
+        });
+
         if (cancelled || !containerRef.current || !window.turnstile) return;
 
         if (widgetIdRef.current) {
-          window.turnstile.remove(widgetIdRef.current);
+          try {
+            window.turnstile.remove(widgetIdRef.current);
+          } catch {
+            /* ignore */
+          }
           widgetIdRef.current = null;
         }
 
@@ -88,19 +120,47 @@ export default function TurnstileWidget({ onTokenChange, resetSignal = 0 }: Turn
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: SITE_KEY,
           theme: currentTheme(),
-          callback: (token) => onTokenChangeRef.current(token),
-          "expired-callback": () => onTokenChangeRef.current(""),
-          "error-callback": () => onTokenChangeRef.current(""),
+          size: "flexible",
+          appearance: "always",
+          retry: "auto",
+          callback: (token) => {
+            setFailed(false);
+            onStatusChangeRef.current?.("ready");
+            onTokenChangeRef.current(token);
+          },
+          "expired-callback": () => {
+            onTokenChangeRef.current("");
+            onStatusChangeRef.current?.("loading");
+          },
+          "timeout-callback": () => {
+            onTokenChangeRef.current("");
+            setFailed(true);
+            onStatusChangeRef.current?.("error");
+          },
+          "error-callback": () => {
+            onTokenChangeRef.current("");
+            setFailed(true);
+            onStatusChangeRef.current?.("error");
+          },
         });
-      })
-      .catch(() => {
+      } catch {
+        if (cancelled) return;
+        setFailed(true);
         onTokenChangeRef.current("");
-      });
+        onStatusChangeRef.current?.("error");
+      }
+    };
+
+    void mount();
 
     return () => {
       cancelled = true;
       if (widgetIdRef.current && window.turnstile) {
-        window.turnstile.remove(widgetIdRef.current);
+        try {
+          window.turnstile.remove(widgetIdRef.current);
+        } catch {
+          /* ignore */
+        }
         widgetIdRef.current = null;
       }
     };
@@ -108,13 +168,30 @@ export default function TurnstileWidget({ onTokenChange, resetSignal = 0 }: Turn
 
   useEffect(() => {
     if (!resetSignal || !widgetIdRef.current || !window.turnstile) return;
+    setFailed(false);
     onTokenChange("");
-    window.turnstile.reset(widgetIdRef.current);
+    onStatusChangeRef.current?.("loading");
+    try {
+      window.turnstile.reset(widgetIdRef.current);
+    } catch {
+      /* ignore */
+    }
   }, [resetSignal, onTokenChange]);
 
   if (!SITE_KEY) return null;
 
-  return <div ref={containerRef} className="contact-turnstile" />;
+  return (
+    <div className="contact-turnstile-wrap">
+      <div ref={containerRef} className="contact-turnstile" />
+      {failed ? (
+        <p className="contact-turnstile-error">
+          Anti-spam check failed to load. Allow challenges.cloudflare.com (disable Brave shields /
+          adblock on this site), confirm fabiodaros.com and www.fabiodaros.com are in the Turnstile
+          hostnames, then reload.
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 export function isTurnstileConfigured(): boolean {

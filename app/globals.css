@@ -1563,10 +1563,42 @@ body.preloader-released #preloader {
   position: relative;
 }
 
+.contact-turnstile-wrap {
+  width: min(100%, 320px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .contact-turnstile {
-  display: inline-flex;
+  display: flex;
   justify-content: center;
+  width: 100%;
   min-height: 65px;
+}
+
+.contact-turnstile-error {
+  margin: 0;
+  max-width: 28rem;
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #f87171;
+}
+
+.contact-turnstile-retry {
+  border: 1px solid color-mix(in srgb, var(--accent-color) 55%, transparent);
+  background: transparent;
+  color: var(--accent-color);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.contact-turnstile-retry:hover {
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
 }
 
 .swipe-nav-btn {
