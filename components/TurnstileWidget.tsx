@@ -25,9 +25,11 @@ declare global {
   }
 }
 
+export type TurnstileStatus = "loading" | "ready" | "blocked" | "error";
+
 type TurnstileWidgetProps = {
   onTokenChange: (token: string) => void;
-  onStatusChange: (status: "loading" | "ready" | "error") => void;
+  onStatusChange: (status: TurnstileStatus) => void;
   resetSignal?: number;
 };
 
@@ -37,14 +39,14 @@ const LOAD_TIMEOUT_MS = 15000;
 
 function loadTurnstileScript(): Promise<TurnstileApi> {
   if (typeof window === "undefined") {
-    return Promise.reject(new Error("ssr"));
+    return Promise.reject(new Error("blocked"));
   }
   if (window.turnstile) return Promise.resolve(window.turnstile);
 
   return new Promise((resolve, reject) => {
     const finish = () => {
       if (window.turnstile) resolve(window.turnstile);
-      else reject(new Error("Turnstile API missing after script load"));
+      else reject(new Error("blocked"));
     };
 
     const existing = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
@@ -54,9 +56,7 @@ function loadTurnstileScript(): Promise<TurnstileApi> {
         return;
       }
       existing.addEventListener("load", finish, { once: true });
-      existing.addEventListener("error", () => reject(new Error("Turnstile script failed")), {
-        once: true,
-      });
+      existing.addEventListener("error", () => reject(new Error("blocked")), { once: true });
       return;
     }
 
@@ -65,7 +65,7 @@ function loadTurnstileScript(): Promise<TurnstileApi> {
     script.src = SCRIPT_SRC;
     script.async = true;
     script.onload = finish;
-    script.onerror = () => reject(new Error("Turnstile script failed"));
+    script.onerror = () => reject(new Error("blocked"));
     document.head.appendChild(script);
   });
 }
@@ -104,21 +104,17 @@ export default function TurnstileWidget({
     let cancelled = false;
     let rendered = false;
 
-    const markError = () => {
-      // Only fail the whole widget before a successful render.
-      // Post-render error-callback often fires during React remount/remove.
-      if (!cancelled && !rendered) {
-        onStatusChangeRef.current("error");
-      }
+    const report = (status: TurnstileStatus) => {
+      if (!cancelled) onStatusChangeRef.current(status);
     };
 
     const timeoutId = window.setTimeout(() => {
       if (!cancelled && !rendered) {
-        onStatusChangeRef.current("error");
+        report("blocked");
       }
     }, LOAD_TIMEOUT_MS);
 
-    onStatusChangeRef.current("loading");
+    report("loading");
     onTokenChangeRef.current("");
 
     (async () => {
@@ -146,14 +142,15 @@ export default function TurnstileWidget({
           callback: (token) => {
             if (cancelled) return;
             onTokenChangeRef.current(token);
-            onStatusChangeRef.current("ready");
+            report("ready");
           },
           "error-callback": () => {
-            if (cancelled) return;
+            if (cancelled || rendered) {
+              onTokenChangeRef.current("");
+              return;
+            }
             onTokenChangeRef.current("");
-            // Keep widget status ready if already rendered; user can retry via reset.
-            // Fatal only before first successful render.
-            markError();
+            report("error");
           },
           "expired-callback": () => {
             if (cancelled) return;
@@ -162,16 +159,17 @@ export default function TurnstileWidget({
           "timeout-callback": () => {
             if (cancelled) return;
             onTokenChangeRef.current("");
-            markError();
+            if (!rendered) report("blocked");
           },
         });
 
         rendered = true;
         window.clearTimeout(timeoutId);
-        if (!cancelled) onStatusChangeRef.current("ready");
-      } catch {
+        if (!cancelled) report("ready");
+      } catch (err) {
         window.clearTimeout(timeoutId);
-        markError();
+        const message = err instanceof Error ? err.message : "";
+        report(message === "blocked" ? "blocked" : "error");
       }
     })();
 

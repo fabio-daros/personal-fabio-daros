@@ -18,9 +18,24 @@ async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
 
-    if (!response.ok) return false;
-    const data = (await response.json()) as { success?: boolean };
-    return Boolean(data.success);
+    const data = (await response.json()) as {
+      success?: boolean;
+      "error-codes"?: string[];
+      hostname?: string;
+    };
+
+    if (!response.ok || !data.success) {
+      console.warn("[Contact API] Turnstile siteverify rejected", {
+        ok: response.ok,
+        status: response.status,
+        success: data.success,
+        errorCodes: data["error-codes"],
+        hostname: data.hostname,
+      });
+      return false;
+    }
+
+    return true;
   } catch (err) {
     console.error("[Contact API] Turnstile verify failed:", err);
     return false;

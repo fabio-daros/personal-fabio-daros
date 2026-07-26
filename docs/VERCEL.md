@@ -58,12 +58,17 @@ As variáveis abaixo estão em **Production**, **Preview** e **Development**:
 ### Anti-spam do contato (híbrido)
 
 1. **Preferência:** Cloudflare Turnstile, se `NEXT_PUBLIC_TURNSTILE_SITE_KEY` estiver definida.
-2. **Fallback:** se o script for bloqueado (Brave/adblock) ou falhar em ~8s, o formulário troca automaticamente para captcha matemático (soma + token HMAC).
-3. O servidor aceita **Turnstile ou** a soma. Honeypot + rate limit (3 / 10 min / IP) continuam ativos.
+2. **Se o script for bloqueado** (Brave Shields / adblock em `challenges.cloudflare.com`): o formulário mostra uma mensagem amigável + **Tentar novamente**. Não há bypass por user-agent.
+3. **Alternativa opcional:** o visitante pode escolher a soma assinada (HMAC) — ainda é captcha validado no servidor.
+4. Honeypot + rate limit (3 / 10 min / IP) continuam ativos.
+
+CSP do site inclui `script-src` / `frame-src` / `connect-src` para `https://challenges.cloudflare.com`.
 
 Domínios no dashboard Turnstile: `fabiodaros.com`, `www.fabiodaros.com`, `localhost`.
 
 Opcional: `CONTACT_CAPTCHA_SECRET` para assinar o fallback; sem ela, usa `RESEND_API_KEY`.
+
+**Nota Brave:** Shields costuma bloquear `challenges.cloudflare.com`. O visitante precisa permitir o site (ou esse domínio) para o widget da Cloudflare carregar.
 
 ## Testar em produção
 

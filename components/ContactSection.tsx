@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { SiOrcid } from "react-icons/si";
-import TurnstileWidget, { isTurnstileConfigured } from "@/components/TurnstileWidget";
+import TurnstileWidget, {
+  isTurnstileConfigured,
+  type TurnstileStatus,
+} from "@/components/TurnstileWidget";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
@@ -67,9 +70,10 @@ export default function ContactSection() {
   );
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileReset, setTurnstileReset] = useState(0);
-  const [turnstileStatus, setTurnstileStatus] = useState<"loading" | "ready" | "error">(
+  const [turnstileStatus, setTurnstileStatus] = useState<TurnstileStatus>(
     turnstileAvailable ? "loading" : "error"
   );
+  const [showMathAlternative, setShowMathAlternative] = useState(!turnstileAvailable);
 
   const [captcha, setCaptcha] = useState<CaptchaChallenge | null>(null);
   const [captchaAnswer, setCaptchaAnswer] = useState("");
@@ -94,8 +98,18 @@ export default function ContactSection() {
     }
   }, []);
 
-  const switchToMath = useCallback(() => {
+  const retryTurnstile = useCallback(() => {
+    setCaptchaMode("turnstile");
+    setShowMathAlternative(false);
+    setTurnstileToken("");
+    setTurnstileStatus("loading");
+    setCaptchaAnswer("");
+    setTurnstileReset((value) => value + 1);
+  }, []);
+
+  const useMathAlternative = useCallback(() => {
     setCaptchaMode("math");
+    setShowMathAlternative(true);
     setTurnstileToken("");
   }, []);
 
@@ -105,17 +119,19 @@ export default function ContactSection() {
     }
   }, [captchaMode, loadMathCaptcha]);
 
+  // After a confirmed Turnstile load failure, offer the math alternative —
+  // still a real captcha, never skipped by browser/user-agent detection.
   useEffect(() => {
-    if (captchaMode !== "turnstile" || turnstileStatus !== "error") return;
+    if (!turnstileAvailable) return;
+    if (captchaMode !== "turnstile") return;
+    if (turnstileStatus !== "blocked" && turnstileStatus !== "error") return;
 
-    // Debounce fallback so React Strict Mode remount / Turnstile remove
-    // does not permanently abandon Cloudflare for the math challenge.
     const id = window.setTimeout(() => {
-      switchToMath();
-    }, 400);
+      setShowMathAlternative(true);
+    }, 500);
 
     return () => window.clearTimeout(id);
-  }, [captchaMode, turnstileStatus, switchToMath]);
+  }, [turnstileAvailable, captchaMode, turnstileStatus]);
 
   const triggerConfetti = () => {
     if (!submitButtonRef.current) return;
@@ -194,6 +210,10 @@ export default function ContactSection() {
   const captchaLabel = captcha
     ? t.captchaLabel.replace("{question}", captcha.question)
     : t.captchaLabel.replace("{question}", "…");
+
+  const turnstileBlocked =
+    captchaMode === "turnstile" &&
+    (turnstileStatus === "blocked" || turnstileStatus === "error");
 
   const submitDisabled =
     loading ||
@@ -311,7 +331,7 @@ export default function ContactSection() {
               <textarea className="form-control" name="message" rows={6} placeholder={t.message} required maxLength={5000}></textarea>
             </div>
 
-            {captchaMode === "turnstile" ? (
+            {turnstileAvailable && captchaMode === "turnstile" ? (
               <div className="col-md-12 d-flex flex-column align-items-center gap-2">
                 <TurnstileWidget
                   onTokenChange={setTurnstileToken}
@@ -321,40 +341,79 @@ export default function ContactSection() {
                 {turnstileStatus === "loading" ? (
                   <p className="contact-captcha-hint">{t.captchaLoading}</p>
                 ) : null}
+                {turnstileBlocked ? (
+                  <div className="contact-captcha-blocked" role="status">
+                    <p className="contact-captcha-blocked__text">{t.captchaBlocked}</p>
+                    <button
+                      type="button"
+                      className="contact-captcha-refresh contact-captcha-retry"
+                      onClick={retryTurnstile}
+                    >
+                      {t.captchaRetry}
+                    </button>
+                  </div>
+                ) : null}
               </div>
-            ) : (
+            ) : null}
+
+            {(captchaMode === "math" || showMathAlternative) && (
               <div className="col-md-12">
-                {turnstileAvailable ? (
+                {turnstileAvailable && turnstileBlocked && captchaMode === "turnstile" ? (
                   <p className="contact-captcha-hint">{t.captchaFallbackHint}</p>
                 ) : null}
-                <label className="contact-captcha-label" htmlFor="captcha_answer">
-                  {captchaLabel}
-                </label>
-                <div className="contact-captcha-row">
-                  <input
-                    id="captcha_answer"
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="off"
-                    className="form-control"
-                    name="captcha_answer"
-                    value={captchaAnswer}
-                    onChange={(event) => setCaptchaAnswer(event.target.value)}
-                    placeholder={t.captchaPlaceholder}
-                    required
-                    disabled={captchaLoading || !captcha}
-                  />
+                {captchaMode === "math" && turnstileAvailable ? (
+                  <div className="contact-captcha-blocked contact-captcha-blocked--compact" role="status">
+                    <p className="contact-captcha-blocked__text">{t.captchaBlocked}</p>
+                    <button
+                      type="button"
+                      className="contact-captcha-refresh contact-captcha-retry"
+                      onClick={retryTurnstile}
+                    >
+                      {t.captchaRetry}
+                    </button>
+                  </div>
+                ) : null}
+                {captchaMode === "turnstile" && showMathAlternative && turnstileBlocked ? (
                   <button
                     type="button"
-                    className="contact-captcha-refresh"
-                    onClick={() => void loadMathCaptcha()}
-                    disabled={captchaLoading}
-                    aria-label={t.captchaRefresh}
-                    title={t.captchaRefresh}
+                    className="contact-captcha-alt"
+                    onClick={useMathAlternative}
                   >
-                    <i className="bi bi-arrow-clockwise" aria-hidden="true" />
+                    {t.captchaUseAlternative}
                   </button>
-                </div>
+                ) : null}
+                {captchaMode === "math" ? (
+                  <>
+                    <label className="contact-captcha-label" htmlFor="captcha_answer">
+                      {captchaLabel}
+                    </label>
+                    <div className="contact-captcha-row">
+                      <input
+                        id="captcha_answer"
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="off"
+                        className="form-control"
+                        name="captcha_answer"
+                        value={captchaAnswer}
+                        onChange={(event) => setCaptchaAnswer(event.target.value)}
+                        placeholder={t.captchaPlaceholder}
+                        required
+                        disabled={captchaLoading || !captcha}
+                      />
+                      <button
+                        type="button"
+                        className="contact-captcha-refresh"
+                        onClick={() => void loadMathCaptcha()}
+                        disabled={captchaLoading}
+                        aria-label={t.captchaRefresh}
+                        title={t.captchaRefresh}
+                      >
+                        <i className="bi bi-arrow-clockwise" aria-hidden="true" />
+                      </button>
+                    </div>
+                  </>
+                ) : null}
               </div>
             )}
 

@@ -48,7 +48,11 @@ export const translations = {
       captchaRequired: "Complete a verificação anti-spam antes de enviar.",
       captchaRefresh: "Nova pergunta",
       captchaLoading: "Carregando verificação anti-spam…",
-      captchaFallbackHint: "A verificação Cloudflare não carregou. Use a soma abaixo.",
+      captchaBlocked:
+        "A verificação anti-spam da Cloudflare não carregou. Se você usa Brave ou um bloqueador de anúncios, permita este site (ou challenges.cloudflare.com) e toque em tentar novamente.",
+      captchaRetry: "Tentar Cloudflare novamente",
+      captchaFallbackHint: "Enquanto isso, você pode usar a verificação alternativa abaixo.",
+      captchaUseAlternative: "Usar verificação alternativa (soma)",
     },
     footer: {
       tagline: "Where Software meets Biology...",
@@ -284,7 +288,11 @@ export const translations = {
       captchaRequired: "Please complete the anti-spam check before sending.",
       captchaRefresh: "New question",
       captchaLoading: "Loading anti-spam check…",
-      captchaFallbackHint: "Cloudflare check did not load. Use the sum below.",
+      captchaBlocked:
+        "The Cloudflare anti-spam check failed to load. If you use Brave or an ad blocker, allow this site (or challenges.cloudflare.com), then tap retry.",
+      captchaRetry: "Retry Cloudflare check",
+      captchaFallbackHint: "Meanwhile, you can use the alternative check below.",
+      captchaUseAlternative: "Use alternative check (sum)",
     },
     footer: {
       tagline: "Where Software meets Biology...",
