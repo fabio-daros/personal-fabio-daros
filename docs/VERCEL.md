@@ -49,11 +49,20 @@ Depois faça push ou redeploy.
 As 8 variáveis abaixo estão em **Production**, **Preview** e **Development**:
 
 - `RESEND_API_KEY`, `CONTACT_EMAIL_OVERRIDE`
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` (Cloudflare Turnstile no formulário)
 - `GOOGLE_DRIVE_API_KEY`, `GOOGLE_DRIVE_CV_FOLDER_ID`
 - `CV_DRIVE_FILENAME_PT`, `CV_DRIVE_FILENAME_EN`
 - `GOOGLE_DRIVE_FILE_ID_PT`, `GOOGLE_DRIVE_FILE_ID_EN`
 
-Pode fazer deploy. Após o deploy, um **Redeploy** garante que o build pegue as variáveis novas (se o último deploy foi antes desta configuração).
+### Cloudflare Turnstile (anti-spam do contato)
+
+1. Crie um widget em [dash.cloudflare.com → Turnstile](https://dash.cloudflare.com/?to=/:account/turnstile)
+2. Domínios: `fabiodaros.com`, `www.fabiodaros.com`, `localhost`
+3. Copie **Site Key** → `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+4. Copie **Secret Key** → `TURNSTILE_SECRET_KEY`
+5. Adicione as duas no Vercel (e no `.env.local`) e faça **Redeploy**
+
+Sem `TURNSTILE_SECRET_KEY` em produção, o `/api/contact` recusa envios.
 
 ## Testar em produção
 
