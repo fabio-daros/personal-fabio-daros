@@ -64,7 +64,7 @@ As variáveis abaixo estão em **Production**, **Preview** e **Development**:
 5. Alternativa opcional: soma HMAC após falha de carga do widget (ainda validada no servidor).
 6. Honeypot + rate limit (3 / 10 min / IP).
 
-CSP: `script-src` / `frame-src` / `connect-src` incluem `https://challenges.cloudflare.com`.
+CSP: removida por enquanto — a policy anterior quebrava o Turnstile em produção (`400020`) mesmo com site key e hostnames corretos. Se voltar CSP, incluir `script-src` / `frame-src` / `connect-src` / `worker-src` para `https://challenges.cloudflare.com` e validar o widget antes de publicar.
 
 Domínios no dashboard Turnstile: `fabiodaros.com`, `www.fabiodaros.com` (e opcionalmente `localhost` / `127.0.0.1`).
 
