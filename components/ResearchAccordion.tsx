@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useId, type RefObject } from "react";
+import { useEffect, type RefObject } from "react";
 import type { ReactNode } from "react";
 
 type ResearchProjectCardProps = {
+  id: string;
   title: string;
   description?: string;
   onOpen: () => void;
@@ -11,17 +12,16 @@ type ResearchProjectCardProps = {
 };
 
 export function ResearchProjectCard({
+  id,
   title,
   description,
   onOpen,
   expandLabel,
 }: ResearchProjectCardProps) {
-  const triggerId = useId();
-
   return (
     <article className="research-accordion research-accordion--card">
       <button
-        id={triggerId}
+        id={id}
         type="button"
         className="research-accordion__trigger research-accordion__trigger--card"
         aria-haspopup="dialog"
@@ -55,7 +55,7 @@ export function ResearchProjectPanel({
   closeLabel,
   children,
 }: ResearchProjectPanelProps) {
-  const titleId = useId();
+  const titleId = "research-project-panel-title";
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

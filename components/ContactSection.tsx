@@ -135,19 +135,19 @@ export default function ContactSection() {
 
   const turnstileHasError = turnstileStatus === "error" && turnstileFailure;
 
-  const isLocalHostname =
-    typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-
-  const turnstileErrorText = turnstileFailure
-    ? turnstileFailure.code === "400020"
-      ? isLocalHostname
-        ? t.captchaErrorLocalhostSitekey
-        : t.captchaErrorInvalidSitekey
-      : turnstileFailure.isClientBlock
-        ? t.captchaBlocked.replace("{code}", turnstileFailure.code)
-        : t.captchaError.replace("{code}", turnstileFailure.code)
-    : "";
+  const turnstileErrorText = (() => {
+    if (!turnstileFailure) return "";
+    if (turnstileFailure.code === "400020") {
+      // Read hostname only when rendering an error (client-only path).
+      const host = typeof window !== "undefined" ? window.location.hostname : "";
+      const isLocal = host === "localhost" || host === "127.0.0.1";
+      return isLocal ? t.captchaErrorLocalhostSitekey : t.captchaErrorInvalidSitekey;
+    }
+    if (turnstileFailure.isClientBlock) {
+      return t.captchaBlocked.replace("{code}", turnstileFailure.code);
+    }
+    return t.captchaError.replace("{code}", turnstileFailure.code);
+  })();
 
   const submitDisabled =
     loading || !turnstileAvailable || turnstileStatus === "loading" || !turnstileToken;

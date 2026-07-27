@@ -146,6 +146,7 @@ export default function ResearchContent() {
                 ) : (
                   <div className="research-accordions__cards">
                     <ResearchProjectCard
+                      id="research-card-oncopixel"
                       title={r.research1Title}
                       description={r.research1Desc}
                       onOpen={() => setOpenId("oncopixel")}
@@ -153,6 +154,7 @@ export default function ResearchContent() {
                     />
 
                     <ResearchProjectCard
+                      id="research-card-inpunto"
                       title={t.inpuntoTitle}
                       onOpen={() => setOpenId("inpunto")}
                       expandLabel={t.expandProject}
