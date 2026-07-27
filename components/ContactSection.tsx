@@ -221,9 +221,11 @@ export default function ContactSection() {
   const turnstileHasError = captchaMode === "turnstile" && turnstileStatus === "error" && turnstileFailure;
 
   const turnstileErrorText = turnstileFailure
-    ? turnstileFailure.isClientBlock
-      ? t.captchaBlocked.replace("{code}", turnstileFailure.code)
-      : t.captchaError.replace("{code}", turnstileFailure.code)
+    ? turnstileFailure.code === "400020"
+      ? t.captchaErrorInvalidSitekey
+      : turnstileFailure.isClientBlock
+        ? t.captchaBlocked.replace("{code}", turnstileFailure.code)
+        : t.captchaError.replace("{code}", turnstileFailure.code)
     : "";
 
   const submitDisabled =
@@ -377,9 +379,11 @@ export default function ContactSection() {
                   <div className="contact-captcha-blocked contact-captcha-blocked--compact" role="status">
                     <p className="contact-captcha-blocked__text">
                       {turnstileFailure
-                        ? turnstileFailure.isClientBlock
-                          ? t.captchaBlocked.replace("{code}", turnstileFailure.code)
-                          : t.captchaError.replace("{code}", turnstileFailure.code)
+                        ? turnstileFailure.code === "400020"
+                          ? t.captchaErrorInvalidSitekey
+                          : turnstileFailure.isClientBlock
+                            ? t.captchaBlocked.replace("{code}", turnstileFailure.code)
+                            : t.captchaError.replace("{code}", turnstileFailure.code)
                         : t.captchaError.replace("{code}", "fallback")}
                     </p>
                     <button

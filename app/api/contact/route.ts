@@ -2,13 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { verifyMathChallenge } from "@/lib/contactCaptcha";
 
-/** Cloudflare's documented dummy keys — never accept these in this project. */
+/** Cloudflare documented dummy keys — allowed in local `next dev` only. */
 function isCloudflareDummySiteKey(value: string): boolean {
   return /^1x0+AA$/i.test(value) || /^2x0+AB$/i.test(value) || /^3x0+FF$/i.test(value);
 }
 
 function isCloudflareDummySecretKey(value: string): boolean {
   return /^1x0+AA$/i.test(value) || /^2x0+BB$/i.test(value) || /^3x0+DD$/i.test(value);
+}
+
+function isProductionRuntime(): boolean {
+  return (
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production"
+  );
 }
 
 function getTurnstileConfig():
@@ -24,10 +31,13 @@ function getTurnstileConfig():
     };
   }
 
-  if (isCloudflareDummySiteKey(siteKey) || isCloudflareDummySecretKey(secret)) {
+  if (
+    isProductionRuntime() &&
+    (isCloudflareDummySiteKey(siteKey) || isCloudflareDummySecretKey(secret))
+  ) {
     return {
       ok: false,
-      reason: "Cloudflare Turnstile dummy/test keys are not allowed",
+      reason: "Cloudflare Turnstile dummy/test keys are not allowed in production",
     };
   }
 

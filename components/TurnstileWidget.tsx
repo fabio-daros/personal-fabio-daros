@@ -9,6 +9,7 @@ type TurnstileApi = {
     options: {
       sitekey: string;
       theme?: "light" | "dark" | "auto";
+      size?: "normal" | "compact" | "flexible";
       callback?: (token: string) => void;
       "error-callback"?: (errorCode: string) => void;
       "expired-callback"?: () => void;
@@ -47,6 +48,19 @@ const SCRIPT_ID = "cf-turnstile-script";
 const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
 let scriptLoadPromise: Promise<void> | null = null;
+
+const CF_ERROR_HINTS: Record<string, string> = {
+  "110100": "Invalid sitekey",
+  "110110": "Sitekey not found",
+  "110200": "Domain not authorized — add this hostname in Turnstile Hostname Management",
+  "400020": "Invalid sitekey or unauthorized hostname (Cloudflare often returns 400020 for localhost with production keys)",
+  "400070": "Sitekey disabled",
+};
+
+function describeTurnstileError(code: string): string {
+  const hint = CF_ERROR_HINTS[code];
+  return hint ? `${code} (${hint})` : code;
+}
 
 function isClientBlockCode(code: string): code is TurnstileBlockCode {
   return code === "ERR_BLOCKED_BY_CLIENT" || code === "blocked:csp";
@@ -157,8 +171,12 @@ export default function TurnstileWidget({
       return;
     }
 
-    if (/^1x0+AA$/i.test(siteKey) || /^2x0+AB$/i.test(siteKey) || /^3x0+FF$/i.test(siteKey)) {
-      console.error("[Turnstile] Cloudflare dummy/test site key is not allowed");
+    // Dummy keys are allowed in `next dev` via .env.development.local only.
+    if (
+      process.env.NODE_ENV === "production" &&
+      (/^1x0+AA$/i.test(siteKey) || /^2x0+AB$/i.test(siteKey) || /^3x0+FF$/i.test(siteKey))
+    ) {
+      console.error("[Turnstile] Cloudflare dummy/test site key is not allowed in production");
       onFailureChangeRef.current?.({ code: "test_sitekey_forbidden", isClientBlock: false });
       onStatusChangeRef.current("error");
       return;
@@ -215,37 +233,48 @@ export default function TurnstileWidget({
           // Plain container only — do not use className="cf-turnstile" (implicit mode).
           containerRef.current.innerHTML = "";
 
-          widgetIdRef.current = window.turnstile.render(containerRef.current, {
+          const activeWidgetId = window.turnstile.render(containerRef.current, {
             sitekey: siteKey,
             theme: "dark",
+            size: "normal",
             callback: (token) => {
-              if (cancelled) return;
+              if (cancelled || widgetIdRef.current !== activeWidgetId) return;
               console.info("[Turnstile] token received");
               onTokenChangeRef.current(token);
               clearFailure();
               onStatusChangeRef.current("ready");
             },
             "error-callback": (errorCode) => {
-              if (cancelled) return;
-              const code = errorCode || "unknown_cf_error";
-              console.error("Turnstile error:", code);
+              if (cancelled || widgetIdRef.current !== activeWidgetId) return;
+              const code = String(errorCode || "unknown_cf_error");
+              const host = window.location.hostname;
+              console.error(
+                `Turnstile error: ${describeTurnstileError(code)} | hostname=${host} origin=${window.location.origin}`
+              );
+              if (code === "400020" && (host === "localhost" || host === "127.0.0.1")) {
+                console.error(
+                  "[Turnstile] Production sitekeys often reject localhost. Use http://localhost.fabiodaros.com:3000 (add 127.0.0.1 localhost.fabiodaros.com to /etc/hosts). Cloudflare docs: production keys should not rely on localhost."
+                );
+              }
               onTokenChangeRef.current("");
               reportFailure(code);
             },
             "expired-callback": () => {
-              if (cancelled) return;
+              if (cancelled || widgetIdRef.current !== activeWidgetId) return;
               console.info("[Turnstile] token expired");
               onTokenChangeRef.current("");
             },
             "timeout-callback": () => {
-              if (cancelled) return;
-              console.error("Turnstile error:", "timeout");
+              if (cancelled || widgetIdRef.current !== activeWidgetId) return;
+              console.error("Turnstile error: timeout");
               onTokenChangeRef.current("");
               reportFailure("timeout");
             },
           });
 
-          console.info("[Turnstile] widget rendered", widgetIdRef.current);
+          widgetIdRef.current = activeWidgetId;
+
+          console.info("[Turnstile] widget rendered", activeWidgetId);
           // Widget is mounted; token may arrive asynchronously via callback.
           if (!cancelled) onStatusChangeRef.current("ready");
         };
@@ -288,7 +317,7 @@ export default function TurnstileWidget({
   return (
     <div className="contact-turnstile-wrap">
       {/* Explicit render target only — do not use className="cf-turnstile". */}
-      <div ref={containerRef} />
+      <div ref={containerRef} className="contact-turnstile-host" />
     </div>
   );
 }

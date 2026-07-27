@@ -19,8 +19,14 @@ const contentSecurityPolicy = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["192.168.0.155"],
+  allowedDevOrigins: ["192.168.0.155", "localhost.fabiodaros.com", "local.fabiodaros.com"],
   async headers() {
+    // Production sitekeys often reject bare localhost; keep CSP only in production builds
+    // so local Turnstile debugging is not skewed by policy violations.
+    if (process.env.NODE_ENV !== "production") {
+      return [];
+    }
+
     return [
       {
         source: "/:path*",

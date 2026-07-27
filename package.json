@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
+    "dev:local-cf": "next dev --webpack --hostname localhost.fabiodaros.com",
     "dev:turbo": "next dev --turbopack",
     "build": "next build",
     "start": "next start",

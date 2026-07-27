@@ -66,9 +66,23 @@ As variáveis abaixo estão em **Production**, **Preview** e **Development**:
 
 CSP: `script-src` / `frame-src` / `connect-src` incluem `https://challenges.cloudflare.com`.
 
-Domínios no dashboard Turnstile: `fabiodaros.com`, `www.fabiodaros.com`, `localhost`.
+Domínios no dashboard Turnstile: `fabiodaros.com`, `www.fabiodaros.com` (e opcionalmente `localhost` / `127.0.0.1`).
 
-Opcional: `CONTACT_CAPTCHA_SECRET` para assinar o fallback; sem ela, usa `RESEND_API_KEY`.
+### Localhost (`next dev`)
+
+Site keys de produção costumam falhar em `localhost` com erro `400020`.
+
+Use o arquivo **`.env.development.local`** (gitignored) com as keys oficiais de teste da Cloudflare. Ele sobrescreve `.env.local` só no `next dev` e **não** entra no build/Vercel Production.
+
+```bash
+# .env.development.local
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+```
+
+Reinicie o `npm run dev` depois de criar/alterar esse arquivo.
+
+Production (Vercel) continua só com as keys reais do dashboard.
 
 
 ## Testar em produção

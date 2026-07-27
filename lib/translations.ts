@@ -49,6 +49,8 @@ export const translations = {
       captchaRefresh: "Nova pergunta",
       captchaLoading: "Carregando verificação anti-spam…",
       captchaError: "Turnstile falhou (código: {code}). Veja o Console para detalhes e tente novamente.",
+      captchaErrorInvalidSitekey:
+        "Turnstile 400020: site key de produção não funciona em localhost. No `next dev`, use as keys de teste em `.env.development.local` (já configurado). Em fabiodaros.com usa a key real.",
       captchaBlocked:
         "O navegador bloqueou o script do Turnstile ({code}). Permita challenges.cloudflare.com neste site e tente novamente.",
       captchaConfigMissing: "Anti-spam não configurado (chaves Turnstile ausentes).",
@@ -291,6 +293,8 @@ export const translations = {
       captchaRefresh: "New question",
       captchaLoading: "Loading anti-spam check…",
       captchaError: "Turnstile failed (code: {code}). Check the Console for details and try again.",
+      captchaErrorInvalidSitekey:
+        "Turnstile 400020: production sitekeys do not work on localhost. For `next dev`, use Cloudflare test keys in `.env.development.local` (already set). On fabiodaros.com the real key is used.",
       captchaBlocked:
         "The browser blocked the Turnstile script ({code}). Allow challenges.cloudflare.com on this site, then retry.",
       captchaConfigMissing: "Anti-spam is not configured (Turnstile keys missing).",
