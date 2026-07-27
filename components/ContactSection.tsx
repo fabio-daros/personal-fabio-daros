@@ -24,6 +24,8 @@ type ConfettiPiece = {
 };
 
 const CONFETTI_COLORS = ["#ef4444", "#2563eb", "#facc15", "#18d26e", "#0d9e4e", "#38bdf8"];
+/** Show Turnstile once the message has meaningful content. */
+const MESSAGE_TURNSTILE_MIN = 4;
 
 function createConfettiBurst(button: HTMLButtonElement, burstId: number): ConfettiPiece[] {
   const rect = button.getBoundingClientRect();
@@ -61,13 +63,14 @@ export default function ContactSection() {
 
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileReset, setTurnstileReset] = useState(0);
-  const [turnstileStatus, setTurnstileStatus] = useState<TurnstileStatus>(
-    turnstileAvailable ? "loading" : "error"
-  );
+  const [turnstileStatus, setTurnstileStatus] = useState<TurnstileStatus>("loading");
   const [turnstileFailure, setTurnstileFailure] = useState<TurnstileFailure | null>(null);
+  const [message, setMessage] = useState("");
 
   const burstIdRef = useRef(0);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  const showTurnstile = message.trim().length >= MESSAGE_TURNSTILE_MIN;
 
   const retryTurnstile = useCallback(() => {
     setTurnstileToken("");
@@ -75,6 +78,19 @@ export default function ContactSection() {
     setTurnstileStatus("loading");
     setTurnstileReset((value) => value + 1);
   }, []);
+
+  const resetTurnstileState = useCallback(() => {
+    setTurnstileToken("");
+    setTurnstileFailure(null);
+    setTurnstileStatus("loading");
+  }, []);
+
+  const handleMessageChange = (value: string) => {
+    setMessage(value);
+    if (value.trim().length < MESSAGE_TURNSTILE_MIN) {
+      resetTurnstileState();
+    }
+  };
 
   const triggerConfetti = () => {
     if (!submitButtonRef.current) return;
@@ -121,7 +137,8 @@ export default function ContactSection() {
 
       setSent(true);
       form.reset();
-      setTurnstileToken("");
+      setMessage("");
+      resetTurnstileState();
       setTurnstileReset((value) => value + 1);
       triggerConfetti();
     } catch (err) {
@@ -133,7 +150,7 @@ export default function ContactSection() {
     }
   };
 
-  const turnstileHasError = turnstileStatus === "error" && turnstileFailure;
+  const turnstileHasError = showTurnstile && turnstileStatus === "error" && turnstileFailure;
 
   const turnstileErrorText = (() => {
     if (!turnstileFailure) return "";
@@ -150,7 +167,11 @@ export default function ContactSection() {
   })();
 
   const submitDisabled =
-    loading || !turnstileAvailable || turnstileStatus === "loading" || !turnstileToken;
+    loading ||
+    !turnstileAvailable ||
+    !showTurnstile ||
+    turnstileStatus === "loading" ||
+    !turnstileToken;
 
   return (
     <section id="contact" className="contact section">
@@ -259,41 +280,52 @@ export default function ContactSection() {
               <input type="text" className="form-control" name="subject" placeholder={t.subject} required maxLength={200} />
             </div>
             <div className="col-md-12">
-              <textarea className="form-control" name="message" rows={6} placeholder={t.message} required maxLength={5000}></textarea>
+              <textarea
+                className="form-control"
+                name="message"
+                rows={6}
+                placeholder={t.message}
+                required
+                maxLength={5000}
+                value={message}
+                onChange={(event) => handleMessageChange(event.target.value)}
+              />
             </div>
 
-            <div className="col-md-12 d-flex flex-column align-items-center gap-2">
-              {turnstileAvailable ? (
-                <>
-                  <TurnstileWidget
-                    language={locale === "pt" ? "pt-BR" : "en"}
-                    onTokenChange={setTurnstileToken}
-                    onStatusChange={setTurnstileStatus}
-                    onFailureChange={setTurnstileFailure}
-                    resetSignal={turnstileReset}
-                  />
-                  {turnstileStatus === "loading" ? (
-                    <p className="contact-captcha-hint">{t.captchaLoading}</p>
-                  ) : null}
-                  {turnstileHasError ? (
-                    <div className="contact-captcha-blocked" role="status">
-                      <p className="contact-captcha-blocked__text">{turnstileErrorText}</p>
-                      <button
-                        type="button"
-                        className="contact-captcha-refresh contact-captcha-retry"
-                        onClick={retryTurnstile}
-                      >
-                        {t.captchaRetry}
-                      </button>
-                    </div>
-                  ) : null}
-                </>
-              ) : (
+            {turnstileAvailable && showTurnstile ? (
+              <div className="col-md-12 d-flex flex-column align-items-center gap-2">
+                <TurnstileWidget
+                  language={locale === "pt" ? "pt-BR" : "en"}
+                  onTokenChange={setTurnstileToken}
+                  onStatusChange={setTurnstileStatus}
+                  onFailureChange={setTurnstileFailure}
+                  resetSignal={turnstileReset}
+                />
+                {turnstileStatus === "loading" ? (
+                  <p className="contact-captcha-hint">{t.captchaLoading}</p>
+                ) : null}
+                {turnstileHasError ? (
+                  <div className="contact-captcha-blocked" role="status">
+                    <p className="contact-captcha-blocked__text">{turnstileErrorText}</p>
+                    <button
+                      type="button"
+                      className="contact-captcha-refresh contact-captcha-retry"
+                      onClick={retryTurnstile}
+                    >
+                      {t.captchaRetry}
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {!turnstileAvailable ? (
+              <div className="col-md-12 d-flex flex-column align-items-center gap-2">
                 <p className="contact-captcha-blocked__text" role="status">
                   {t.captchaConfigMissing}
                 </p>
-              )}
-            </div>
+              </div>
+            ) : null}
 
             <div className="col-md-12 text-center">
               <div className={`loading${loading ? " d-block" : ""}`}>{t.loading}</div>
