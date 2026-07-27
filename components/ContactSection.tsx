@@ -8,6 +8,7 @@ import TurnstileWidget, {
   type TurnstileStatus,
 } from "@/components/TurnstileWidget";
 import { useLanguage } from "@/context/LanguageContext";
+import { useTheme } from "@/context/ThemeContext";
 import { translations } from "@/lib/translations";
 
 type ConfettiPiece = {
@@ -53,6 +54,7 @@ function createConfettiBurst(button: HTMLButtonElement, burstId: number): Confet
 
 export default function ContactSection() {
   const { locale } = useLanguage();
+  const { theme } = useTheme();
   const t = translations[locale].contact;
   const turnstileAvailable = isTurnstileConfigured();
 
@@ -308,6 +310,7 @@ export default function ContactSection() {
               <div className="col-md-12 d-flex flex-column align-items-center gap-2">
                 <TurnstileWidget
                   language={locale === "pt" ? "pt-BR" : "en"}
+                  theme={theme}
                   onTokenChange={setTurnstileToken}
                   onStatusChange={setTurnstileStatus}
                   onFailureChange={setTurnstileFailure}
