@@ -89,6 +89,7 @@ export default function ContactSection() {
 
   const handleMessageChange = (value: string) => {
     setMessage(value);
+    if (sent) setSent(false);
     if (value.trim().length < MESSAGE_TURNSTILE_MIN) {
       resetTurnstileState();
     }

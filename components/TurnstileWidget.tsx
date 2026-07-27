@@ -11,6 +11,8 @@ type TurnstileApi = {
       theme?: "light" | "dark" | "auto";
       size?: "normal" | "compact" | "flexible";
       language?: string;
+      "refresh-expired"?: "auto" | "manual" | "never";
+      "refresh-timeout"?: "auto" | "manual" | "never";
       callback?: (token: string) => void;
       "error-callback"?: (errorCode: string) => void;
       "expired-callback"?: () => void;
@@ -245,6 +247,9 @@ export default function TurnstileWidget({
             theme,
             size: "normal",
             language,
+            // Tokens last ~5 minutes; auto-refresh instead of a hard failure UI.
+            "refresh-expired": "auto",
+            "refresh-timeout": "auto",
             callback: (token) => {
               if (cancelled || widgetIdRef.current !== activeWidgetId) return;
               console.info("[Turnstile] token received");
@@ -269,14 +274,24 @@ export default function TurnstileWidget({
             },
             "expired-callback": () => {
               if (cancelled || widgetIdRef.current !== activeWidgetId) return;
-              console.info("[Turnstile] token expired");
+              // Expected after ~5 minutes idle with a solved challenge.
+              console.info("[Turnstile] token expired; waiting for auto-refresh");
               onTokenChangeRef.current("");
+              clearFailure();
+              onStatusChangeRef.current("loading");
             },
             "timeout-callback": () => {
               if (cancelled || widgetIdRef.current !== activeWidgetId) return;
-              console.error("Turnstile error: timeout");
+              // Interactive challenge waited too long — auto-refresh, no scary error banner.
+              console.info("[Turnstile] challenge timed out; waiting for auto-refresh");
               onTokenChangeRef.current("");
-              reportFailure("timeout");
+              clearFailure();
+              onStatusChangeRef.current("loading");
+              try {
+                window.turnstile?.reset(activeWidgetId);
+              } catch {
+                // ignore
+              }
             },
           });
 
