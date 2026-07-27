@@ -220,9 +220,15 @@ export default function ContactSection() {
 
   const turnstileHasError = captchaMode === "turnstile" && turnstileStatus === "error" && turnstileFailure;
 
+  const isLocalHostname =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
   const turnstileErrorText = turnstileFailure
     ? turnstileFailure.code === "400020"
-      ? t.captchaErrorInvalidSitekey
+      ? isLocalHostname
+        ? t.captchaErrorLocalhostSitekey
+        : t.captchaErrorInvalidSitekey
       : turnstileFailure.isClientBlock
         ? t.captchaBlocked.replace("{code}", turnstileFailure.code)
         : t.captchaError.replace("{code}", turnstileFailure.code)
@@ -380,7 +386,9 @@ export default function ContactSection() {
                     <p className="contact-captcha-blocked__text">
                       {turnstileFailure
                         ? turnstileFailure.code === "400020"
-                          ? t.captchaErrorInvalidSitekey
+                          ? isLocalHostname
+                            ? t.captchaErrorLocalhostSitekey
+                            : t.captchaErrorInvalidSitekey
                           : turnstileFailure.isClientBlock
                             ? t.captchaBlocked.replace("{code}", turnstileFailure.code)
                             : t.captchaError.replace("{code}", turnstileFailure.code)
