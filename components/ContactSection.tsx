@@ -266,6 +266,7 @@ export default function ContactSection() {
               {turnstileAvailable ? (
                 <>
                   <TurnstileWidget
+                    language={locale === "pt" ? "pt-BR" : "en"}
                     onTokenChange={setTurnstileToken}
                     onStatusChange={setTurnstileStatus}
                     onFailureChange={setTurnstileFailure}

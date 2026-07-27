@@ -10,6 +10,7 @@ type TurnstileApi = {
       sitekey: string;
       theme?: "light" | "dark" | "auto";
       size?: "normal" | "compact" | "flexible";
+      language?: string;
       callback?: (token: string) => void;
       "error-callback"?: (errorCode: string) => void;
       "expired-callback"?: () => void;
@@ -38,6 +39,8 @@ export type TurnstileFailure = {
 };
 
 type TurnstileWidgetProps = {
+  /** Turnstile UI language (e.g. `pt-BR`, `en`). */
+  language?: string;
   onTokenChange: (token: string) => void;
   onStatusChange: (status: TurnstileStatus) => void;
   onFailureChange?: (failure: TurnstileFailure | null) => void;
@@ -140,6 +143,7 @@ export function isTurnstileConfigured(): boolean {
 }
 
 export default function TurnstileWidget({
+  language = "auto",
   onTokenChange,
   onStatusChange,
   onFailureChange,
@@ -237,6 +241,7 @@ export default function TurnstileWidget({
             sitekey: siteKey,
             theme: "dark",
             size: "normal",
+            language,
             callback: (token) => {
               if (cancelled || widgetIdRef.current !== activeWidgetId) return;
               console.info("[Turnstile] token received");
@@ -312,7 +317,7 @@ export default function TurnstileWidget({
         widgetIdRef.current = null;
       }
     };
-  }, [resetSignal]);
+  }, [language, resetSignal]);
 
   return (
     <div className="contact-turnstile-wrap">
