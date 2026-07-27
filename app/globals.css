@@ -1563,13 +1563,6 @@ body.preloader-released #preloader {
   position: relative;
 }
 
-.contact-captcha-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: color-mix(in srgb, var(--default-color) 85%, transparent);
-  font-size: 0.95rem;
-}
-
 .contact-captcha-hint {
   margin: 0 0 0.65rem;
   max-width: 28rem;
@@ -1587,10 +1580,6 @@ body.preloader-released #preloader {
   text-align: center;
 }
 
-.contact-captcha-blocked--compact {
-  margin-bottom: 0.85rem;
-}
-
 .contact-captcha-blocked__text {
   margin: 0;
   font-size: 0.9rem;
@@ -1603,33 +1592,6 @@ body.preloader-released #preloader {
   padding: 0.4rem 0.95rem;
   border-radius: 999px;
   font-size: 0.85rem;
-}
-
-.contact-captcha-alt {
-  display: inline-block;
-  margin: 0.35rem 0 0.85rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--accent-color);
-  font-size: 0.9rem;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.contact-captcha-alt:hover {
-  opacity: 0.85;
-}
-
-.contact-captcha-row {
-  display: flex;
-  align-items: stretch;
-  gap: 0.65rem;
-  max-width: 22rem;
-}
-
-.contact-captcha-row .form-control {
-  flex: 1;
 }
 
 .contact-captcha-refresh {

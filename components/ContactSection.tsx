@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { useCallback, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { SiOrcid } from "react-icons/si";
 import TurnstileWidget, {
   isTurnstileConfigured,
@@ -22,13 +22,6 @@ type ConfettiPiece = {
   delay: number;
   duration: number;
 };
-
-type CaptchaChallenge = {
-  question: string;
-  token: string;
-};
-
-type CaptchaMode = "turnstile" | "math";
 
 const CONFETTI_COLORS = ["#ef4444", "#2563eb", "#facc15", "#18d26e", "#0d9e4e", "#38bdf8"];
 
@@ -66,73 +59,22 @@ export default function ContactSection() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
-  const [captchaMode, setCaptchaMode] = useState<CaptchaMode>(
-    turnstileAvailable ? "turnstile" : "math"
-  );
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileReset, setTurnstileReset] = useState(0);
   const [turnstileStatus, setTurnstileStatus] = useState<TurnstileStatus>(
     turnstileAvailable ? "loading" : "error"
   );
   const [turnstileFailure, setTurnstileFailure] = useState<TurnstileFailure | null>(null);
-  const [showMathAlternative, setShowMathAlternative] = useState(!turnstileAvailable);
-
-  const [captcha, setCaptcha] = useState<CaptchaChallenge | null>(null);
-  const [captchaAnswer, setCaptchaAnswer] = useState("");
-  const [captchaLoading, setCaptchaLoading] = useState(false);
 
   const burstIdRef = useRef(0);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-  const loadMathCaptcha = useCallback(async () => {
-    setCaptchaLoading(true);
-    setCaptchaAnswer("");
-    try {
-      const response = await fetch("/api/contact/challenge", { cache: "no-store" });
-      if (!response.ok) throw new Error("challenge failed");
-      const data = (await response.json()) as CaptchaChallenge;
-      if (!data.question || !data.token) throw new Error("invalid challenge");
-      setCaptcha(data);
-    } catch {
-      setCaptcha(null);
-    } finally {
-      setCaptchaLoading(false);
-    }
-  }, []);
-
   const retryTurnstile = useCallback(() => {
-    setCaptchaMode("turnstile");
-    setShowMathAlternative(false);
     setTurnstileToken("");
     setTurnstileFailure(null);
     setTurnstileStatus("loading");
-    setCaptchaAnswer("");
     setTurnstileReset((value) => value + 1);
   }, []);
-
-  const useMathAlternative = useCallback(() => {
-    setCaptchaMode("math");
-    setShowMathAlternative(true);
-    setTurnstileToken("");
-  }, []);
-
-  useEffect(() => {
-    if (captchaMode === "math") {
-      void loadMathCaptcha();
-    }
-  }, [captchaMode, loadMathCaptcha]);
-
-  useEffect(() => {
-    if (!turnstileAvailable) return;
-    if (captchaMode !== "turnstile") return;
-    if (turnstileStatus !== "error" || !turnstileFailure) return;
-
-    const id = window.setTimeout(() => {
-      setShowMathAlternative(true);
-    }, 500);
-
-    return () => window.clearTimeout(id);
-  }, [turnstileAvailable, captchaMode, turnstileStatus, turnstileFailure]);
 
   const triggerConfetti = () => {
     if (!submitButtonRef.current) return;
@@ -153,12 +95,7 @@ export default function ContactSection() {
       return;
     }
 
-    if (captchaMode === "turnstile") {
-      if (!turnstileToken) {
-        setError(t.captchaRequired);
-        return;
-      }
-    } else if (!captcha?.token || !captchaAnswer.trim()) {
+    if (!turnstileToken) {
       setError(t.captchaRequired);
       return;
     }
@@ -169,15 +106,7 @@ export default function ContactSection() {
 
     try {
       const body = new FormData(form);
-      if (captchaMode === "turnstile") {
-        body.set("cf-turnstile-response", turnstileToken);
-        body.delete("captcha_token");
-        body.delete("captcha_answer");
-      } else {
-        body.set("captcha_token", captcha!.token);
-        body.set("captcha_answer", captchaAnswer.trim());
-        body.delete("cf-turnstile-response");
-      }
+      body.set("cf-turnstile-response", turnstileToken);
 
       const response = await fetch(form.action, {
         method: "POST",
@@ -193,32 +122,18 @@ export default function ContactSection() {
       setSent(true);
       form.reset();
       setTurnstileToken("");
-      setCaptchaAnswer("");
-      if (captchaMode === "turnstile") {
-        setTurnstileReset((value) => value + 1);
-      } else {
-        await loadMathCaptcha();
-      }
+      setTurnstileReset((value) => value + 1);
       triggerConfetti();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
       setTurnstileToken("");
-      setCaptchaAnswer("");
-      if (captchaMode === "turnstile") {
-        setTurnstileReset((value) => value + 1);
-      } else {
-        await loadMathCaptcha();
-      }
+      setTurnstileReset((value) => value + 1);
     } finally {
       setLoading(false);
     }
   };
 
-  const captchaLabel = captcha
-    ? t.captchaLabel.replace("{question}", captcha.question)
-    : t.captchaLabel.replace("{question}", "…");
-
-  const turnstileHasError = captchaMode === "turnstile" && turnstileStatus === "error" && turnstileFailure;
+  const turnstileHasError = turnstileStatus === "error" && turnstileFailure;
 
   const isLocalHostname =
     typeof window !== "undefined" &&
@@ -235,10 +150,7 @@ export default function ContactSection() {
     : "";
 
   const submitDisabled =
-    loading ||
-    (captchaMode === "turnstile"
-      ? turnstileStatus === "loading" || !turnstileToken
-      : captchaLoading || !captcha);
+    loading || !turnstileAvailable || turnstileStatus === "loading" || !turnstileToken;
 
   return (
     <section id="contact" className="contact section">
@@ -350,102 +262,37 @@ export default function ContactSection() {
               <textarea className="form-control" name="message" rows={6} placeholder={t.message} required maxLength={5000}></textarea>
             </div>
 
-            {turnstileAvailable && captchaMode === "turnstile" ? (
-              <div className="col-md-12 d-flex flex-column align-items-center gap-2">
-                <TurnstileWidget
-                  onTokenChange={setTurnstileToken}
-                  onStatusChange={setTurnstileStatus}
-                  onFailureChange={setTurnstileFailure}
-                  resetSignal={turnstileReset}
-                />
-                {turnstileStatus === "loading" ? (
-                  <p className="contact-captcha-hint">{t.captchaLoading}</p>
-                ) : null}
-                {turnstileHasError ? (
-                  <div className="contact-captcha-blocked" role="status">
-                    <p className="contact-captcha-blocked__text">{turnstileErrorText}</p>
-                    <button
-                      type="button"
-                      className="contact-captcha-refresh contact-captcha-retry"
-                      onClick={retryTurnstile}
-                    >
-                      {t.captchaRetry}
-                    </button>
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
-
-            {(captchaMode === "math" || showMathAlternative) && (
-              <div className="col-md-12">
-                {turnstileAvailable && turnstileHasError && captchaMode === "turnstile" ? (
-                  <p className="contact-captcha-hint">{t.captchaFallbackHint}</p>
-                ) : null}
-                {captchaMode === "math" && turnstileAvailable ? (
-                  <div className="contact-captcha-blocked contact-captcha-blocked--compact" role="status">
-                    <p className="contact-captcha-blocked__text">
-                      {turnstileFailure
-                        ? turnstileFailure.code === "400020"
-                          ? isLocalHostname
-                            ? t.captchaErrorLocalhostSitekey
-                            : t.captchaErrorInvalidSitekey
-                          : turnstileFailure.isClientBlock
-                            ? t.captchaBlocked.replace("{code}", turnstileFailure.code)
-                            : t.captchaError.replace("{code}", turnstileFailure.code)
-                        : t.captchaError.replace("{code}", "fallback")}
-                    </p>
-                    <button
-                      type="button"
-                      className="contact-captcha-refresh contact-captcha-retry"
-                      onClick={retryTurnstile}
-                    >
-                      {t.captchaRetry}
-                    </button>
-                  </div>
-                ) : null}
-                {captchaMode === "turnstile" && showMathAlternative && turnstileHasError ? (
-                  <button
-                    type="button"
-                    className="contact-captcha-alt"
-                    onClick={useMathAlternative}
-                  >
-                    {t.captchaUseAlternative}
-                  </button>
-                ) : null}
-                {captchaMode === "math" ? (
-                  <>
-                    <label className="contact-captcha-label" htmlFor="captcha_answer">
-                      {captchaLabel}
-                    </label>
-                    <div className="contact-captcha-row">
-                      <input
-                        id="captcha_answer"
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="off"
-                        className="form-control"
-                        name="captcha_answer"
-                        value={captchaAnswer}
-                        onChange={(event) => setCaptchaAnswer(event.target.value)}
-                        placeholder={t.captchaPlaceholder}
-                        required
-                        disabled={captchaLoading || !captcha}
-                      />
+            <div className="col-md-12 d-flex flex-column align-items-center gap-2">
+              {turnstileAvailable ? (
+                <>
+                  <TurnstileWidget
+                    onTokenChange={setTurnstileToken}
+                    onStatusChange={setTurnstileStatus}
+                    onFailureChange={setTurnstileFailure}
+                    resetSignal={turnstileReset}
+                  />
+                  {turnstileStatus === "loading" ? (
+                    <p className="contact-captcha-hint">{t.captchaLoading}</p>
+                  ) : null}
+                  {turnstileHasError ? (
+                    <div className="contact-captcha-blocked" role="status">
+                      <p className="contact-captcha-blocked__text">{turnstileErrorText}</p>
                       <button
                         type="button"
-                        className="contact-captcha-refresh"
-                        onClick={() => void loadMathCaptcha()}
-                        disabled={captchaLoading}
-                        aria-label={t.captchaRefresh}
-                        title={t.captchaRefresh}
+                        className="contact-captcha-refresh contact-captcha-retry"
+                        onClick={retryTurnstile}
                       >
-                        <i className="bi bi-arrow-clockwise" aria-hidden="true" />
+                        {t.captchaRetry}
                       </button>
                     </div>
-                  </>
-                ) : null}
-              </div>
-            )}
+                  ) : null}
+                </>
+              ) : (
+                <p className="contact-captcha-blocked__text" role="status">
+                  {t.captchaConfigMissing}
+                </p>
+              )}
+            </div>
 
             <div className="col-md-12 text-center">
               <div className={`loading${loading ? " d-block" : ""}`}>{t.loading}</div>

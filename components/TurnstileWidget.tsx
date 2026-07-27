@@ -53,7 +53,7 @@ const CF_ERROR_HINTS: Record<string, string> = {
   "110100": "Invalid sitekey",
   "110110": "Sitekey not found",
   "110200": "Domain not authorized — add this hostname in Turnstile Hostname Management",
-  "400020": "Invalid sitekey or unauthorized hostname (Cloudflare often returns 400020 for localhost with production keys)",
+  "400020": "Invalid sitekey (Cloudflare docs). Re-copy Site Key from the Turnstile widget or create a new widget; also common on localhost with production keys",
   "400070": "Sitekey disabled",
 };
 

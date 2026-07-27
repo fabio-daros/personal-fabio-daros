@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { verifyMathChallenge } from "@/lib/contactCaptcha";
 
 /** Cloudflare documented dummy keys — allowed in local `next dev` only. */
 function isCloudflareDummySiteKey(value: string): boolean {
@@ -186,22 +185,15 @@ export async function POST(request: NextRequest) {
     }
 
     const turnstileToken = readField(formData, "cf-turnstile-response");
-    const captchaToken = readField(formData, "captcha_token");
-    const captchaAnswer = readField(formData, "captcha_answer");
+    if (!turnstileToken) {
+      return new NextResponse("Captcha verification failed", { status: 403 });
+    }
 
-    let captchaOk = false;
-    if (turnstileToken) {
-      captchaOk = await verifyTurnstile(turnstileConfig.secret, turnstileToken, ip);
-      if (captchaOk) {
-        console.info("[Contact API] Turnstile siteverify ok", { ip });
-      }
-    }
-    if (!captchaOk && captchaToken && captchaAnswer) {
-      captchaOk = verifyMathChallenge(captchaToken, captchaAnswer);
-    }
+    const captchaOk = await verifyTurnstile(turnstileConfig.secret, turnstileToken, ip);
     if (!captchaOk) {
       return new NextResponse("Captcha verification failed", { status: 403 });
     }
+    console.info("[Contact API] Turnstile siteverify ok", { ip });
 
     const locale = normalizeLocale(readField(formData, "locale") || "en");
     const override = process.env.CONTACT_EMAIL_OVERRIDE?.trim();

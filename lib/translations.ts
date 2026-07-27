@@ -43,22 +43,17 @@ export const translations = {
       sendMessage: "Enviar mensagem",
       loading: "Carregando",
       sentMessage: "Sua mensagem foi enviada. Obrigado!",
-      captchaLabel: "Anti-spam: quanto é {question}?",
-      captchaPlaceholder: "Resposta",
       captchaRequired: "Complete a verificação anti-spam antes de enviar.",
-      captchaRefresh: "Nova pergunta",
       captchaLoading: "Carregando verificação anti-spam…",
       captchaError: "Turnstile falhou (código: {code}). Veja o Console para detalhes e tente novamente.",
       captchaErrorInvalidSitekey:
-        "Turnstile 400020: site key rejeitada neste hostname. No dashboard Cloudflare → Turnstile, confira a Site Key e adicione fabiodaros.com e www.fabiodaros.com (e localhost só para testes locais).",
+        "Turnstile 400020: site key inválida (não é só hostname). No Cloudflare → Turnstile, copie de novo a Site Key deste widget (ou crie um widget novo), atualize NEXT_PUBLIC_TURNSTILE_SITE_KEY + TURNSTILE_SECRET_KEY na Vercel e faça Redeploy.",
       captchaErrorLocalhostSitekey:
         "Turnstile 400020: site key de produção não funciona em localhost. No `next dev`, use as keys de teste em `.env.development.local`.",
       captchaBlocked:
         "O navegador bloqueou o script do Turnstile ({code}). Permita challenges.cloudflare.com neste site e tente novamente.",
       captchaConfigMissing: "Anti-spam não configurado (chaves Turnstile ausentes).",
       captchaRetry: "Tentar Cloudflare novamente",
-      captchaFallbackHint: "Enquanto isso, você pode usar a verificação alternativa abaixo.",
-      captchaUseAlternative: "Usar verificação alternativa (soma)",
     },
     footer: {
       tagline: "Where Software meets Biology...",
@@ -289,22 +284,17 @@ export const translations = {
       sendMessage: "Send Message",
       loading: "Loading",
       sentMessage: "Your message has been sent. Thank you!",
-      captchaLabel: "Anti-spam: what is {question}?",
-      captchaPlaceholder: "Answer",
       captchaRequired: "Please complete the anti-spam check before sending.",
-      captchaRefresh: "New question",
       captchaLoading: "Loading anti-spam check…",
       captchaError: "Turnstile failed (code: {code}). Check the Console for details and try again.",
       captchaErrorInvalidSitekey:
-        "Turnstile 400020: site key rejected on this hostname. In Cloudflare → Turnstile, verify the Site Key and add fabiodaros.com and www.fabiodaros.com (localhost only for local testing).",
+        "Turnstile 400020: invalid site key (not just hostname). In Cloudflare → Turnstile, re-copy this widget’s Site Key (or create a new widget), update NEXT_PUBLIC_TURNSTILE_SITE_KEY + TURNSTILE_SECRET_KEY on Vercel, then Redeploy.",
       captchaErrorLocalhostSitekey:
         "Turnstile 400020: production sitekeys do not work on localhost. For `next dev`, use Cloudflare test keys in `.env.development.local`.",
       captchaBlocked:
         "The browser blocked the Turnstile script ({code}). Allow challenges.cloudflare.com on this site, then retry.",
       captchaConfigMissing: "Anti-spam is not configured (Turnstile keys missing).",
       captchaRetry: "Retry Cloudflare check",
-      captchaFallbackHint: "Meanwhile, you can use the alternative check below.",
-      captchaUseAlternative: "Use alternative check (sum)",
     },
     footer: {
       tagline: "Where Software meets Biology...",

@@ -6,11 +6,10 @@ Configure **antes** do deploy para o download do currículo e o formulário de c
 
 | Variável | Sensível | Uso |
 |----------|----------|-----|
-| `RESEND_API_KEY` | Sim | Envio do formulário de contato (também assina o captcha matemático se `CONTACT_CAPTCHA_SECRET` não existir) |
+| `RESEND_API_KEY` | Sim | Envio do formulário de contato |
 | `RESEND_FROM` | Não | Remetente Resend (ex.: `Fabio Daros Site <noreply@fabiodaros.com>`) |
 | `CONTACT_EMAIL_OVERRIDE` | Não | (Opcional) Redireciona todos os envios para este endereço (útil em testes) |
-| `CONTACT_CAPTCHA_SECRET` | Sim | (Opcional) Segredo HMAC do captcha matemático (fallback) |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Não | Cloudflare Turnstile site key (widget preferido) |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Não | Cloudflare Turnstile site key |
 | `TURNSTILE_SECRET_KEY` | Sim | Cloudflare Turnstile secret (validação server-side) |
 | `GOOGLE_DRIVE_API_KEY` | Sim | Backup: busca por pasta no Drive |
 | `GOOGLE_DRIVE_CV_FOLDER_ID` | Não | ID da pasta do Drive |
@@ -55,16 +54,17 @@ As variáveis abaixo estão em **Production**, **Preview** e **Development**:
 - `CV_DRIVE_FILENAME_PT`, `CV_DRIVE_FILENAME_EN`
 - `GOOGLE_DRIVE_FILE_ID_PT`, `GOOGLE_DRIVE_FILE_ID_EN`
 
-### Anti-spam do contato (híbrido)
+### Anti-spam do contato
 
-1. **Preferência:** Cloudflare Turnstile (`api.js?render=explicit` + `turnstile.ready` → `turnstile.render`).
+1. Cloudflare Turnstile (`api.js?render=explicit` + `turnstile.ready` → `turnstile.render`).
 2. **Env obrigatório:** `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` (keys reais do dashboard). Sem fallback para chaves de teste da Cloudflare.
-3. Se qualquer uma faltar (ou for dummy `1x000…`), `/api/contact` responde **503** e não envia e-mail.
+3. Se qualquer uma faltar (ou for dummy `1x000…` em produção), `/api/contact` responde **503** e não envia e-mail.
 4. Com token Turnstile, o backend chama `siteverify` com `TURNSTILE_SECRET_KEY` **antes** do Resend.
-5. Alternativa opcional: soma HMAC após falha de carga do widget (ainda validada no servidor).
-6. Honeypot + rate limit (3 / 10 min / IP).
+5. Honeypot + rate limit (3 / 10 min / IP).
 
-CSP: removida por enquanto — a policy anterior quebrava o Turnstile em produção (`400020`) mesmo com site key e hostnames corretos. Se voltar CSP, incluir `script-src` / `frame-src` / `connect-src` / `worker-src` para `https://challenges.cloudflare.com` e validar o widget antes de publicar.
+CSP: removida por enquanto (a policy anterior interferia no Turnstile). Se voltar CSP, incluir `script-src` / `frame-src` / `connect-src` / `worker-src` para `https://challenges.cloudflare.com` e validar o widget antes de publicar.
+
+Erro `400020` (docs Cloudflare = **Invalid sitekey**): hostnames corretos + cache limpo não resolvem. Recrie o widget ou copie de novo Site Key + Secret do mesmo widget, atualize as duas vars na Vercel Production e faça Redeploy (a `NEXT_PUBLIC_*` precisa entrar no build).
 
 Domínios no dashboard Turnstile: `fabiodaros.com`, `www.fabiodaros.com` (e opcionalmente `localhost` / `127.0.0.1`).
 
