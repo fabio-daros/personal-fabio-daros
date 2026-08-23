@@ -18,7 +18,7 @@ import type { Locale } from "@/lib/translations";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Fabio Daros | Software Engineer • Biotechnology & AI",
-  description: "Fabio Daros is a software engineer transitioning into biotechnology and biomedical AI, focusing on data analysis, cancer research and health technology.",
+  description: "Fabio Daros is a software engineer working in biotechnology and biomedical AI, focusing on data analysis, cancer research and health technology.",
   alternates: {
     canonical: "/",
   },
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Fabio Daros | Software Engineer • Biotechnology & AI",
-    description: "Software engineer transitioning into biotechnology and biomedical AI. Focused on health technology, data analysis and cancer research.",
+    description: "Software engineer in biotechnology and biomedical AI. Focused on health technology, data analysis and cancer research.",
     url: SITE_URL,
     type: "website",
     images: [`${SITE_URL}/assets/img/profile-img.jpg`],
@@ -73,7 +73,7 @@ export default async function RootLayout({
               url: SITE_URL,
               image: `${SITE_URL}/assets/img/profile-img.jpg`,
               jobTitle: "Software Engineer",
-              description: "Software engineer transitioning into biotechnology and biomedical AI, focused on data analysis, cancer research and health technology.",
+              description: "Software engineer in biotechnology and biomedical AI, focused on data analysis, cancer research and health technology.",
               sameAs: [
                 "https://github.com/fabio-daros",
                 "https://www.linkedin.com/in/daros-fabio",

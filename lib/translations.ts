@@ -58,7 +58,7 @@ export const translations = {
     },
     footer: {
       tagline: "Where Software meets Biology...",
-      blurb: "Engenheiro de software em transição para biotecnologia e IA biomédica.",
+      blurb: "Engenheiro de software, biotecnologia e IA biomédica.",
       explore: "Explorar",
       contact: "Contato",
       locationValue: "Florianópolis, SC, Brasil",
@@ -304,7 +304,7 @@ export const translations = {
     },
     footer: {
       tagline: "Where Software meets Biology...",
-      blurb: "Software engineer transitioning into biotechnology and biomedical AI.",
+      blurb: "Software engineer, biotechnology and biomedical AI.",
       explore: "Explore",
       contact: "Contact",
       locationValue: "Florianópolis, SC, Brazil",
