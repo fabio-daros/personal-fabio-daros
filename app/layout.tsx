@@ -12,11 +12,16 @@ import SwipeDragWrapper from "@/components/SwipeDragWrapper";
 import GetInTouchButton from "@/components/GetInTouchButton";
 import LegacyBrowserNotice from "@/components/LegacyBrowserNotice";
 import { LOCALE_COOKIE, localeToHtmlLang, resolveLocale } from "@/lib/locale";
+import { SITE_URL } from "@/lib/site";
 import type { Locale } from "@/lib/translations";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Fabio Daros | Software Engineer • Biotechnology & AI",
   description: "Fabio Daros is a software engineer transitioning into biotechnology and biomedical AI, focusing on data analysis, cancer research and health technology.",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/assets/img/favicon_v2.png",
     apple: "/assets/img/apple-touch-icon_v2.png",
@@ -27,9 +32,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Fabio Daros | Software Engineer • Biotechnology & AI",
     description: "Software engineer transitioning into biotechnology and biomedical AI. Focused on health technology, data analysis and cancer research.",
-    url: "https://fabiodaros.com",
+    url: SITE_URL,
     type: "website",
-    images: ["https://fabiodaros.com/assets/img/profile-img.jpg"],
+    images: [`${SITE_URL}/assets/img/profile-img.jpg`],
   },
 };
 
@@ -60,8 +65,8 @@ export default async function RootLayout({
               "@context": "https://schema.org",
               "@type": "Person",
               name: "Fabio Daros",
-              url: "https://fabiodaros.com",
-              image: "https://fabiodaros.com/assets/img/profile-img.jpg",
+              url: SITE_URL,
+              image: `${SITE_URL}/assets/img/profile-img.jpg`,
               jobTitle: "Software Engineer",
               description: "Software engineer transitioning into biotechnology and biomedical AI, focused on data analysis, cancer research and health technology.",
               sameAs: [

@@ -1,5 +1,20 @@
-import HashRedirect from "@/components/HashRedirect";
+import SectionHashPage, { sectionMetadata } from "@/components/SectionHashPage";
+import { translations } from "@/lib/translations";
+
+const { title, pageDescription } = translations.en.expertise;
+
+export const metadata = sectionMetadata({
+  title,
+  description: pageDescription,
+  path: "/expertise",
+});
 
 export default function ExpertisePage() {
-  return <HashRedirect id="expertise" />;
+  return (
+    <SectionHashPage
+      id="expertise"
+      title={title}
+      description={pageDescription}
+    />
+  );
 }
