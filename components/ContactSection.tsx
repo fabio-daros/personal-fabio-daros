@@ -193,11 +193,11 @@ export default function ContactSection() {
               <i className="icon bi bi-geo-alt flex-shrink-0"></i>
               <div>
                 <h3>{t.location}</h3>
-                <ul className="contact-location-list">
+                <div className="contact-location-list">
                   {t.locationValue.map((place) => (
-                    <li key={place}>{place}</li>
+                    <p key={place}>{place}</p>
                   ))}
-                </ul>
+                </div>
               </div>
             </div>
           </div>
