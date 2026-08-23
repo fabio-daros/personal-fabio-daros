@@ -36,12 +36,6 @@ function prepareVideo(video: HTMLVideoElement, preload: "auto" | "metadata" | "n
   video.loop = true;
   video.preload = preload;
   video.playbackRate = 1;
-  video.setAttribute("muted", "");
-  video.setAttribute("autoplay", "");
-  video.setAttribute("playsinline", "");
-  video.setAttribute("webkit-playsinline", "");
-  video.setAttribute("x-webkit-airplay", "deny");
-  video.removeAttribute("controls");
 }
 
 function tryPlay(video: HTMLVideoElement) {
@@ -50,10 +44,6 @@ function tryPlay(video: HTMLVideoElement) {
   video.volume = 0;
   video.playsInline = true;
   video.playbackRate = 1;
-  video.setAttribute("muted", "");
-  video.setAttribute("autoplay", "");
-  video.setAttribute("playsinline", "");
-  video.setAttribute("webkit-playsinline", "");
   const playPromise = video.play();
   if (playPromise) {
     playPromise.catch(() => {});
@@ -547,6 +537,7 @@ export default function HeroSection() {
               controlsList="nodownload nofullscreen noremoteplayback"
               disablePictureInPicture
               disableRemotePlayback
+              suppressHydrationWarning
             />
             <video
               ref={nightRef}
@@ -562,6 +553,7 @@ export default function HeroSection() {
               controlsList="nodownload nofullscreen noremoteplayback"
               disablePictureInPicture
               disableRemotePlayback
+              suppressHydrationWarning
             />
             <div className="hero-video-bg__cover" />
           </>

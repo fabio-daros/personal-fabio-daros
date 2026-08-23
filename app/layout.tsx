@@ -122,7 +122,7 @@ export default async function RootLayout({
         <SwipeNavigation />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){function kick(){var nodes=document.querySelectorAll("#hero video.hero-video-bg__media.is-active");if(!nodes.length)nodes=document.querySelectorAll("#hero video.hero-video-bg__media");nodes.forEach(function(v){try{v.defaultMuted=true;v.muted=true;v.playsInline=true;v.setAttribute("playsinline","");v.setAttribute("webkit-playsinline","");var p=v.play();if(p&&p.catch)p.catch(function(){})}catch(e){}})}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",kick);else kick();setTimeout(kick,0);setTimeout(kick,400);setTimeout(kick,1200);})();`,
+            __html: `(function(){function kick(){var nodes=document.querySelectorAll("#hero video.hero-video-bg__media.is-active");if(!nodes.length)nodes=document.querySelectorAll("#hero video.hero-video-bg__media");nodes.forEach(function(v){try{v.defaultMuted=true;v.muted=true;v.playsInline=true;var p=v.play();if(p&&p.catch)p.catch(function(){})}catch(e){}})}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",kick);else kick();setTimeout(kick,0);setTimeout(kick,400);setTimeout(kick,1200);})();`,
           }}
         />
         {process.env.NODE_ENV === "production" && <Analytics mode="production" />}
