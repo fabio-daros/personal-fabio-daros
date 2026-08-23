@@ -703,7 +703,7 @@ h6 {
 
 .page-title .heading {
   padding: 50px 0 24px 0;
-  border-top: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  border-top: none;
 }
 
 .page-title .heading h1,
