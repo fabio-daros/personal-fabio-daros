@@ -586,8 +586,10 @@ h6 {
 
 @media (max-width: 991px) {
   .footer-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem 1.75rem;
+    grid-template-columns: max-content max-content;
+    justify-content: center;
+    column-gap: 3rem;
+    row-gap: 2rem;
   }
 
   .footer-col--brand {
@@ -602,8 +604,10 @@ h6 {
   }
 
   .footer-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 1.75rem 1.25rem;
+    grid-template-columns: max-content max-content;
+    justify-content: center;
+    column-gap: 2.5rem;
+    row-gap: 1.75rem;
   }
 
   .footer-col--brand {
