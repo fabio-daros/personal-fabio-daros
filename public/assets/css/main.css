@@ -586,14 +586,23 @@ h6 {
 
 @media (max-width: 991px) {
   .footer-grid {
-    grid-template-columns: max-content max-content;
+    display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    column-gap: 3rem;
-    row-gap: 2rem;
+    gap: 2rem 2.25rem;
   }
 
   .footer-col--brand {
-    grid-column: 1 / -1;
+    flex: 0 0 100%;
+  }
+
+  .footer-col--explore,
+  .footer-col--contact {
+    flex: 0 0 auto;
+  }
+
+  .footer-col--contact {
+    max-width: 15.5rem;
   }
 }
 
@@ -604,15 +613,15 @@ h6 {
   }
 
   .footer-grid {
-    grid-template-columns: max-content max-content;
-    justify-content: center;
-    column-gap: 2.5rem;
-    row-gap: 1.75rem;
+    gap: 1.75rem 1.75rem;
   }
 
   .footer-col--brand {
-    grid-column: 1 / -1;
     text-align: center;
+  }
+
+  .footer-col--contact {
+    max-width: 14.5rem;
   }
 
   .footer-blurb {
