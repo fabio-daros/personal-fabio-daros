@@ -756,6 +756,7 @@ section,
 
 .section-title {
   padding-bottom: 60px;
+  padding-top: 8px;
   position: relative;
 }
 

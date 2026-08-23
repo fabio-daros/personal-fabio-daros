@@ -9,11 +9,11 @@ export const SITE_SECTIONS = [
 
 export type SiteSectionId = (typeof SITE_SECTIONS)[number]["id"];
 
-/** Measured sticky header height + gap so the previous section never peeks through. */
+/** Measured sticky header height + gap so titles aren't flush under the header. */
 export function getHeaderOffset() {
   const header = document.getElementById("header");
   const height = header?.getBoundingClientRect().height ?? 56;
-  return Math.ceil(height) + 1;
+  return Math.ceil(height) + 12;
 }
 
 function setHash(id: string) {
