@@ -60,7 +60,7 @@ export default async function RootLayout({
       <head suppressHydrationWarning>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem("site-theme");var t=(s==="light"||s==="dark")?s:"dark";document.documentElement.setAttribute("data-theme",t)}catch(e){}})();`,
+            __html: `(function(){try{var s=localStorage.getItem("site-theme");var t=(s==="light"||s==="dark")?s:"dark";document.documentElement.setAttribute("data-theme",t);var mobile=window.matchMedia("(max-width: 992px), (hover: none) and (pointer: coarse)").matches;var href=mobile?(t==="light"?"/assets/video/hero-day-mobile.mp4?v=1":"/assets/video/hero-night-mobile.mp4?v=1"):null;if(href){var l=document.createElement("link");l.rel="preload";l.as="video";l.href=href;document.head.appendChild(l)}}catch(e){}})();`,
           }}
         />
         <script

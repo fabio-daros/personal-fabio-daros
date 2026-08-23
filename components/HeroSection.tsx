@@ -11,6 +11,8 @@ const USE_STATIC_HERO = false;
 const HERO_IMAGE_SRC = "/assets/img/hero-clouds.jpg";
 const HERO_VIDEO_DAY = "/assets/video/hero-day.mp4?v=smooth074";
 const HERO_VIDEO_NIGHT = "/assets/video/hero-night.mp4?v=smooth074";
+const HERO_VIDEO_DAY_MOBILE = "/assets/video/hero-day-mobile.mp4?v=1";
+const HERO_VIDEO_NIGHT_MOBILE = "/assets/video/hero-night-mobile.mp4?v=1";
 const HERO_POSTER_DAY = "/assets/img/hero-day-poster.jpg";
 const HERO_POSTER_NIGHT = "/assets/img/hero-night-poster.jpg";
 const THEME_CROSSFADE_MS = 5000;
@@ -35,11 +37,11 @@ function prepareVideo(video: HTMLVideoElement, preload: "auto" | "metadata" | "n
   video.preload = preload;
   video.playbackRate = 1;
   video.setAttribute("muted", "");
+  video.setAttribute("autoplay", "");
   video.setAttribute("playsinline", "");
   video.setAttribute("webkit-playsinline", "");
   video.setAttribute("x-webkit-airplay", "deny");
   video.removeAttribute("controls");
-  video.removeAttribute("autoplay");
 }
 
 function tryPlay(video: HTMLVideoElement) {
@@ -49,6 +51,7 @@ function tryPlay(video: HTMLVideoElement) {
   video.playsInline = true;
   video.playbackRate = 1;
   video.setAttribute("muted", "");
+  video.setAttribute("autoplay", "");
   video.setAttribute("playsinline", "");
   video.setAttribute("webkit-playsinline", "");
   const playPromise = video.play();
@@ -166,7 +169,12 @@ export default function HeroSection() {
     const initialTheme = readDocumentTheme();
     activeThemeRef.current = initialTheme;
 
-    const srcFor = (video: HTMLVideoElement) => (video === day ? HERO_VIDEO_DAY : HERO_VIDEO_NIGHT);
+    const srcFor = (video: HTMLVideoElement) => {
+      if (mobile) {
+        return video === day ? HERO_VIDEO_DAY_MOBILE : HERO_VIDEO_NIGHT_MOBILE;
+      }
+      return video === day ? HERO_VIDEO_DAY : HERO_VIDEO_NIGHT;
+    };
     const posterFor = (video: HTMLVideoElement) =>
       video === day ? HERO_POSTER_DAY : HERO_POSTER_NIGHT;
 
