@@ -106,20 +106,16 @@ export default function Footer() {
             © {new Date().getFullYear()} Fabio Daros
           </div>
           <div className="credits">
-            {footer.credits}
-            <span className="ms-1">
-              |{" "}
-              <a
-                href="https://nextjs.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="credits-next d-inline-flex align-items-center gap-1"
-                title="Next.js"
-              >
-                <span>{footer.poweredBy}</span>
-                <SiNextdotjs size={16} />
-              </a>
-            </span>
+            <a
+              href="https://nextjs.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="credits-next d-inline-flex align-items-center gap-1"
+              title="Next.js"
+            >
+              <span>{footer.poweredBy}</span>
+              <SiNextdotjs size={16} />
+            </a>
           </div>
         </div>
       </div>

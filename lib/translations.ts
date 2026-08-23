@@ -62,7 +62,6 @@ export const translations = {
       explore: "Explorar",
       contact: "Contato",
       locationValue: "Florianópolis, SC, Brasil",
-      credits: "Design baseado no template BootstrapMade",
       poweredBy: "Powered by Next.js",
     },
     legacyBrowser: {
@@ -308,7 +307,6 @@ export const translations = {
       explore: "Explore",
       contact: "Contact",
       locationValue: "Florianópolis, SC, Brazil",
-      credits: "Design based on BootstrapMade template",
       poweredBy: "Powered by Next.js",
     },
     legacyBrowser: {
