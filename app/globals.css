@@ -834,15 +834,28 @@ html[data-theme="dark"] .research .research-gallery__img {
   background-position: center;
   opacity: 1;
   transition: opacity 0.5s ease;
+  transform: scale(1.06);
+  animation: hero-cover-drift 20s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 html[data-theme="light"] .hero-video-bg__cover {
   background-image: url("/assets/img/hero-day-poster.jpg");
 }
 
+@keyframes hero-cover-drift {
+  from {
+    transform: scale(1.06) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.14) translate3d(-2%, -1.5%, 0);
+  }
+}
+
 .hero-video-bg.is-video-live .hero-video-bg__cover {
   opacity: 0;
   visibility: hidden;
+  animation: none;
   transition: opacity 0.5s ease, visibility 0s linear 0.5s;
 }
 
@@ -854,13 +867,18 @@ html[data-theme="light"] .hero-video-bg__cover {
   height: 100%;
   object-fit: cover;
   object-position: center;
+  /* Keep non-zero opacity on the active clip — opacity:0 can block iOS autoplay. */
   opacity: 0;
   will-change: opacity;
   transform: translateZ(0);
   backface-visibility: hidden;
-  /* Hide native mobile play overlays (iOS/Android) */
   -webkit-appearance: none;
   appearance: none;
+}
+
+.hero-video-bg__media.is-active {
+  opacity: 1;
+  z-index: 3;
 }
 
 .hero-video-bg__media::-webkit-media-controls,

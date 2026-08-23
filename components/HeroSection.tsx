@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme, type Theme } from "@/context/ThemeContext";
 import { translations } from "@/lib/translations";
@@ -158,7 +158,7 @@ export default function HeroSection() {
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (USE_STATIC_HERO) return;
 
     const day = dayRef.current;
@@ -175,28 +175,28 @@ export default function HeroSection() {
       }
       return video === day ? HERO_VIDEO_DAY : HERO_VIDEO_NIGHT;
     };
-    const posterFor = (video: HTMLVideoElement) =>
-      video === day ? HERO_POSTER_DAY : HERO_POSTER_NIGHT;
 
-    const attachSource = (video: HTMLVideoElement, preload: "auto" | "metadata" | "none") => {
-      prepareVideo(video, preload);
-      video.poster = posterFor(video);
+    const attachSource = (video: HTMLVideoElement) => {
+      prepareVideo(video, "auto");
       const src = srcFor(video);
       if (video.getAttribute("src") !== src) {
         video.src = src;
+        // Only reload when upgrading/changing source (e.g. desktop full clip).
+        try {
+          video.load();
+        } catch {
+          // Ignore load() errors on some mobile browsers.
+        }
       }
     };
 
-    // Bind muted + source after mount (iOS-friendly). On mobile, only load the active theme clip.
-    if (mobile) {
-      attachSource(videoForTheme(initialTheme, day, night), "auto");
-      const inactive = initialTheme === "light" ? night : day;
-      prepareVideo(inactive, "none");
-      inactive.poster = posterFor(inactive);
-      inactive.removeAttribute("src");
+    // Keep the SSR mobile src on phones; upgrade to full clips on desktop only.
+    if (!mobile) {
+      attachSource(day);
+      attachSource(night);
     } else {
-      attachSource(day, "auto");
-      attachSource(night, "auto");
+      prepareVideo(day, "auto");
+      prepareVideo(night, "auto");
     }
 
     let revealed = false;
@@ -207,16 +207,7 @@ export default function HeroSection() {
     let kickAttempts = 0;
 
     const ensureReady = (video: HTMLVideoElement) => {
-      const needsSrc = !video.getAttribute("src");
-      const needsPreload = video.preload === "none";
-      if (needsSrc || needsPreload) {
-        attachSource(video, "auto");
-        try {
-          video.load();
-        } catch {
-          // Ignore load() errors on some mobile browsers.
-        }
-      }
+      attachSource(video);
     };
 
     const showInstant = (active: HTMLVideoElement, inactive: HTMLVideoElement) => {
@@ -326,10 +317,10 @@ export default function HeroSection() {
         }
         kickAttempts += 1;
         kickActive();
-        if (kickAttempts >= 40) {
+        if (kickAttempts >= 48) {
           window.clearInterval(kickInterval);
         }
-      }, 250);
+      }, 200);
     };
 
     const applyTheme = (nextTheme: Theme, { animate }: { animate: boolean }) => {
@@ -358,9 +349,7 @@ export default function HeroSection() {
       if (disposed || fading) return;
       const video = event.currentTarget as HTMLVideoElement;
       if (video !== videoForTheme(activeThemeRef.current, day, night)) return;
-      const active = video;
-      const inactive = active === day ? night : day;
-      showInstant(active, inactive);
+      showInstant(video, video === day ? night : day);
       kickActive();
     };
 
@@ -547,10 +536,12 @@ export default function HeroSection() {
             <video
               ref={dayRef}
               className="hero-video-bg__media hero-video-bg__media--day"
+              src={HERO_VIDEO_DAY_MOBILE}
+              autoPlay
               muted
               playsInline
               loop
-              preload="metadata"
+              preload="auto"
               poster={HERO_POSTER_DAY}
               controls={false}
               controlsList="nodownload nofullscreen noremoteplayback"
@@ -559,11 +550,13 @@ export default function HeroSection() {
             />
             <video
               ref={nightRef}
-              className="hero-video-bg__media hero-video-bg__media--night"
+              className="hero-video-bg__media hero-video-bg__media--night is-active is-playing"
+              src={HERO_VIDEO_NIGHT_MOBILE}
+              autoPlay
               muted
               playsInline
               loop
-              preload="metadata"
+              preload="auto"
               poster={HERO_POSTER_NIGHT}
               controls={false}
               controlsList="nodownload nofullscreen noremoteplayback"
