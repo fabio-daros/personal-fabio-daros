@@ -11,7 +11,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 60px;
+  scroll-padding-top: 68px;
 }
 
 .night-sky {
@@ -57,17 +57,17 @@ html[data-theme="dark"] .skills.section {
 #expertise,
 #contact,
 section.section {
-  scroll-margin-top: 60px;
+  scroll-margin-top: 68px;
 }
 
 .page-title .heading {
-  padding-top: 32px !important;
-  padding-bottom: 24px !important;
+  padding-top: 48px !important;
+  padding-bottom: 28px !important;
 }
 
 @media (max-width: 991.98px) {
   html {
-    scroll-padding-top: 56px;
+    scroll-padding-top: 64px;
   }
 
   .site-section,
@@ -78,12 +78,12 @@ section.section {
   #expertise,
   #contact,
   section.section {
-    scroll-margin-top: 56px;
+    scroll-margin-top: 64px;
   }
 
   .page-title .heading {
-    padding-top: 24px !important;
-    padding-bottom: 18px !important;
+    padding-top: 36px !important;
+    padding-bottom: 20px !important;
   }
 
   .page-title .heading h2 {

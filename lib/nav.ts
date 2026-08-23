@@ -13,7 +13,7 @@ export type SiteSectionId = (typeof SITE_SECTIONS)[number]["id"];
 export function getHeaderOffset() {
   const header = document.getElementById("header");
   const height = header?.getBoundingClientRect().height ?? 56;
-  return Math.ceil(height) + 12;
+  return Math.ceil(height) + 20;
 }
 
 function setHash(id: string) {
