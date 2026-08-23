@@ -8,11 +8,7 @@ import { translations } from "@/lib/translations";
 const USE_STATIC_HERO = false;
 
 const HERO_IMAGE_SRC = "/assets/img/hero-clouds.jpg";
-const HERO_VIDEO_SRC = "/assets/video/hero-clouds.mp4";
-
-const HERO_PLAYBACK_RATE = 0.6;
-
-const CROSSFADE_SECONDS = 2.1;
+const HERO_VIDEO_SRC = "/assets/video/hero-test.mp4?v=loop1-smooth074";
 
 function prepareVideo(video: HTMLVideoElement) {
   video.defaultMuted = true;
@@ -21,9 +17,9 @@ function prepareVideo(video: HTMLVideoElement) {
   video.playsInline = true;
   video.controls = false;
   video.disablePictureInPicture = true;
-  video.loop = false;
+  video.loop = true;
   video.preload = "auto";
-  video.playbackRate = HERO_PLAYBACK_RATE;
+  video.playbackRate = 1;
   video.setAttribute("muted", "");
   video.setAttribute("playsinline", "");
   video.setAttribute("webkit-playsinline", "");
@@ -34,7 +30,7 @@ function prepareVideo(video: HTMLVideoElement) {
 function tryPlay(video: HTMLVideoElement) {
   video.muted = true;
   video.volume = 0;
-  video.playbackRate = HERO_PLAYBACK_RATE;
+  video.playbackRate = 1;
   const playPromise = video.play();
   if (playPromise) {
     playPromise.catch(() => {});
@@ -68,7 +64,6 @@ export default function HeroSection() {
   const heroBgRef = useRef<HTMLDivElement>(null);
   const typedRef = useRef<HTMLSpanElement>(null);
   const primaryRef = useRef<HTMLVideoElement>(null);
-  const secondaryRef = useRef<HTMLVideoElement>(null);
   const [typedArmed, setTypedArmed] = useState(false);
   const [entranceKey, setEntranceKey] = useState(0);
   const { locale } = useLanguage();
@@ -122,28 +117,17 @@ export default function HeroSection() {
   useEffect(() => {
     if (USE_STATIC_HERO) return;
 
-    const primary = primaryRef.current;
-    const secondary = secondaryRef.current;
-    if (!primary || !secondary) return;
+    const video = primaryRef.current;
+    if (!video) return;
 
-    prepareVideo(primary);
-    prepareVideo(secondary);
-
-    let active: HTMLVideoElement = primary;
-    let inactive: HTMLVideoElement = secondary;
-    let fading = false;
-    let rafId = 0;
-    let disposed = false;
-
-    const setFront = (video: HTMLVideoElement, isFront: boolean) => {
-      video.classList.toggle("is-front", isFront);
-      video.classList.toggle("is-back", !isFront);
-    };
+    prepareVideo(video);
 
     let revealed = false;
+    let disposed = false;
 
-    const revealWhenLive = (video: HTMLVideoElement) => {
-      video.classList.add("is-playing");
+    const revealWhenLive = () => {
+      video.classList.add("is-playing", "is-front");
+      video.classList.remove("is-back");
       if (revealed || disposed) return;
       if (video.paused || video.ended) return;
 
@@ -165,120 +149,42 @@ export default function HeroSection() {
       window.setTimeout(goLive, 50);
     };
 
-    const resetLayers = () => {
-      setFront(primary, true);
-      setFront(secondary, false);
-      primary.style.opacity = "";
-      secondary.style.opacity = "0";
-    };
-
-    resetLayers();
-
-    const tryPlayBoth = () => {
-      if (disposed) return;
-      primary.playbackRate = HERO_PLAYBACK_RATE;
-      secondary.playbackRate = HERO_PLAYBACK_RATE;
-      tryPlay(primary);
-    };
-
     const onReady = () => {
-      tryPlayBoth();
+      if (!disposed) tryPlay(video);
     };
 
-    const onPlaying = (event: Event) => {
-      const video = event.currentTarget as HTMLVideoElement;
-      revealWhenLive(video);
-    };
-
-    const swapRoles = () => {
-      const previous = active;
-      active = inactive;
-      inactive = previous;
-      setFront(active, true);
-      setFront(inactive, false);
-      fading = false;
-    };
-
-    const startCrossfade = () => {
-      if (fading || disposed) return;
-      fading = true;
-
-      inactive.currentTime = 0;
-      tryPlay(inactive);
-
-      const durationMs = (CROSSFADE_SECONDS / HERO_PLAYBACK_RATE) * 1000;
-      const startedAt = performance.now();
-
-      const tick = (now: number) => {
-        if (disposed) return;
-
-        const progress = Math.min(1, (now - startedAt) / durationMs);
-        const eased = progress * progress * (3 - 2 * progress);
-
-        active.style.opacity = String(1 - eased);
-        inactive.style.opacity = String(eased);
-
-        if (progress < 1) {
-          rafId = requestAnimationFrame(tick);
-          return;
-        }
-
-        active.pause();
-        active.currentTime = 0;
-        active.style.opacity = "0";
-        inactive.style.opacity = "1";
-        swapRoles();
-      };
-
-      rafId = requestAnimationFrame(tick);
-    };
-
-    const onTimeUpdate = () => {
-      if (fading || disposed) return;
-      const duration = active.duration;
-      if (!Number.isFinite(duration) || duration <= CROSSFADE_SECONDS) return;
-      if (active.currentTime >= duration - CROSSFADE_SECONDS) {
-        startCrossfade();
-      }
+    const onPlaying = () => {
+      revealWhenLive();
     };
 
     const onVisibility = () => {
-      if (document.visibilityState === "visible") tryPlay(active);
+      if (document.visibilityState === "visible") tryPlay(video);
     };
 
-    primary.addEventListener("loadeddata", onReady);
-    primary.addEventListener("canplay", onReady);
-    primary.addEventListener("playing", onPlaying);
-    secondary.addEventListener("playing", onPlaying);
-    primary.addEventListener("timeupdate", onTimeUpdate);
-    secondary.addEventListener("timeupdate", onTimeUpdate);
+    video.addEventListener("loadeddata", onReady);
+    video.addEventListener("canplay", onReady);
+    video.addEventListener("playing", onPlaying);
     document.addEventListener("visibilitychange", onVisibility);
 
     const unlockPlayback = () => {
-      tryPlay(primary);
-      tryPlay(secondary);
+      tryPlay(video);
       document.removeEventListener("touchstart", unlockPlayback);
       document.removeEventListener("click", unlockPlayback);
     };
     document.addEventListener("touchstart", unlockPlayback, { once: true, passive: true });
     document.addEventListener("click", unlockPlayback, { once: true });
 
-    tryPlayBoth();
+    tryPlay(video);
 
     return () => {
       disposed = true;
-      cancelAnimationFrame(rafId);
-      primary.removeEventListener("loadeddata", onReady);
-      primary.removeEventListener("canplay", onReady);
-      primary.removeEventListener("playing", onPlaying);
-      secondary.removeEventListener("playing", onPlaying);
-      primary.removeEventListener("timeupdate", onTimeUpdate);
-      secondary.removeEventListener("timeupdate", onTimeUpdate);
+      video.removeEventListener("loadeddata", onReady);
+      video.removeEventListener("canplay", onReady);
+      video.removeEventListener("playing", onPlaying);
       document.removeEventListener("visibilitychange", onVisibility);
       document.removeEventListener("touchstart", unlockPlayback);
       document.removeEventListener("click", unlockPlayback);
-      primary.pause();
-      secondary.pause();
+      video.pause();
     };
   }, []);
 
@@ -352,16 +258,7 @@ export default function HeroSection() {
               src={HERO_VIDEO_SRC}
               muted
               playsInline
-              preload="auto"
-              controls={false}
-              disablePictureInPicture
-            />
-            <video
-              ref={secondaryRef}
-              className="hero-video-bg__media is-back"
-              src={HERO_VIDEO_SRC}
-              muted
-              playsInline
+              loop
               preload="auto"
               controls={false}
               disablePictureInPicture
