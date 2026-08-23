@@ -2234,12 +2234,19 @@ html[data-theme="light"] .swipe-nav-dot.active {
 }
 
 html[data-theme="light"] .footer.dark-background {
-  --background-color: #eeeeee;
-  --default-color: #1a1a1a;
-  --heading-color: #000000;
+  --background-color: #111111;
+  --default-color: #f2f2f2;
+  --heading-color: #ffffff;
   --contrast-color: #ffffff;
-  background-color: #eeeeee;
-  border-top: 1px solid color-mix(in srgb, #000 8%, transparent);
+  background-color: #111111;
+  border-top: 1px solid color-mix(in srgb, #fff 10%, transparent);
+}
+
+html[data-theme="light"] .footer .footer-contact-label,
+html[data-theme="light"] .footer .footer-heading,
+html[data-theme="light"] .footer .copyright,
+html[data-theme="light"] .footer .credits {
+  opacity: 0.72;
 }
 
 html[data-theme="dark"] .footer.dark-background {
