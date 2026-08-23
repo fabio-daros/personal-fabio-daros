@@ -58,6 +58,10 @@ export const translations = {
     },
     footer: {
       tagline: "Where Software meets Biology...",
+      blurb: "Engenheiro de software em transição para biotecnologia e IA biomédica.",
+      explore: "Explorar",
+      contact: "Contato",
+      locationValue: "Florianópolis, SC, Brasil · Remoto",
       credits: "Design baseado no template BootstrapMade",
       poweredBy: "Powered by Next.js",
     },
@@ -300,6 +304,10 @@ export const translations = {
     },
     footer: {
       tagline: "Where Software meets Biology...",
+      blurb: "Software engineer transitioning into biotechnology and biomedical AI.",
+      explore: "Explore",
+      contact: "Contact",
+      locationValue: "Florianópolis, SC, Brazil · Remote",
       credits: "Design based on BootstrapMade template",
       poweredBy: "Powered by Next.js",
     },
