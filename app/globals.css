@@ -2240,6 +2240,11 @@ html[data-theme="light"] .footer.dark-background {
   --heading-color: #000000;
   --contrast-color: #ffffff;
   background-color: #f5f5f5;
+  border-top: 1px solid color-mix(in srgb, #000 8%, transparent);
+}
+
+html[data-theme="dark"] .footer.dark-background {
+  border-top: 1px solid color-mix(in srgb, #fff 8%, transparent);
 }
 
 @media (max-width: 1199px) {

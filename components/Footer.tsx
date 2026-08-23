@@ -77,6 +77,12 @@ export default function Footer() {
                 <a href={`mailto:${contact.contactEmail}`}>{contact.contactEmail}</a>
               </li>
               <li>
+                <span className="footer-contact-label">{contact.callMe}</span>
+                <a href="https://wa.me/353834677853" target="_blank" rel="noopener noreferrer">
+                  +353 83 467 7853
+                </a>
+              </li>
+              <li>
                 <span className="footer-contact-label">{contact.location}</span>
                 <span>{footer.locationValue}</span>
               </li>

@@ -410,7 +410,7 @@ h6 {
   background-color: var(--background-color);
   font-size: 14px;
   text-align: left;
-  padding: 56px 0 28px;
+  padding: 56px 0 88px;
   position: relative;
 }
 
@@ -588,7 +588,7 @@ h6 {
 @media (max-width: 575px) {
   .footer {
     text-align: center;
-    padding: 48px 0 24px;
+    padding: 48px 0 96px;
   }
 
   .footer-grid {
