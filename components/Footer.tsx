@@ -84,7 +84,11 @@ export default function Footer() {
               </li>
               <li>
                 <span className="footer-contact-label">{contact.location}</span>
-                <span>{contact.locationValue}</span>
+                <ul className="footer-location-list">
+                  {contact.locationValue.map((place) => (
+                    <li key={place}>{place}</li>
+                  ))}
+                </ul>
               </li>
               <li>
                 <a
