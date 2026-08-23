@@ -13,7 +13,12 @@ const HERO_VIDEO_DAY = "/assets/video/hero-day.mp4?v=smooth074";
 const HERO_VIDEO_NIGHT = "/assets/video/hero-night.mp4?v=smooth074";
 const THEME_CROSSFADE_MS = 5000;
 
-function prepareVideo(video: HTMLVideoElement) {
+function isMobileHero(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(max-width: 992px), (hover: none) and (pointer: coarse)").matches;
+}
+
+function prepareVideo(video: HTMLVideoElement, preload: "auto" | "metadata" | "none" = "auto") {
   video.defaultMuted = true;
   video.muted = true;
   video.volume = 0;
@@ -21,9 +26,10 @@ function prepareVideo(video: HTMLVideoElement) {
   video.controls = false;
   video.disablePictureInPicture = true;
   video.loop = true;
-  video.preload = "auto";
+  video.preload = preload;
   video.playbackRate = 1;
   video.setAttribute("muted", "");
+  video.setAttribute("autoplay", "");
   video.setAttribute("playsinline", "");
   video.setAttribute("webkit-playsinline", "");
   video.setAttribute("x-webkit-airplay", "deny");
@@ -31,9 +37,14 @@ function prepareVideo(video: HTMLVideoElement) {
 }
 
 function tryPlay(video: HTMLVideoElement) {
+  video.defaultMuted = true;
   video.muted = true;
   video.volume = 0;
+  video.playsInline = true;
   video.playbackRate = 1;
+  video.setAttribute("muted", "");
+  video.setAttribute("playsinline", "");
+  video.setAttribute("webkit-playsinline", "");
   const playPromise = video.play();
   if (playPromise) {
     playPromise.catch(() => {});
@@ -145,24 +156,47 @@ export default function HeroSection() {
     const night = nightRef.current;
     if (!day || !night) return;
 
-    prepareVideo(day);
-    prepareVideo(night);
-
+    const mobile = isMobileHero();
     const initialTheme =
       (document.documentElement.getAttribute("data-theme") as Theme | null) === "light"
         ? "light"
         : "dark";
     activeThemeRef.current = initialTheme;
 
+    prepareVideo(day, mobile && initialTheme !== "light" ? "none" : "auto");
+    prepareVideo(night, mobile && initialTheme !== "dark" ? "none" : "auto");
+
     let revealed = false;
     let disposed = false;
     let fading = false;
     let pauseTimeout = 0;
+    let kickInterval = 0;
+    let kickAttempts = 0;
+
+    const ensureReady = (video: HTMLVideoElement) => {
+      if (video.preload === "none") {
+        video.preload = "auto";
+        try {
+          video.load();
+        } catch {
+          // Ignore load() errors on some mobile browsers.
+        }
+        return;
+      }
+      if (video.readyState === 0) {
+        try {
+          video.load();
+        } catch {
+          // Ignore load() errors on some mobile browsers.
+        }
+      }
+    };
 
     const showInstant = (active: HTMLVideoElement, inactive: HTMLVideoElement) => {
       fading = false;
       window.clearTimeout(pauseTimeout);
 
+      ensureReady(active);
       active.style.transition = "none";
       inactive.style.transition = "none";
       active.style.opacity = "1";
@@ -180,6 +214,7 @@ export default function HeroSection() {
       fading = true;
       window.clearTimeout(pauseTimeout);
 
+      ensureReady(incoming);
       syncPlayback(outgoing, incoming);
       tryPlay(incoming);
       tryPlay(outgoing);
@@ -214,24 +249,58 @@ export default function HeroSection() {
 
     const revealWhenLive = (video: HTMLVideoElement) => {
       if (revealed || disposed) return;
-      if (video.paused || video.ended) return;
+      if (video.paused && video.readyState < 2) return;
 
       const goLive = () => {
         if (revealed || disposed) return;
         revealed = true;
         heroBgRef.current?.classList.add("is-video-live");
+        window.clearInterval(kickInterval);
       };
 
       const anyVideo = video as HTMLVideoElement & {
         requestVideoFrameCallback?: (cb: () => void) => number;
       };
 
-      if (typeof anyVideo.requestVideoFrameCallback === "function") {
+      if (!video.paused && typeof anyVideo.requestVideoFrameCallback === "function") {
         anyVideo.requestVideoFrameCallback(() => goLive());
         return;
       }
 
-      window.setTimeout(goLive, 50);
+      window.setTimeout(goLive, video.paused ? 0 : 50);
+    };
+
+    const kickActive = () => {
+      if (disposed) return;
+      const active = videoForTheme(activeThemeRef.current, day, night);
+      ensureReady(active);
+      tryPlay(active);
+      if (!active.paused || active.readyState >= 2) {
+        revealWhenLive(active);
+      }
+    };
+
+    const startKickLoop = () => {
+      window.clearInterval(kickInterval);
+      kickAttempts = 0;
+      kickActive();
+      kickInterval = window.setInterval(() => {
+        if (disposed) {
+          window.clearInterval(kickInterval);
+          return;
+        }
+        const active = videoForTheme(activeThemeRef.current, day, night);
+        if (!active.paused && !active.ended) {
+          revealWhenLive(active);
+          window.clearInterval(kickInterval);
+          return;
+        }
+        kickAttempts += 1;
+        kickActive();
+        if (kickAttempts >= 40) {
+          window.clearInterval(kickInterval);
+        }
+      }, 250);
     };
 
     const applyTheme = (nextTheme: Theme, { animate }: { animate: boolean }) => {
@@ -261,17 +330,24 @@ export default function HeroSection() {
       const active = videoForTheme(activeThemeRef.current, day, night);
       const inactive = active === day ? night : day;
       showInstant(active, inactive);
+      kickActive();
     };
 
     const onPlaying = (event: Event) => {
       revealWhenLive(event.currentTarget as HTMLVideoElement);
     };
 
+    const onTimeUpdate = (event: Event) => {
+      const video = event.currentTarget as HTMLVideoElement;
+      if (video.currentTime > 0.05) revealWhenLive(video);
+    };
+
     const onVisibility = () => {
       if (document.visibilityState !== "visible") return;
-      const active = videoForTheme(activeThemeRef.current, day, night);
-      tryPlay(active);
+      startKickLoop();
     };
+
+    const onPageShow = () => startKickLoop();
 
     day.addEventListener("loadeddata", onReady);
     night.addEventListener("loadeddata", onReady);
@@ -279,17 +355,25 @@ export default function HeroSection() {
     night.addEventListener("canplay", onReady);
     day.addEventListener("playing", onPlaying);
     night.addEventListener("playing", onPlaying);
+    day.addEventListener("timeupdate", onTimeUpdate);
+    night.addEventListener("timeupdate", onTimeUpdate);
     document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pageshow", onPageShow);
 
     const unlockPlayback = () => {
-      tryPlay(videoForTheme(activeThemeRef.current, day, night));
-      document.removeEventListener("touchstart", unlockPlayback);
-      document.removeEventListener("click", unlockPlayback);
+      startKickLoop();
     };
-    document.addEventListener("touchstart", unlockPlayback, { once: true, passive: true });
-    document.addEventListener("click", unlockPlayback, { once: true });
+    document.addEventListener("touchstart", unlockPlayback, { passive: true });
+    document.addEventListener("touchend", unlockPlayback, { passive: true });
+    document.addEventListener("pointerdown", unlockPlayback, { passive: true });
+    document.addEventListener("click", unlockPlayback);
 
     showInstant(videoForTheme(initialTheme, day, night), initialTheme === "light" ? night : day);
+    startKickLoop();
+
+    void whenPreloaderReleased().then(() => {
+      if (!disposed) startKickLoop();
+    });
 
     const onThemeAttribute = () => {
       const next =
@@ -297,6 +381,7 @@ export default function HeroSection() {
           ? "light"
           : "dark";
       applyTheme(next, { animate: true });
+      startKickLoop();
     };
 
     const themeObserver = new MutationObserver(onThemeAttribute);
@@ -308,6 +393,7 @@ export default function HeroSection() {
     return () => {
       disposed = true;
       window.clearTimeout(pauseTimeout);
+      window.clearInterval(kickInterval);
       themeObserver.disconnect();
       day.removeEventListener("loadeddata", onReady);
       night.removeEventListener("loadeddata", onReady);
@@ -315,8 +401,13 @@ export default function HeroSection() {
       night.removeEventListener("canplay", onReady);
       day.removeEventListener("playing", onPlaying);
       night.removeEventListener("playing", onPlaying);
+      day.removeEventListener("timeupdate", onTimeUpdate);
+      night.removeEventListener("timeupdate", onTimeUpdate);
       document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pageshow", onPageShow);
       document.removeEventListener("touchstart", unlockPlayback);
+      document.removeEventListener("touchend", unlockPlayback);
+      document.removeEventListener("pointerdown", unlockPlayback);
       document.removeEventListener("click", unlockPlayback);
       day.pause();
       night.pause();
@@ -414,6 +505,7 @@ export default function HeroSection() {
               ref={dayRef}
               className="hero-video-bg__media hero-video-bg__media--day"
               src={HERO_VIDEO_DAY}
+              autoPlay
               muted
               playsInline
               loop
@@ -425,6 +517,7 @@ export default function HeroSection() {
               ref={nightRef}
               className="hero-video-bg__media hero-video-bg__media--night"
               src={HERO_VIDEO_NIGHT}
+              autoPlay
               muted
               playsInline
               loop
