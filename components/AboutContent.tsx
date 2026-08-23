@@ -6,6 +6,7 @@ import PageTitle from "@/components/PageTitle";
 import ProfileLinks from "@/components/ProfileLinks";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
+import { scrollToSection } from "@/lib/nav";
 import { DiAws } from "react-icons/di";
 import { FaBrain } from "react-icons/fa";
 import {
@@ -81,8 +82,7 @@ export default function AboutContent() {
                   aria-label={researchCta}
                   onClick={(event) => {
                     event.preventDefault();
-                    document.getElementById("research")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                    history.replaceState(null, "", "#research");
+                    scrollToSection("research");
                   }}
                 >
                   <span>{researchCta}</span>

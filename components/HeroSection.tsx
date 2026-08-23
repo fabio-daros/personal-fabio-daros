@@ -3,12 +3,15 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { useTheme, type Theme } from "@/context/ThemeContext";
 import { translations } from "@/lib/translations";
 
 const USE_STATIC_HERO = false;
 
 const HERO_IMAGE_SRC = "/assets/img/hero-clouds.jpg";
-const HERO_VIDEO_SRC = "/assets/video/hero-test.mp4?v=loop1-smooth074";
+const HERO_VIDEO_DAY = "/assets/video/hero-day.mp4?v=smooth074";
+const HERO_VIDEO_NIGHT = "/assets/video/hero-night.mp4?v=smooth074";
+const THEME_CROSSFADE_MS = 5000;
 
 function prepareVideo(video: HTMLVideoElement) {
   video.defaultMuted = true;
@@ -34,6 +37,24 @@ function tryPlay(video: HTMLVideoElement) {
   const playPromise = video.play();
   if (playPromise) {
     playPromise.catch(() => {});
+  }
+}
+
+function videoForTheme(theme: Theme, day: HTMLVideoElement, night: HTMLVideoElement) {
+  return theme === "light" ? day : night;
+}
+
+function syncPlayback(from: HTMLVideoElement, to: HTMLVideoElement) {
+  const fromDuration = from.duration;
+  const toDuration = to.duration;
+  if (!Number.isFinite(fromDuration) || !Number.isFinite(toDuration) || fromDuration <= 0 || toDuration <= 0) {
+    return;
+  }
+  const progress = from.currentTime / fromDuration;
+  try {
+    to.currentTime = progress * toDuration;
+  } catch {
+    // Ignore seek errors while metadata is still settling.
   }
 }
 
@@ -63,10 +84,13 @@ export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const heroBgRef = useRef<HTMLDivElement>(null);
   const typedRef = useRef<HTMLSpanElement>(null);
-  const primaryRef = useRef<HTMLVideoElement>(null);
+  const dayRef = useRef<HTMLVideoElement>(null);
+  const nightRef = useRef<HTMLVideoElement>(null);
+  const activeThemeRef = useRef<Theme>("dark");
   const [typedArmed, setTypedArmed] = useState(false);
   const [entranceKey, setEntranceKey] = useState(0);
   const { locale } = useLanguage();
+  const { theme, mounted } = useTheme();
   const typedStrings = translations[locale].hero.typed;
 
   useEffect(() => {
@@ -117,17 +141,78 @@ export default function HeroSection() {
   useEffect(() => {
     if (USE_STATIC_HERO) return;
 
-    const video = primaryRef.current;
-    if (!video) return;
+    const day = dayRef.current;
+    const night = nightRef.current;
+    if (!day || !night) return;
 
-    prepareVideo(video);
+    prepareVideo(day);
+    prepareVideo(night);
+
+    const initialTheme =
+      (document.documentElement.getAttribute("data-theme") as Theme | null) === "light"
+        ? "light"
+        : "dark";
+    activeThemeRef.current = initialTheme;
 
     let revealed = false;
     let disposed = false;
+    let fading = false;
+    let pauseTimeout = 0;
 
-    const revealWhenLive = () => {
-      video.classList.add("is-playing", "is-front");
-      video.classList.remove("is-back");
+    const showInstant = (active: HTMLVideoElement, inactive: HTMLVideoElement) => {
+      fading = false;
+      window.clearTimeout(pauseTimeout);
+
+      active.style.transition = "none";
+      inactive.style.transition = "none";
+      active.style.opacity = "1";
+      inactive.style.opacity = "0";
+      active.style.zIndex = "3";
+      inactive.style.zIndex = "2";
+      active.classList.add("is-playing", "is-active");
+      inactive.classList.add("is-playing");
+      inactive.classList.remove("is-active");
+      tryPlay(active);
+      inactive.pause();
+    };
+
+    const crossfadeTo = (incoming: HTMLVideoElement, outgoing: HTMLVideoElement) => {
+      fading = true;
+      window.clearTimeout(pauseTimeout);
+
+      syncPlayback(outgoing, incoming);
+      tryPlay(incoming);
+      tryPlay(outgoing);
+
+      incoming.style.transition = "none";
+      outgoing.style.transition = "none";
+      incoming.style.opacity = "0";
+      outgoing.style.opacity = "1";
+      incoming.style.zIndex = "3";
+      outgoing.style.zIndex = "2";
+      incoming.classList.add("is-playing", "is-active");
+      outgoing.classList.add("is-playing");
+      outgoing.classList.remove("is-active");
+
+      // Force style flush so the long opacity transition always starts from 0 → 1 / 1 → 0.
+      void incoming.offsetWidth;
+
+      const duration = `${THEME_CROSSFADE_MS}ms`;
+      incoming.style.transition = `opacity ${duration} ease-in-out`;
+      outgoing.style.transition = `opacity ${duration} ease-in-out`;
+      incoming.style.opacity = "1";
+      outgoing.style.opacity = "0";
+
+      pauseTimeout = window.setTimeout(() => {
+        if (disposed) return;
+        fading = false;
+        if (videoForTheme(activeThemeRef.current, day, night) !== incoming) return;
+        outgoing.pause();
+        outgoing.style.transition = "none";
+      }, THEME_CROSSFADE_MS + 120);
+    };
+
+    const revealWhenLive = (video: HTMLVideoElement) => {
       if (revealed || disposed) return;
       if (video.paused || video.ended) return;
 
@@ -149,44 +234,117 @@ export default function HeroSection() {
       window.setTimeout(goLive, 50);
     };
 
-    const onReady = () => {
-      if (!disposed) tryPlay(video);
+    const applyTheme = (nextTheme: Theme, { animate }: { animate: boolean }) => {
+      if (disposed) return;
+
+      const incoming = videoForTheme(nextTheme, day, night);
+      const outgoing = incoming === day ? night : day;
+      const previousTheme = activeThemeRef.current;
+
+      if (previousTheme === nextTheme) {
+        if (!fading) showInstant(incoming, outgoing);
+        return;
+      }
+
+      activeThemeRef.current = nextTheme;
+
+      if (!animate) {
+        showInstant(incoming, outgoing);
+        return;
+      }
+
+      crossfadeTo(incoming, outgoing);
     };
 
-    const onPlaying = () => {
-      revealWhenLive();
+    const onReady = () => {
+      if (disposed || fading) return;
+      const active = videoForTheme(activeThemeRef.current, day, night);
+      const inactive = active === day ? night : day;
+      showInstant(active, inactive);
+    };
+
+    const onPlaying = (event: Event) => {
+      revealWhenLive(event.currentTarget as HTMLVideoElement);
     };
 
     const onVisibility = () => {
-      if (document.visibilityState === "visible") tryPlay(video);
+      if (document.visibilityState !== "visible") return;
+      const active = videoForTheme(activeThemeRef.current, day, night);
+      tryPlay(active);
     };
 
-    video.addEventListener("loadeddata", onReady);
-    video.addEventListener("canplay", onReady);
-    video.addEventListener("playing", onPlaying);
+    day.addEventListener("loadeddata", onReady);
+    night.addEventListener("loadeddata", onReady);
+    day.addEventListener("canplay", onReady);
+    night.addEventListener("canplay", onReady);
+    day.addEventListener("playing", onPlaying);
+    night.addEventListener("playing", onPlaying);
     document.addEventListener("visibilitychange", onVisibility);
 
     const unlockPlayback = () => {
-      tryPlay(video);
+      tryPlay(videoForTheme(activeThemeRef.current, day, night));
       document.removeEventListener("touchstart", unlockPlayback);
       document.removeEventListener("click", unlockPlayback);
     };
     document.addEventListener("touchstart", unlockPlayback, { once: true, passive: true });
     document.addEventListener("click", unlockPlayback, { once: true });
 
-    tryPlay(video);
+    showInstant(videoForTheme(initialTheme, day, night), initialTheme === "light" ? night : day);
+
+    const onThemeAttribute = () => {
+      const next =
+        (document.documentElement.getAttribute("data-theme") as Theme | null) === "light"
+          ? "light"
+          : "dark";
+      applyTheme(next, { animate: true });
+    };
+
+    const themeObserver = new MutationObserver(onThemeAttribute);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
 
     return () => {
       disposed = true;
-      video.removeEventListener("loadeddata", onReady);
-      video.removeEventListener("canplay", onReady);
-      video.removeEventListener("playing", onPlaying);
+      window.clearTimeout(pauseTimeout);
+      themeObserver.disconnect();
+      day.removeEventListener("loadeddata", onReady);
+      night.removeEventListener("loadeddata", onReady);
+      day.removeEventListener("canplay", onReady);
+      night.removeEventListener("canplay", onReady);
+      day.removeEventListener("playing", onPlaying);
+      night.removeEventListener("playing", onPlaying);
       document.removeEventListener("visibilitychange", onVisibility);
       document.removeEventListener("touchstart", unlockPlayback);
       document.removeEventListener("click", unlockPlayback);
-      video.pause();
+      day.pause();
+      night.pause();
     };
   }, []);
+
+  useEffect(() => {
+    if (USE_STATIC_HERO || !mounted) return;
+
+    const day = dayRef.current;
+    const night = nightRef.current;
+    if (!day || !night) return;
+
+    // Keep ref aligned; MutationObserver drives the animated crossfade.
+    if (activeThemeRef.current === theme) {
+      const active = videoForTheme(theme, day, night);
+      const inactive = active === day ? night : day;
+      if (active.style.opacity !== "1") {
+        active.style.transition = "none";
+        inactive.style.transition = "none";
+        active.style.opacity = "1";
+        inactive.style.opacity = "0";
+        active.classList.add("is-playing", "is-active");
+        inactive.classList.remove("is-active");
+        tryPlay(active);
+      }
+    }
+  }, [theme, mounted]);
 
   useEffect(() => {
     if (!typedArmed || typeof window === "undefined" || !typedRef.current) return;
@@ -248,14 +406,25 @@ export default function HeroSection() {
             fill
             priority
             sizes="100vw"
-            className="hero-video-bg__media hero-video-bg__media--static is-front is-playing"
+            className="hero-video-bg__media hero-video-bg__media--static is-active is-playing"
           />
         ) : (
           <>
             <video
-              ref={primaryRef}
-              className="hero-video-bg__media is-front"
-              src={HERO_VIDEO_SRC}
+              ref={dayRef}
+              className="hero-video-bg__media hero-video-bg__media--day"
+              src={HERO_VIDEO_DAY}
+              muted
+              playsInline
+              loop
+              preload="auto"
+              controls={false}
+              disablePictureInPicture
+            />
+            <video
+              ref={nightRef}
+              className="hero-video-bg__media hero-video-bg__media--night"
+              src={HERO_VIDEO_NIGHT}
               muted
               playsInline
               loop

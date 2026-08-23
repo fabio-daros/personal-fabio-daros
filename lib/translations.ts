@@ -31,6 +31,7 @@ export const translations = {
     contact: {
       title: "Contato",
       getInTouch: "Entre em contato",
+      scrollToTop: "Voltar ao topo",
       location: "Localização",
       callMe: "Vamos conversar",
       emailMe: "Email",
@@ -272,6 +273,7 @@ export const translations = {
     contact: {
       title: "Contact",
       getInTouch: "Get In Touch",
+      scrollToTop: "Back to top",
       location: "Location",
       callMe: "Let's Talk",
       emailMe: "Email Me",

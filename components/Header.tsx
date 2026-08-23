@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, type MouseEvent } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
-import { SITE_SECTIONS, scrollToSection, type SiteSectionId } from "@/lib/nav";
+import { SITE_SECTIONS, getHeaderOffset, scrollToSection, type SiteSectionId } from "@/lib/nav";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
 
@@ -15,7 +15,7 @@ export default function Header() {
 
   useEffect(() => {
     const updateActive = () => {
-      const marker = 96;
+      const marker = getHeaderOffset() + 24;
       let current: SiteSectionId = SITE_SECTIONS[0].id;
 
       for (const { id } of SITE_SECTIONS) {

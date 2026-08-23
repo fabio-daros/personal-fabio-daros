@@ -5,7 +5,7 @@
 }
 
 :root { 
-  --background-color: #000000;
+  --background-color: #1a1a1a;
   --default-color: #fafafa;
   --heading-color: #ffffff;
   --accent-color: #18d26e;
@@ -593,7 +593,7 @@ section,
   color: var(--default-color);
   background-color: var(--background-color);
   padding: 60px 0;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 48px;
   overflow: clip;
 }
 
@@ -601,7 +601,7 @@ section,
 
   section,
   .section {
-    scroll-margin-top: 66px;
+    scroll-margin-top: 44px;
   }
 }
 
