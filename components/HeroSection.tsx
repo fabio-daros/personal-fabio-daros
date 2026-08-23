@@ -248,11 +248,11 @@ export default function HeroSection() {
     };
 
     const revealWhenLive = (video: HTMLVideoElement) => {
-      if (revealed || disposed) return;
-      if (video.paused && video.readyState < 2) return;
+      // Never lift the cover while paused — mobile browsers show a native play button.
+      if (revealed || disposed || video.paused || video.ended) return;
 
       const goLive = () => {
-        if (revealed || disposed) return;
+        if (revealed || disposed || video.paused) return;
         revealed = true;
         heroBgRef.current?.classList.add("is-video-live");
         window.clearInterval(kickInterval);
@@ -262,12 +262,12 @@ export default function HeroSection() {
         requestVideoFrameCallback?: (cb: () => void) => number;
       };
 
-      if (!video.paused && typeof anyVideo.requestVideoFrameCallback === "function") {
+      if (typeof anyVideo.requestVideoFrameCallback === "function") {
         anyVideo.requestVideoFrameCallback(() => goLive());
         return;
       }
 
-      window.setTimeout(goLive, video.paused ? 0 : 50);
+      window.setTimeout(goLive, 50);
     };
 
     const kickActive = () => {
@@ -275,7 +275,7 @@ export default function HeroSection() {
       const active = videoForTheme(activeThemeRef.current, day, night);
       ensureReady(active);
       tryPlay(active);
-      if (!active.paused || active.readyState >= 2) {
+      if (!active.paused) {
         revealWhenLive(active);
       }
     };
@@ -339,7 +339,7 @@ export default function HeroSection() {
 
     const onTimeUpdate = (event: Event) => {
       const video = event.currentTarget as HTMLVideoElement;
-      if (video.currentTime > 0.05) revealWhenLive(video);
+      if (!video.paused && video.currentTime > 0.05) revealWhenLive(video);
     };
 
     const onVisibility = () => {
@@ -511,7 +511,9 @@ export default function HeroSection() {
               loop
               preload="auto"
               controls={false}
+              controlsList="nodownload nofullscreen noremoteplayback"
               disablePictureInPicture
+              disableRemotePlayback
             />
             <video
               ref={nightRef}
@@ -523,7 +525,9 @@ export default function HeroSection() {
               loop
               preload="auto"
               controls={false}
+              controlsList="nodownload nofullscreen noremoteplayback"
               disablePictureInPicture
+              disableRemotePlayback
             />
             <div className="hero-video-bg__cover" />
           </>

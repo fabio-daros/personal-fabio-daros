@@ -854,18 +854,28 @@ html[data-theme="dark"] .research .research-gallery__img {
   will-change: opacity;
   transform: translateZ(0);
   backface-visibility: hidden;
+  /* Hide native mobile play overlays (iOS/Android) */
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .hero-video-bg__media::-webkit-media-controls,
 .hero-video-bg__media::-webkit-media-controls-enclosure,
+.hero-video-bg__media::-webkit-media-controls-panel,
+.hero-video-bg__media::-webkit-media-controls-play-button,
 .hero-video-bg__media::-webkit-media-controls-start-playback-button,
-.hero-video-bg__media::-webkit-media-controls-overlay-play-button {
+.hero-video-bg__media::-webkit-media-controls-overlay-play-button,
+.hero-video-bg__media::-webkit-media-controls-overlay-enclosure {
   display: none !important;
   -webkit-appearance: none !important;
+  appearance: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
   width: 0 !important;
   height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
 }
 
 .hero-video-bg__media.is-playing {
