@@ -37,7 +37,6 @@ html[data-theme="dark"] .night-sky {
 html[data-theme="dark"] section:not(#hero),
 html[data-theme="dark"] .section:not(#hero),
 html[data-theme="dark"] .site-section,
-html[data-theme="dark"] .footer.dark-background,
 html[data-theme="dark"] .page-title {
   background-color: transparent;
 }
@@ -2235,15 +2234,20 @@ html[data-theme="light"] .swipe-nav-dot.active {
 }
 
 html[data-theme="light"] .footer.dark-background {
-  --background-color: #f5f5f5;
+  --background-color: #eeeeee;
   --default-color: #1a1a1a;
   --heading-color: #000000;
   --contrast-color: #ffffff;
-  background-color: #f5f5f5;
+  background-color: #eeeeee;
   border-top: 1px solid color-mix(in srgb, #000 8%, transparent);
 }
 
 html[data-theme="dark"] .footer.dark-background {
+  --background-color: #111111;
+  --default-color: #ffffff;
+  --heading-color: #ffffff;
+  --contrast-color: #ffffff;
+  background-color: #111111;
   border-top: 1px solid color-mix(in srgb, #fff 8%, transparent);
 }
 
