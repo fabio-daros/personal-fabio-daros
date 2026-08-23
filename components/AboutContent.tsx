@@ -97,7 +97,16 @@ export default function AboutContent() {
                 <div className="col-lg-6">
                   <ul>
                     <li><i className="bi bi-chevron-right"></i> <b>{t.whatsapp}:{'\u00A0'}</b><span>+353 83 467 7853</span></li>
-                    <li><i className="bi bi-chevron-right"></i> <b>{t.city}:{'\u00A0'}</b><span>{t.cityValue}</span></li>
+                    <li>
+                      <i className="bi bi-chevron-right"></i>{" "}
+                      <b>{t.city}:{'\u00A0'}</b>
+                      <span>
+                        <span className="resume-flag" aria-hidden>
+                          {t.cityFlag}
+                        </span>
+                        {t.cityValue}
+                      </span>
+                    </li>
                     <li><i className="bi bi-chevron-right"></i> <b>{t.citizenship}:{'\u00A0'}</b><span>{t.citizenshipValue}</span></li>
                   </ul>
                 </div>

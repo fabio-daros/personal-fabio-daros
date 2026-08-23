@@ -321,7 +321,7 @@ body.preloader-released #hero .hero-content__social a:nth-child(5),
   flex-shrink: 0;
 }
 
-.resume .resume-flag {
+.resume-flag {
   margin-right: 0.35em;
   font-style: normal;
 }
