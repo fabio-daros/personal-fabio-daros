@@ -1770,13 +1770,15 @@ body.preloader-released #preloader {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px color-mix(in srgb, #000 28%, transparent);
-  transition: background-color 0.3s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: none;
+  filter: none;
+  transition: background-color 0.3s ease, transform 0.25s ease;
 }
 .floating-action-btn:hover,
 .floating-action-btn:focus-visible {
   background-color: color-mix(in srgb, var(--accent-color), transparent 18%);
   transform: translateY(-2px);
+  box-shadow: none;
   outline: none;
 }
 .floating-action-btn__icon {
