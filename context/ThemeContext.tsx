@@ -18,12 +18,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useLayoutEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-    let initial: Theme;
-    if (stored === "dark" || stored === "light") {
-      initial = stored;
-    } else {
-      initial = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    }
+    // Match site default + boot script: stored theme, otherwise dark (not system).
+    const initial: Theme = stored === "light" || stored === "dark" ? stored : "dark";
     setThemeState(initial);
     document.documentElement.setAttribute("data-theme", initial);
     setMounted(true);

@@ -829,11 +829,15 @@ html[data-theme="dark"] .research .research-gallery__img {
   inset: 0;
   z-index: 10;
   background-color: #020304;
-  background-image: url("/assets/img/hero-clouds.jpg");
+  background-image: url("/assets/img/hero-night-poster.jpg");
   background-size: cover;
   background-position: center;
   opacity: 1;
   transition: opacity 0.5s ease;
+}
+
+html[data-theme="light"] .hero-video-bg__cover {
+  background-image: url("/assets/img/hero-day-poster.jpg");
 }
 
 .hero-video-bg.is-video-live .hero-video-bg__cover {
