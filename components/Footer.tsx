@@ -84,7 +84,7 @@ export default function Footer() {
               </li>
               <li>
                 <span className="footer-contact-label">{contact.location}</span>
-                <span>{footer.locationValue}</span>
+                <span>{contact.locationValue}</span>
               </li>
               <li>
                 <a

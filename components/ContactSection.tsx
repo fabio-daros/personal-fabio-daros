@@ -193,7 +193,7 @@ export default function ContactSection() {
               <i className="icon bi bi-geo-alt flex-shrink-0"></i>
               <div>
                 <h3>{t.location}</h3>
-                <p>Florianópolis, SC, Brazil</p>
+                <p>{t.locationValue}</p>
               </div>
             </div>
           </div>
